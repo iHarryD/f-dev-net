@@ -1,0 +1,93 @@
+.postCardContainer {
+  background: #f4f4f4;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 2rem;
+  width: min(100%, 30rem);
+}
+
+.postingAccountDetailsContainer {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+.profilePicturePreview {
+  aspect-ratio: 1;
+  background: var(--ACCENT-CLR);
+  border-radius: 50%;
+  width: 2rem;
+}
+
+.demoPostPicture {
+  aspect-ratio: 1;
+  background: #000;
+}
+
+.postCaptionContainer {
+  font-weight: 600;
+  max-width: 100%;
+  padding: var(--POST-CARD-TEXT-PADDING);
+}
+
+.latestCommentsPreview {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  opacity: var(--FADED-TEXT-OPACITY);
+  padding: var(--POST-CARD-TEXT-PADDING);
+}
+
+.actionBarCommentInputContainer {
+  background: var(--SECONDARY-BACKGROUND-CLR);
+  border-radius: var(--BORDER-RADIUS);
+  color: var(--SECONDARY-FONT-CLR);
+  padding: 1rem;
+}
+
+.actionBar {
+  display: flex;
+  font-size: 1.5rem;
+  justify-content: space-between;
+  padding-bottom: 0.5rem;
+}
+
+.actionBar button:first-child {
+  margin-inline-end: 1.5rem;
+}
+
+.addCommentInput {
+  background: var(--SECONDARY-BACKGROUND-CLR);
+  color: var(--SECONDARY-FONT-CLR);
+  padding: 0.5rem 0;
+  width: 100%;
+}
+
+.viewAllCommentsButtonContainer {
+  padding: var(--POST-CARD-TEXT-PADDING);
+}
+
+.commentButton {
+  font-size: var(--SMALL-FONT-SIZE);
+  font-weight: 600;
+  padding: 0 0.8rem;
+  text-transform: uppercase;
+}
+
+.commentActionBar {
+  display: flex;
+  gap: 1rem;
+  padding-top: 0.5rem;
+}
+
+.username {
+  display: block;
+  font-size: var(--SMALL-FONT-SIZE);
+  opacity: var(--FADED-TEXT-OPACITY);
+}
+
+.postAge {
+  font-size: var(--SMALL-FONT-SIZE);
+  opacity: var(--FADED-TEXT-OPACITY);
+}
