@@ -35,3 +35,13 @@
   background: var(--PRIMARY-BACKGROUND-CLR);
   color: var(--PRIMARY-FONT-CLR);
 }
+
+.closeIconButton {
+  aspect-ratio: 1;
+  background: var(--RED-CLR);
+  border-radius: 50%;
+  color: #fff;
+  padding: 5px;
+  text-align: center;
+  width: 19px;
+}

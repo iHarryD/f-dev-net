@@ -2,10 +2,10 @@
   background: var(--SECONDARY-BACKGROUND-CLR);
   color: var(--SECONDARY-FONT-CLR);
   display: flex;
+  flex-basis: 30%;
   flex-direction: column;
   gap: 2rem;
   min-height: calc(100vh - var(--NAVBAR-HEIGHT));
   margin-left: auto;
   padding: var(--MEDIUM-PADDING);
-  width: 30vw;
 }

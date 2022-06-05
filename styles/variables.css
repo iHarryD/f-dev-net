@@ -4,6 +4,7 @@
   --PRIMARY-FONT-CLR: #000;
   --SECONDARY-BACKGROUND-CLR: #000;
   --SECONDARY-FONT-CLR: #fff;
+  --RED-CLR: #fd3b3b;
 
   --SMALL-FONT-SIZE: 0.8rem;
   --MEDIUM-FONT-SIZE: 1rem;
@@ -19,6 +20,7 @@
   --INPUT-PADDING: 0.5rem;
   --MIN-PADDING: 0.5rem;
   --MEDIUM-PADDING: 1rem;
+  --LARGE-PADDING: 1.5rem;
   --MIN-GAP: 0.5rem;
   --MEDIUM-GAP: 1rem;
   --LARGE-GAP: 1.5rem;

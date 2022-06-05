@@ -18,11 +18,16 @@ body {
 a,
 button,
 input,
-li {
+li,
+textarea {
   all: unset;
 }
 
 a,
 button {
   cursor: pointer;
+}
+
+img {
+  max-width: 100%;
 }

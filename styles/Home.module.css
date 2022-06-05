@@ -1,0 +1,7 @@
+.main {
+  display: flex;
+}
+
+.homePostsSection {
+  flex-basis: 70%;
+}
