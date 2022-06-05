@@ -5,12 +5,27 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import buttonsStyles from "../../styles/Buttons.module.css";
 import signupFormSecondStepStyles from "./SignupFormSecondStep.module.css";
 import { loginSetterAsProp } from "../../interfaces/Common.interface";
+import { isImage } from "../../helpers/isImage";
 
 export default function SignupFormSecondStep({
   loginSetter,
 }: loginSetterAsProp) {
-  const [lasestUpload, setLasestUpload] = useState<string | null>(null);
+  const [lasestUpload, setLasestUpload] = useState<File | null>(null);
   const profilePictureInputRef = useRef<HTMLInputElement>(null);
+
+  function dropHandlerForDragAndDrop(e: any) {
+    e.preventDefault();
+    if (e.dataTransfer.items) {
+      const file = e.dataTransfer.items[0];
+      if (isImage(file)) {
+        setLasestUpload(file.getAsFile());
+      }
+    }
+  }
+
+  function dragOverHandlerForDragAndDrop(e: any) {
+    e.preventDefault();
+  }
 
   return (
     <div className={signupFormSecondStepStyles.secondStepContainer}>
@@ -18,13 +33,16 @@ export default function SignupFormSecondStep({
         Almost done
       </h2>
       <h3>Set your profile picture</h3>
-      <div
-        className={
-          signupFormSecondStepStyles.dragAndDropProfilePictureContainer
-        }
-      >
+      <div className={signupFormSecondStepStyles.dragAndDropContainer}>
+        <div
+          className={signupFormSecondStepStyles.dropZone}
+          onDrop={(e) => {
+            dropHandlerForDragAndDrop(e);
+          }}
+          onDragOver={(e) => dragOverHandlerForDragAndDrop(e)}
+        ></div>
         {lasestUpload ? (
-          <img src={lasestUpload} />
+          <img src={URL.createObjectURL(lasestUpload)} />
         ) : (
           <div
             className={
@@ -54,12 +72,10 @@ export default function SignupFormSecondStep({
             accept="image/*"
             capture
             className={signupFormSecondStepStyles.profilePictureInput}
-            // onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            //   if (e.target.files === null) return;
-            //   setLasestUpload(
-            //     optimizeImage(e.target.files[e.target.files.length - 1], 200)
-            //   );
-            // }}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              if (e.target.files === null) return;
+              setLasestUpload(e.target.files[e.target.files.length - 1]);
+            }}
           />
           {lasestUpload ? "Change" : "Choose image"}
         </label>
