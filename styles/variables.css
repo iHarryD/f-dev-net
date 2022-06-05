@@ -6,9 +6,20 @@
   --SECONDARY-FONT-CLR: #fff;
 
   --SMALL-FONT-SIZE: 0.8rem;
+  --MEDIUM-FONT-SIZE: 1rem;
+  --LARGE-FONT-SIZE: 1.5rem;
+  --LARGER-FONT-SIZE: 2rem;
   --BORDER-RADIUS: 5px;
 
   --POST-CARD-TEXT-PADDING: 0 5px;
 
   --FADED-TEXT-OPACITY: 0.8;
+
+  --NAVBAR-HEIGHT: 50px;
+  --INPUT-PADDING: 0.5rem;
+  --MIN-PADDING: 0.5rem;
+  --MEDIUM-PADDING: 1rem;
+  --MIN-GAP: 0.5rem;
+  --MEDIUM-GAP: 1rem;
+  --LARGE-GAP: 1.5rem;
 }

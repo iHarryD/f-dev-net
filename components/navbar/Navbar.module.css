@@ -3,6 +3,7 @@
   background: var(--SECONDARY-BACKGROUND-CLR);
   color: var(--SECONDARY-FONT-CLR);
   display: flex;
+  height: var(--NAVBAR-HEIGHT);
   justify-content: space-between;
   padding: 10px 2rem;
 }

@@ -1,5 +1,5 @@
 .textButton {
-  font-size: 0.85em;
+  font-size: var(--SMALL-FONT-SIZE);
 }
 
 .textButton:hover {
@@ -9,6 +9,29 @@
 .primaryButton {
   background: var(--ACCENT-CLR);
   color: var(--PRIMARY-FONT-CLR);
-  border-radius: 5px;
+  border-radius: var(--BORDER-RADIUS);
   padding: 0.5rem 1rem;
+}
+
+.secondaryButton {
+  background: var(--SECONDARY-BACKGROUND-CLR);
+  color: var(--SECONDARY-FONT-CLR);
+  border-radius: var(--BORDER-RADIUS);
+  padding: 0.5rem 1rem;
+}
+
+.iconWithTextButton {
+  align-items: center;
+  background: var(--ACCENT-CLR);
+  border-radius: var(--BORDER-RADIUS);
+  color: var(--PRIMARY-FONT-CLR);
+  display: flex;
+  justify-content: center;
+  gap: var(--MEDIUM-GAP);
+  padding: 0.5rem 1rem;
+}
+
+.resetButton {
+  background: var(--PRIMARY-BACKGROUND-CLR);
+  color: var(--PRIMARY-FONT-CLR);
 }

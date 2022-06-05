@@ -1,0 +1,59 @@
+.userProfileCard {
+  align-items: center;
+  background: #0c0c0c;
+  border-radius: calc(var(--BORDER-RADIUS) + var(--MEDIUM-PADDING));
+  display: flex;
+  flex-direction: column;
+  gap: var(--MEDIUM-GAP);
+  padding: var(--MEDIUM-PADDING);
+  position: relative;
+  width: max(100%, 20rem);
+}
+
+.logoutButton {
+  opacity: 0.7;
+  position: absolute;
+  top: var(--MEDIUM-PADDING);
+  right: var(--MEDIUM-PADDING);
+}
+
+.nameUsernameContainer {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--MIN-GAP);
+}
+
+.profilePicturePreview {
+  aspect-ratio: 1;
+  background: var(--ACCENT-CLR);
+  border-radius: 50%;
+  width: 5rem;
+}
+
+.userStatsContainer {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--MEDIUM-GAP);
+}
+
+.userStatsBox {
+  align-items: center;
+  border-radius: var(--BORDER-RADIUS);
+  display: flex;
+  flex-direction: column;
+}
+
+.statsNumber {
+  font-size: var(--LARGER-FONT-SIZE);
+  font-weight: 600;
+}
+
+.userProfileCard .postButton {
+  font-weight: 600;
+  padding: var(--MIN-PADDING) 0;
+  text-align: center;
+  text-transform: uppercase;
+  width: 100%;
+}

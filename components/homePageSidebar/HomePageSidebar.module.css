@@ -1,0 +1,11 @@
+.homeSidebar {
+  background: var(--SECONDARY-BACKGROUND-CLR);
+  color: var(--SECONDARY-FONT-CLR);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  min-height: calc(100vh - var(--NAVBAR-HEIGHT));
+  margin-left: auto;
+  padding: var(--MEDIUM-PADDING);
+  width: 30vw;
+}

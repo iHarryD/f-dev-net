@@ -1,0 +1,28 @@
+.userProfilePicturePreview {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--ACCENT-CLR);
+  width: 2rem;
+}
+
+.userDetails {
+  align-items: center;
+  display: flex;
+  gap: 1ch;
+}
+
+.trendingText {
+  position: relative;
+}
+
+.trendingText::before {
+  content: "#";
+  opacity: var(--FADED-TEXT-OPACITY);
+  position: absolute;
+  left: -2ch;
+}
+
+.followButton {
+  background: var(--PRIMARY-BACKGROUND-CLR);
+  color: var(--PRIMARY-FONT-CLR);
+}
