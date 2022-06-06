@@ -1,5 +1,6 @@
 import createPostStyles from "./CreatePost.module.css";
 import buttonsStyles from "../../styles/Buttons.module.css";
+import commonStyles from "../../styles/Common.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImage, faSmile } from "@fortawesome/free-regular-svg-icons";
 import { faClose, faUserTag } from "@fortawesome/free-solid-svg-icons";
@@ -35,7 +36,9 @@ export default function CreatePost() {
         </span>
       </div>
       <div className={createPostStyles.postCategoryDropdownContainer}>
-        <select>
+        <select
+          className={`${commonStyles.styledDropdown} ${createPostStyles.postCategoryDropdown}`}
+        >
           <option value="general">General</option>
           <option value="query">Query</option>
         </select>

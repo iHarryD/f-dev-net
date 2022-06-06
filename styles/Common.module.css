@@ -48,3 +48,9 @@
   gap: var(--MEDIUM-GAP);
   margin-top: 3rem;
 }
+
+.styledDropdown {
+  border-radius: var(--BORDER-RADIUS);
+  font-size: var(--SMALL-FONT-SIZE);
+  padding: 5px 10px;
+}

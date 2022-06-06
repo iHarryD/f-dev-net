@@ -19,7 +19,8 @@ a,
 button,
 input,
 li,
-textarea {
+textarea,
+select {
   all: unset;
 }
 
@@ -30,4 +31,22 @@ button {
 
 img {
   max-width: 100%;
+}
+
+::-webkit-scrollbar {
+  opacity: 0;
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(10, 10, 10);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(66, 66, 66);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(37, 37, 37);
 }

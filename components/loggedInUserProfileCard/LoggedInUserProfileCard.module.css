@@ -5,9 +5,10 @@
   display: flex;
   flex-direction: column;
   gap: var(--MEDIUM-GAP);
+  margin: auto;
   padding: var(--MEDIUM-PADDING);
   position: relative;
-  width: max(100%, 20rem);
+  width: min(100%, 20rem);
 }
 
 .logoutButton {
@@ -48,12 +49,4 @@
 .statsNumber {
   font-size: var(--LARGER-FONT-SIZE);
   font-weight: 600;
-}
-
-.userProfileCard .postButton {
-  font-weight: 600;
-  padding: var(--MIN-PADDING) 0;
-  text-align: center;
-  text-transform: uppercase;
-  width: 100%;
 }

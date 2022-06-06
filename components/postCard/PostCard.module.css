@@ -1,16 +1,13 @@
 .postCardContainer {
-  background: #f4f4f4;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 2rem;
-  width: min(100%, 30rem);
+  margin: 2rem 0;
+  width: min(100%, 35rem);
 }
 
 .postingAccountDetailsContainer {
   align-items: center;
   display: flex;
-  gap: 10px;
+  gap: var(--MIN-GAP);
+  margin-bottom: 1rem;
 }
 
 .profilePicturePreview {
@@ -22,35 +19,35 @@
 
 .demoPostPicture {
   aspect-ratio: 1;
-  background: #000;
+  background: rgb(255, 133, 133);
 }
 
-.postCaptionContainer {
+.postWrittenTextContainer {
   font-weight: 600;
+  line-height: 1.5;
   max-width: 100%;
-  padding: var(--POST-CARD-TEXT-PADDING);
 }
 
 .latestCommentsPreview {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: var(--MIN-GAP);
   opacity: var(--FADED-TEXT-OPACITY);
-  padding: var(--POST-CARD-TEXT-PADDING);
 }
 
-.actionBarCommentInputContainer {
+.postTextContentContainer {
   background: var(--SECONDARY-BACKGROUND-CLR);
-  border-radius: var(--BORDER-RADIUS);
   color: var(--SECONDARY-FONT-CLR);
-  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--MEDIUM-GAP);
+  padding: var(--MEDIUM-PADDING);
 }
 
 .actionBar {
   display: flex;
-  font-size: 1.5rem;
+  font-size: var(--LARGE-FONT-SIZE);
   justify-content: space-between;
-  padding-bottom: 0.5rem;
 }
 
 .actionBar button:first-child {
@@ -64,10 +61,6 @@
   width: 100%;
 }
 
-.viewAllCommentsButtonContainer {
-  padding: var(--POST-CARD-TEXT-PADDING);
-}
-
 .commentButton {
   font-size: var(--SMALL-FONT-SIZE);
   font-weight: 600;
@@ -77,14 +70,7 @@
 
 .commentActionBar {
   display: flex;
-  gap: 1rem;
-  padding-top: 0.5rem;
-}
-
-.username {
-  display: block;
-  font-size: var(--SMALL-FONT-SIZE);
-  opacity: var(--FADED-TEXT-OPACITY);
+  gap: (--MEDIUM-GAP);
 }
 
 .postAge {

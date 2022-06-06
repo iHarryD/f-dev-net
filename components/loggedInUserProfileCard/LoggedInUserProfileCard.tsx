@@ -38,11 +38,6 @@ export default function LoggedInUserProfileCard({
           connections
         </div>
       </div>
-      <button
-        className={`${buttonsStyles.primaryButton} ${loggedInUserProfileCardStyles.postButton}`}
-      >
-        Post
-      </button>
     </div>
   );
 }

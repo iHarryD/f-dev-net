@@ -2,10 +2,16 @@
   background: var(--SECONDARY-BACKGROUND-CLR);
   color: var(--SECONDARY-FONT-CLR);
   display: flex;
-  flex-basis: 30%;
   flex-direction: column;
   gap: 2rem;
   min-height: calc(100vh - var(--NAVBAR-HEIGHT));
-  margin-left: auto;
+  margin-right: auto;
+  overflow-y: auto;
   padding: var(--MEDIUM-PADDING);
+  padding-top: calc(var(--NAVBAR-HEIGHT) + var(--MEDIUM-PADDING));
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: min(30%, 25rem);
 }

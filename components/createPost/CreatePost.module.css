@@ -1,7 +1,6 @@
 .createPostContainer {
   background: #f0f8ff;
   border-radius: calc(var(--BORDER-RADIUS) + var(--MEDIUM-PADDING));
-  margin: 5rem; /* REMOVE THIS */
   padding: var(--MEDIUM-PADDING) var(--LARGE-PADDING);
   width: min(100%, 35rem);
 }
@@ -107,4 +106,8 @@
 
 .postCategoryDropdownContainer {
   margin-bottom: 0.5rem;
+}
+
+.postCategoryDropdown {
+  background: #e0e7ee;
 }

@@ -3,5 +3,11 @@
 }
 
 .homePostsSection {
+  align-items: center;
+  display: flex;
   flex-basis: 70%;
+  flex-direction: column;
+  margin-left: auto;
+  margin-top: var(--NAVBAR-HEIGHT);
+  padding: 1rem;
 }
