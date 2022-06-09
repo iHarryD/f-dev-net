@@ -1,0 +1,57 @@
+.secondStepContainer {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--LARGE-GAP);
+  margin: auto 0;
+}
+
+.secondStepHeading {
+  margin-bottom: 2rem;
+}
+
+.dragAndDropContainer {
+  align-items: center;
+  aspect-ratio: 1;
+  border: 2px dashed currentColor;
+  border-radius: 50%;
+  display: flex;
+  font-size: clamp(2rem, 2vw + 1rem, 3rem);
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  text-align: center;
+  width: min(60%, 15rem);
+}
+
+.dropZone {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.dragAndDropProfilePictureInner {
+  opacity: 0.5;
+  padding: var(--MEDIUM-PADDING);
+  pointer-events: none;
+}
+
+.dragAndDropProfilePictureText {
+  font-size: clamp(
+    0.5rem,
+    1vw + var(--SMALL-FONT-SIZE),
+    var(--MEDIUM-FONT-SIZE)
+  );
+}
+
+.profilePictureLabel {
+  text-decoration: underline;
+}
+
+.profilePictureInput {
+  opacity: 0;
+  position: absolute;
+  right: 200vw;
+}

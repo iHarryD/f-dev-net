@@ -1,0 +1,23 @@
+.navbar {
+  align-items: center;
+  background: var(--SECONDARY-BACKGROUND-CLR);
+  color: var(--SECONDARY-FONT-CLR);
+  display: flex;
+  height: var(--NAVBAR-HEIGHT);
+  justify-content: space-between;
+  padding: var(--MIN-PADDING) var(--LARGE-PADDING);
+}
+
+.searchBar {
+  background: var(--DARK-GREY-CLR);
+  border-radius: var(--BORDER-RADIUS);
+  font-size: var(--SMALL-FONT-SIZE);
+  padding: var(--MIN-PADDING);
+  width: 20rem;
+}
+
+.buttonContainer {
+  display: flex;
+  font-size: 1.3rem;
+  gap: 3rem;
+}

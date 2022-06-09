@@ -1,0 +1,89 @@
+.postCardContainer {
+  box-shadow: 0px 0px 10px #0002;
+  margin: 2rem 0;
+  padding: var(--MEDIUM-PADDING);
+  width: min(100%, 35rem);
+}
+
+.postingAccountDetailsContainer {
+  align-items: center;
+  display: flex;
+  gap: var(--MIN-GAP);
+  margin-bottom: 1rem;
+}
+
+.profilePicturePreview {
+  aspect-ratio: 1;
+  background: var(--ACCENT-CLR);
+  border-radius: 50%;
+  width: 2rem;
+}
+
+.demoPostPicture {
+  aspect-ratio: 1;
+  background: rgb(255, 133, 133);
+}
+
+.postWrittenTextContainer {
+  font-weight: 600;
+  line-height: 1.5;
+  max-width: 100%;
+}
+
+.latestCommentsPreviewContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--MIN-GAP);
+  opacity: var(--FADED-TEXT-OPACITY);
+}
+
+.latestCommentPreview {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  -moz-box-orient: vertical;
+}
+
+.postTextContentContainer {
+  background: var(--SECONDARY-BACKGROUND-CLR);
+  color: var(--SECONDARY-FONT-CLR);
+  display: flex;
+  flex-direction: column;
+  gap: var(--MEDIUM-GAP);
+  padding: var(--MEDIUM-PADDING);
+}
+
+.actionBar {
+  display: flex;
+  font-size: var(--LARGE-FONT-SIZE);
+  justify-content: space-between;
+}
+
+.actionBar button:first-child {
+  margin-inline-end: 1.5rem;
+}
+
+.addCommentInput {
+  background: var(--SECONDARY-BACKGROUND-CLR);
+  color: var(--SECONDARY-FONT-CLR);
+  padding: 0.5rem 0;
+  width: 100%;
+}
+
+.commentButton {
+  font-size: var(--SMALL-FONT-SIZE);
+  font-weight: 600;
+  padding: 0 0.8rem;
+  text-transform: uppercase;
+}
+
+.commentActionBar {
+  display: flex;
+  gap: (--MEDIUM-GAP);
+}
+
+.postAge {
+  font-size: var(--SMALL-FONT-SIZE);
+  opacity: var(--FADED-TEXT-OPACITY);
+}

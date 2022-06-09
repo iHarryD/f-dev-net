@@ -1,0 +1,32 @@
+:root {
+  --ACCENT-CLR: #4df7ff;
+  --PRIMARY-BACKGROUND-CLR: #fff;
+  --PRIMARY-FONT-CLR: #000;
+  --SECONDARY-BACKGROUND-CLR: #000;
+  --SECONDARY-FONT-CLR: #fff;
+  --RED-CLR: #fd3b3b;
+  --DARK-GREY-CLR: #0c0c0c;
+
+  --SMALL-FONT-SIZE: 0.8rem;
+  --MEDIUM-FONT-SIZE: 1rem;
+  --LARGE-FONT-SIZE: clamp(1.2rem, 1vw + 1rem, 1.5rem);
+  --LARGER-FONT-SIZE: 2rem;
+  --BORDER-RADIUS: 5px;
+
+  --POST-CARD-TEXT-PADDING: 0 5px;
+
+  --FADED-TEXT-OPACITY: 0.8;
+
+  --MIN-SPACING: 0.5rem;
+  --MEDIUM-SPACING: clamp(0.7rem, 1vw + 0.3rem, 1rem);
+
+  --NAVBAR-HEIGHT: 50px;
+  --INPUT-PADDING: 0.5rem;
+  --MIN-PADDING: var(--MIN-SPACING);
+  --MEDIUM-PADDING: var(--MEDIUM-SPACING);
+  --LARGE-PADDING: 1.5rem;
+  --MIN-GAP: var(--MIN-SPACING);
+  --MEDIUM-GAP: var(--MEDIUM-SPACING);
+  --LARGE-GAP: 1.5rem;
+  --HOME-SIDEBARS-WIDTH: min(25%, 25rem);
+}

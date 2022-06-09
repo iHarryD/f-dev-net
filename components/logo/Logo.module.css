@@ -1,0 +1,28 @@
+.logoContainer {
+  color: var(--ACCENT-CLR);
+  display: flex;
+  font-family: "Share Tech Mono", monospace;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  width: 7ch;
+}
+
+.typingIndicator {
+  animation: blink 500ms linear infinite;
+  background: currentColor;
+  display: inline-block;
+  height: 1.5rem;
+  margin-inline-start: 2px;
+  width: 5px;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}

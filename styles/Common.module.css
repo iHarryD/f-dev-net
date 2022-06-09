@@ -1,0 +1,55 @@
+.username {
+  font-weight: 600;
+  opacity: var(--FADED-TEXT-OPACITY);
+  text-transform: lowercase;
+}
+
+.authInput {
+  border-bottom: 1px solid currentColor;
+  padding: var(--INPUT-PADDING);
+  width: -webkit-fill-available;
+}
+
+.authInput::placeholder {
+  color: currentColor;
+}
+
+.animatedInputLabelContainer {
+  margin-top: 1rem;
+  position: relative;
+}
+
+.animatedLabel {
+  pointer-events: none;
+  position: absolute;
+  top: var(--INPUT-PADDING);
+  left: var(--INPUT-PADDING);
+  transition: all 150ms;
+}
+
+.animatedLabel.labelIsAnimated {
+  color: var(--ACCENT-CLR);
+  top: 0;
+  transform: translateY(-100%) scale(0.9);
+}
+
+.authBoxContainer {
+  margin: auto;
+}
+
+.authBoxContainer button {
+  text-align: center;
+}
+
+.otherAuthOptionsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--MEDIUM-GAP);
+  margin-top: 3rem;
+}
+
+.styledDropdown {
+  border-radius: var(--BORDER-RADIUS);
+  font-size: var(--SMALL-FONT-SIZE);
+  padding: 5px 10px;
+}

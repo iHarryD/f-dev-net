@@ -1,0 +1,28 @@
+.homeNavbar {
+  background: var(--SECONDARY-BACKGROUND-CLR);
+  color: var(--SECONDARY-FONT-CLR);
+  padding: var(--MEDIUM-PADDING);
+  position: fixed;
+  top: var(--NAVBAR-HEIGHT);
+  right: 0;
+  bottom: 0;
+  width: var(--HOME-SIDEBARS-WIDTH);
+}
+
+.homeNavbarNavItemsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--MIN-GAP);
+}
+
+.homeNavbarButton {
+  align-items: center;
+  display: flex;
+  gap: var(--MEDIUM-GAP);
+  padding: var(--MIN-PADDING) var(--MEDIUM-PADDING);
+}
+
+.navbarButtonIconContainer {
+  text-align: center;
+  width: 1rem;
+}

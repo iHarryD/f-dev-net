@@ -1,0 +1,47 @@
+.textButton {
+  font-size: var(--SMALL-FONT-SIZE);
+}
+
+.textButton:hover {
+  text-decoration: underline;
+}
+
+.primaryButton {
+  background: var(--ACCENT-CLR);
+  color: var(--PRIMARY-FONT-CLR);
+  border-radius: var(--BORDER-RADIUS);
+  padding: 0.5rem 1rem;
+}
+
+.secondaryButton {
+  background: var(--SECONDARY-BACKGROUND-CLR);
+  color: var(--SECONDARY-FONT-CLR);
+  border-radius: var(--BORDER-RADIUS);
+  padding: 0.5rem 1rem;
+}
+
+.iconWithTextButton {
+  align-items: center;
+  background: var(--ACCENT-CLR);
+  border-radius: var(--BORDER-RADIUS);
+  color: var(--PRIMARY-FONT-CLR);
+  display: flex;
+  justify-content: center;
+  gap: var(--MEDIUM-GAP);
+  padding: 0.5rem 1rem;
+}
+
+.resetButton {
+  background: var(--PRIMARY-BACKGROUND-CLR);
+  color: var(--PRIMARY-FONT-CLR);
+}
+
+.closeIconButton {
+  aspect-ratio: 1;
+  background: var(--RED-CLR);
+  border-radius: 50%;
+  color: #fff;
+  padding: 5px;
+  text-align: center;
+  width: 19px;
+}

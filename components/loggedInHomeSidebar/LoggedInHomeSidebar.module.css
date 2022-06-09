@@ -1,0 +1,15 @@
+.listContainer {
+  margin: 0.5rem 0;
+}
+
+.trendingTagsListContainer .sidebarListItems {
+  padding: var(--MEDIUM-PADDING) var(--MEDIUM-PADDING) 0
+    calc(var(--MEDIUM-PADDING) + 2ch);
+}
+
+.sidebarListItems {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding: var(--MEDIUM-PADDING) var(--MEDIUM-PADDING) 0;
+}

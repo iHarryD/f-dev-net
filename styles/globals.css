@@ -1,16 +1,53 @@
-html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-}
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap");
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--PRIMARY-BACKGROUND-CLR);
+  color: var(--PRIMARY-FONT-CLR);
+  font-family: "Inter", sans-serif;
+  padding-top: var(--NAVBAR-HEIGHT);
+}
+
+a,
+button,
+input,
+li,
+textarea,
+select {
+  all: unset;
+}
+
+a,
+button {
+  cursor: pointer;
+}
+
+img {
+  max-width: 100%;
+}
+
+::-webkit-scrollbar {
+  opacity: 0;
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgb(10, 10, 10);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(66, 66, 66);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(37, 37, 37);
 }
