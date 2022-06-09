@@ -1,0 +1,82 @@
+.profileSection {
+  align-items: center;
+  border-bottom: 1px solid var(--LIGHT-GREY-CLR);
+  display: flex;
+  flex-direction: column;
+  gap: var(--LARGE-GAP);
+  padding: var(--MEDIUM-PADDING) 0;
+}
+
+.profileSectionUpper {
+  display: flex;
+  gap: 2.5rem;
+  justify-content: center;
+}
+
+.profilePictureUsernameContainer {
+  align-self: center;
+}
+
+.profilePicture {
+  aspect-ratio: 1;
+  background: var(--ACCENT-CLR);
+  border-radius: 50%;
+  width: 10rem;
+}
+
+.username {
+  font-weight: 600;
+  margin-top: var(--MIN-SPACING);
+  text-align: center;
+}
+
+.nameBioInputContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--MEDIUM-GAP);
+}
+
+.profileUpdatingInputContainer {
+  margin-top: var(--LARGE-GAP);
+  position: relative;
+}
+
+.profileUpdatingInputContainer label {
+  position: absolute;
+  left: var(--INPUT-PADDING);
+  transform: translateY(calc(-100% - 3px));
+}
+
+.profileUpdatingInput {
+  background: var(--LIGHT-GREY-CLR);
+  border: 2px solid #0000;
+  border-radius: var(--BORDER-RADIUS);
+  padding: var(--INPUT-PADDING);
+}
+
+textarea.profileUpdatingInput {
+  width: 20rem;
+  height: 5rem;
+}
+
+.profileUpdatingInput:focus-within {
+  border-color: var(--ACCENT-CLR);
+}
+
+.userStatsContainer {
+  display: flex;
+  font-weight: 600;
+  gap: var(--LARGE-GAP);
+  text-transform: uppercase;
+}
+
+.profileSectionButtonContainer {
+  align-items: flex-end;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.shareProfileButton {
+  font-size: var(--LARGE-FONT-SIZE);
+}

@@ -3,8 +3,3 @@
   height: calc(100vh - var(--NAVBAR-HEIGHT));
   overflow: hidden;
 }
-
-.divider {
-  background: var(--LIGHT-GREY-CLR);
-  width: 1px;
-}

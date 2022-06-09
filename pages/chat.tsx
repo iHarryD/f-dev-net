@@ -6,7 +6,6 @@ export default function Chat() {
   return (
     <main className={chatStyles.chatPageMain}>
       <AllChats />
-      <div className={chatStyles.divider}></div>
       <ChatScreen />
     </main>
   );
