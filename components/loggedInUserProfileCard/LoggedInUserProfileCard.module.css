@@ -1,6 +1,6 @@
 .userProfileCard {
   align-items: center;
-  background: #0c0c0c;
+  background: var(--DARK-GREY-CLR);
   border-radius: calc(var(--BORDER-RADIUS) + var(--MEDIUM-PADDING));
   display: flex;
   flex-direction: column;
@@ -44,6 +44,7 @@
   border-radius: var(--BORDER-RADIUS);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .statsNumber {

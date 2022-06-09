@@ -1,6 +1,5 @@
 import loggedInUserProfileCardStyles from "./LoggedInUserProfileCard.module.css";
 import commonStyles from "../../styles/Common.module.css";
-import buttonsStyles from "../../styles/Buttons.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import { loginSetterAsProp } from "../../interfaces/Common.interface";
@@ -35,7 +34,7 @@ export default function LoggedInUserProfileCard({
         </div>
         <div className={loggedInUserProfileCardStyles.userStatsBox}>
           <span className={loggedInUserProfileCardStyles.statsNumber}>50</span>
-          connections
+          <span>connections</span>
         </div>
       </div>
     </div>

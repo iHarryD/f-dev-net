@@ -1,10 +1,9 @@
 import sidebarSuggestionItemsStyles from "./SidebarSuggestionItems.module.css";
-import commonStyles from "../../styles/Common.module.css";
 import buttonsStyles from "../../styles/Buttons.module.css";
 import { TagSuggestionProps } from "../../interfaces/SidebarTagSuggestion.interface";
 import { UserSuggestionProps } from "../../interfaces/SidebarUserSuggestion.interface";
 
-export function SidebarUserSuggestion({ name, username }: UserSuggestionProps) {
+export function SidebarUserSuggestion({ name }: UserSuggestionProps) {
   return (
     <>
       <div className={sidebarSuggestionItemsStyles.userDetails}>
@@ -13,11 +12,10 @@ export function SidebarUserSuggestion({ name, username }: UserSuggestionProps) {
         ></div>
         <div>
           <span>{name}</span>
-          <span className={commonStyles.username}>@{username}</span>
         </div>
       </div>
       <button
-        className={`${buttonsStyles.secondaryButton} ${sidebarSuggestionItemsStyles.followButton}`}
+        className={`${buttonsStyles.textButton} ${sidebarSuggestionItemsStyles.followButton}`}
       >
         Follow
       </button>
@@ -30,7 +28,7 @@ export function SidebarTagSuggestion({ tag }: TagSuggestionProps) {
     <>
       <span className={sidebarSuggestionItemsStyles.trendingText}>{tag}</span>
       <button
-        className={`${buttonsStyles.secondaryButton} ${sidebarSuggestionItemsStyles.followButton}`}
+        className={`${buttonsStyles.textButton} ${sidebarSuggestionItemsStyles.followButton}`}
       >
         Follow
       </button>

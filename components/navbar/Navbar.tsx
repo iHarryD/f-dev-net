@@ -1,7 +1,7 @@
 import navbarStyles from "./Navbar.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell, faMessage } from "@fortawesome/free-regular-svg-icons";
-import { faGear } from "@fortawesome/free-solid-svg-icons";
+import { faGear, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import Logo from "../logo/Logo";
 
 export function MacroNavbar() {
@@ -21,13 +21,13 @@ export function MacroNavbar() {
           </button>
         </li>
         <li>
-          <button title="Messages">
-            <FontAwesomeIcon icon={faMessage} />
+          <button title="Settings">
+            <FontAwesomeIcon icon={faGear} />
           </button>
         </li>
         <li>
-          <button title="Settings">
-            <FontAwesomeIcon icon={faGear} />
+          <button title="Log out">
+            <FontAwesomeIcon icon={faRightFromBracket} />
           </button>
         </li>
       </ul>

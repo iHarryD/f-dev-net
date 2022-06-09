@@ -23,6 +23,5 @@
 }
 
 .followButton {
-  background: var(--PRIMARY-BACKGROUND-CLR);
-  color: var(--PRIMARY-FONT-CLR);
+  color: var(--ACCENT-CLR);
 }

@@ -13,7 +13,7 @@ export default function LoggedInHomeSidebar({
     <>
       <LoggedInUserProfileCard loginSetter={loginSetter} />
       <div>
-        <h3>Top trends for you</h3>
+        <h3>Top tags for you</h3>
         <ul
           className={`${loggedInHomeSidebarStyles.listContainer} ${loggedInHomeSidebarStyles.trendingTagsListContainer}`}
         >
@@ -27,15 +27,13 @@ export default function LoggedInHomeSidebar({
       <div>
         <h3>Users you may know</h3>
         <ul className={loggedInHomeSidebarStyles.listContainer}>
-          {[
-            { name: "Harry", username: "Harry910" },
-            { name: "Harry", username: "Harry910" },
-            { name: "Harry", username: "Harry910" },
-          ].map(({ name, username }) => (
-            <li className={loggedInHomeSidebarStyles.sidebarListItems}>
-              <SidebarUserSuggestion name={name} username={username} />
-            </li>
-          ))}
+          {[{ name: "Harry" }, { name: "Harry" }, { name: "Harry" }].map(
+            ({ name }) => (
+              <li className={loggedInHomeSidebarStyles.sidebarListItems}>
+                <SidebarUserSuggestion name={name} />
+              </li>
+            )
+          )}
         </ul>
       </div>
     </>

@@ -8,10 +8,9 @@
   margin-right: auto;
   overflow-y: auto;
   padding: var(--MEDIUM-PADDING);
-  padding-top: calc(var(--NAVBAR-HEIGHT) + var(--MEDIUM-PADDING));
   position: fixed;
-  top: 0;
+  top: var(--NAVBAR-HEIGHT);
   left: 0;
   bottom: 0;
-  width: min(30%, 25rem);
+  width: var(--HOME-SIDEBARS-WIDTH);
 }

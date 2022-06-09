@@ -1,5 +1,6 @@
 import Head from "next/head";
 import CreatePost from "../components/createPost/CreatePost";
+import HomePageNavbar from "../components/homePageNavbar/HomePageNavbar";
 import HomePageSidebar from "../components/homePageSidebar/HomePageSidebar";
 import PostCard from "../components/postCard/PostCard";
 import homeStyles from "../styles/Home.module.css";
@@ -18,6 +19,7 @@ export default function Home() {
           <PostCard />
         ))}
       </div>
+      <HomePageNavbar />
     </main>
   );
 }

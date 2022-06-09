@@ -5,14 +5,14 @@
   display: flex;
   height: var(--NAVBAR-HEIGHT);
   justify-content: space-between;
-  padding: 10px 2rem;
+  padding: var(--MIN-PADDING) var(--LARGE-PADDING);
 }
 
 .searchBar {
-  border: 1px solid currentColor;
-  border-radius: 5px;
-  font-size: 0.9rem;
-  padding: 5px 10px;
+  background: var(--DARK-GREY-CLR);
+  border-radius: var(--BORDER-RADIUS);
+  font-size: var(--SMALL-FONT-SIZE);
+  padding: var(--MIN-PADDING);
   width: 20rem;
 }
 

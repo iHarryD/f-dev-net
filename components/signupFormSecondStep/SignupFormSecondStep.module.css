@@ -16,7 +16,7 @@
   border: 2px dashed currentColor;
   border-radius: 50%;
   display: flex;
-  font-size: 3rem;
+  font-size: clamp(2rem, 2vw + 1rem, 3rem);
   justify-content: center;
   overflow: hidden;
   position: relative;
@@ -34,11 +34,16 @@
 
 .dragAndDropProfilePictureInner {
   opacity: 0.5;
+  padding: var(--MEDIUM-PADDING);
   pointer-events: none;
 }
 
 .dragAndDropProfilePictureText {
-  font-size: var(--MEDIUM-FONT-SIZE);
+  font-size: clamp(
+    0.5rem,
+    1vw + var(--SMALL-FONT-SIZE),
+    var(--MEDIUM-FONT-SIZE)
+  );
 }
 
 .profilePictureLabel {

@@ -46,9 +46,11 @@ export default function PostCard() {
             </button>
           </div>
         </div>
-        <div className={postCardStyles.latestCommentsPreview}>
-          <p>Lorem ipsum dolor sit amet.</p>
-          <p>
+        <div className={postCardStyles.latestCommentsPreviewContainer}>
+          <p className={postCardStyles.latestCommentPreview}>
+            Lorem ipsum dolor sit amet.
+          </p>
+          <p className={postCardStyles.latestCommentPreview}>
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium,
             et sequi? Dolore quibusdam id iusto a delectus saepe tempore at aut
             consequatur, totam et repellat vero debitis inventore magnam illo

@@ -13,6 +13,7 @@ body {
   background: var(--PRIMARY-BACKGROUND-CLR);
   color: var(--PRIMARY-FONT-CLR);
   font-family: "Inter", sans-serif;
+  padding-top: var(--NAVBAR-HEIGHT);
 }
 
 a,
