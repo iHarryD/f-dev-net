@@ -1,0 +1,30 @@
+.chatPreviewContainer {
+  border-bottom: 1px solid var(--LIGHT-GREY-CLR);
+  display: flex;
+  gap: var(--MEDIUM-GAP);
+  padding: var(--MIN-PADDING) var(--MEDIUM-PADDING);
+  width: 20rem;
+}
+
+.lastMessagePreview {
+  font-size: var(--SMALL-FONT-SIZE);
+  opacity: var(--FADED-TEXT-OPACITY);
+}
+
+.smallProfilePicturePreview {
+  aspect-ratio: 1;
+  background: var(--ACCENT-CLR);
+  border-radius: 50%;
+  width: 3rem;
+}
+
+.userName {
+  font-weight: 600;
+}
+
+.userNameAndMessagePreviewContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--MIN-GAP);
+  justify-content: center;
+}
