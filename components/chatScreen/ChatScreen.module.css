@@ -1,0 +1,68 @@
+.profilePicturePreview {
+  aspect-ratio: 1;
+  background: var(--ACCENT-CLR);
+  border-radius: 50%;
+  width: 3rem;
+}
+
+.chatScreen {
+  flex-grow: 1;
+  overflow-y: auto;
+  position: relative;
+}
+
+.chatHeader {
+  background: var(--PRIMARY-BACKGROUND-CLR);
+  box-shadow: 0 1px 5px var(--LIGHT-GREY-CLR);
+  display: flex;
+  justify-content: space-between;
+  padding: var(--MIN-PADDING) var(--MEDIUM-PADDING);
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.userDetailsContainer {
+  align-items: center;
+  display: flex;
+  font-weight: 600;
+  gap: var(--MIN-GAP);
+}
+
+.chatHeaderButtonContainer {
+  align-items: center;
+  display: flex;
+  gap: var(--LARGE-GAP);
+}
+
+.chatBox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--LARGE-GAP);
+  padding: var(--MEDIUM-PADDING);
+}
+
+.messageInputBarContainer {
+  align-items: center;
+  background: var(--SECONDARY-BACKGROUND-CLR);
+  color: var(--SECONDARY-FONT-CLR);
+  display: flex;
+  gap: var(--MEDIUM-GAP);
+  justify-content: space-between;
+  padding: var(--MEDIUM-PADDING);
+  position: sticky;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.messageInputBarButtonContainer {
+  align-items: center;
+  display: flex;
+  gap: var(--MEDIUM-GAP);
+}
+
+.messageInput {
+  flex-grow: 1;
+}

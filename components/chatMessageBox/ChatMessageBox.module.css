@@ -1,0 +1,18 @@
+.messageBox {
+  background: var(--LIGHT-GREY-CLR);
+  max-width: 50%;
+  padding: var(--MEDIUM-PADDING);
+  width: fit-content;
+}
+
+.sentMessage {
+  align-self: flex-end;
+  background: var(--LIGHT-GREY-CLR);
+  border-radius: 10px 10px 0 10px;
+}
+
+.receivedMessage {
+  align-self: flex-start;
+  background: var(--ACCENT-CLR);
+  border-radius: 0 10px 10px 10px;
+}
