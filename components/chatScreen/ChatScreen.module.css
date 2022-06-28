@@ -12,7 +12,8 @@
 }
 
 .chatHeader {
-  background: var(--ACCENT-CLR);
+  background: var(--PRIMARY-BACKGROUND-CLR);
+  box-shadow: 0 1px 5px var(--LIGHT-GREY-CLR);
   display: flex;
   justify-content: space-between;
   padding: var(--MIN-PADDING) var(--MEDIUM-PADDING);
