@@ -23,3 +23,52 @@ export default function Home() {
     </main>
   );
 }
+
+// export async function getServerSideProps({
+//   req,
+//   res,
+// }: {
+//   req: NextApiRequest;
+//   res: NextApiResponse;
+// }) {
+//   const connection = await (await connectToMongoDb).connect();
+//   try {
+//     const session = await unstable_getServerSession(req, res, nextAuthConfig);
+//     if (session === null) throw new Error();
+//     const user = await connection
+//       .db()
+//       .collection("users")
+//       .findOne({ username: session.user.username });
+//     if (user === null) throw new Error();
+//     const badges = connection
+//       .db()
+//       .collection("badges")
+//       .find({ givenTo: session.user.username });
+//     const connections = connection
+//       .db()
+//       .collection("connections")
+//       .find({ connectionBetween: { $in: [session.user.username] } });
+//     const posts = connection
+//       .db()
+//       .collection("posts")
+//       .find({ postedBy: { username: session.user.username } });
+//     return {
+//       props: {
+//         user: {
+//           badges: await cursorToDoc(badges),
+//           connections: await cursorToDoc(connections),
+//           posts: await cursorToDoc(posts),
+//           ...(await cursorToDoc(user)),
+//         },
+//       },
+//     };
+//   } catch (err) {
+//     return {
+//       props: {
+//         user: null,
+//       },
+//     };
+//   } finally {
+//     connection.close();
+//   }
+// }

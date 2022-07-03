@@ -4,6 +4,10 @@
   gap: var(--MEDIUM-GAP);
 }
 
+.authBoxSection button {
+  --ACCENT-CLR: var(--PRIMARY-BACKGROUND-CLR);
+}
+
 .sectionDivider {
   background: currentColor;
   height: 1px;

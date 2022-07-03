@@ -1,40 +1,40 @@
 import loggedInUserProfileCardStyles from "./LoggedInUserProfileCard.module.css";
 import commonStyles from "../../styles/Common.module.css";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
-import { loginSetterAsProp } from "../../interfaces/Common.interface";
+import { useSession } from "next-auth/react";
 
-export default function LoggedInUserProfileCard({
-  loginSetter,
-}: loginSetterAsProp) {
+export default function LoggedInUserProfileCard() {
+  const { data: session } = useSession();
+
   return (
     <div className={loggedInUserProfileCardStyles.userProfileCard}>
-      <button
-        title="Logout"
-        className={loggedInUserProfileCardStyles.logoutButton}
-        onClick={() => loginSetter(false)}
-      >
-        <FontAwesomeIcon icon={faRightFromBracket} />
-      </button>
-      <div
-        className={loggedInUserProfileCardStyles.profilePicturePreview}
-      ></div>
+      <div>
+        <img
+          src={session?.user.image!}
+          className={loggedInUserProfileCardStyles.profilePicturePreview}
+        />
+      </div>
       <div className={loggedInUserProfileCardStyles.nameUsernameContainer}>
-        <span>Harry</span>
-        <span className={commonStyles.username}>@harry</span>
+        <span>{session?.user.name}</span>
+        <span className={commonStyles.username}>{session?.user.username}</span>
       </div>
       <div className={loggedInUserProfileCardStyles.userStatsContainer}>
         <div className={loggedInUserProfileCardStyles.userStatsBox}>
-          <span className={loggedInUserProfileCardStyles.statsNumber}>12</span>
-          posts
-        </div>
-        <div className={loggedInUserProfileCardStyles.userStatsBox}>
-          <span className={loggedInUserProfileCardStyles.statsNumber}>40</span>
+          <span className={loggedInUserProfileCardStyles.statsNumber}>
+            {session?.user.badges.length}
+          </span>
           badges
         </div>
         <div className={loggedInUserProfileCardStyles.userStatsBox}>
-          <span className={loggedInUserProfileCardStyles.statsNumber}>50</span>
-          <span>connections</span>
+          <span className={loggedInUserProfileCardStyles.statsNumber}>
+            {session?.user.connections.length}
+          </span>
+          connections
+        </div>
+        <div className={loggedInUserProfileCardStyles.userStatsBox}>
+          <span className={loggedInUserProfileCardStyles.statsNumber}>
+            {session?.user.posts.length}
+          </span>
+          <span>posts</span>
         </div>
       </div>
     </div>

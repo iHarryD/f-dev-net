@@ -4,14 +4,11 @@ import {
   SidebarTagSuggestion,
   SidebarUserSuggestion,
 } from "../sidebarSuggestionItems/SidebarSuggestionItems";
-import { loginSetterAsProp } from "../../interfaces/Common.interface";
 
-export default function LoggedInHomeSidebar({
-  loginSetter,
-}: loginSetterAsProp) {
+export default function LoggedInHomeSidebar() {
   return (
     <>
-      <LoggedInUserProfileCard loginSetter={loginSetter} />
+      <LoggedInUserProfileCard />
       <div>
         <h3>Top tags for you</h3>
         <ul
