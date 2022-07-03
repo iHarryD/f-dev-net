@@ -1,15 +1,10 @@
 import { DefaultSession } from "next-auth";
 import NextAuth from "next-auth/next";
+import { UserWithStats } from "./Common.interface";
 
 declare module "next-auth" {
   interface Session {
-    user: {
-      badges: string[];
-      bio: string;
-      connections: string[];
-      posts: string[];
-      username: string;
-    } & DefaultSession["user"];
+    user: UserWithStats;
   }
   interface User {
     bio: string;
