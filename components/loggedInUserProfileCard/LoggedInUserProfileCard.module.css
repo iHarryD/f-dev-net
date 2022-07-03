@@ -11,13 +11,6 @@
   width: min(100%, 20rem);
 }
 
-.logoutButton {
-  opacity: 0.7;
-  position: absolute;
-  top: var(--MEDIUM-PADDING);
-  right: var(--MEDIUM-PADDING);
-}
-
 .nameUsernameContainer {
   align-items: center;
   display: flex;
