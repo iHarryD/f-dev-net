@@ -8,25 +8,31 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import postCardStyles from "./PostCard.module.css";
 import buttonsStyles from "../../styles/Buttons.module.css";
 import commonStyles from "../../styles/Common.module.css";
+import { Post } from "../../interfaces/Common.interface";
 
-export default function PostCard() {
+export default function PostCard({
+  details: { _id, caption, comments, likes, media, postedBy, timestamp },
+}: {
+  details: Post;
+}) {
   return (
     <div className={postCardStyles.postCardContainer}>
       <div className={postCardStyles.postingAccountDetailsContainer}>
         <div className={postCardStyles.profilePicturePreview}></div>
         <div>
-          <p>Harry</p>
-          <span className={commonStyles.username}>@harry</span>
+          <p>{postedBy.name}</p>
+          <span className={commonStyles.username}>@{postedBy.username}</span>
         </div>
       </div>
-      <div className={postCardStyles.demoPostPicture}></div>
+      {media.length > 0 && (
+        <div className={postCardStyles.demoPostPicture}></div>
+      )}
       <div className={postCardStyles.postTextContentContainer}>
         <div className={postCardStyles.postWrittenTextContainer}>
-          <p>
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Optio,
-            adipisci!
-          </p>
-          <span className={postCardStyles.postAge}>2 days ago</span>
+          <p>{caption}</p>
+          <span className={postCardStyles.postAge}>
+            {new Date(timestamp).toLocaleDateString()}
+          </span>
         </div>
         <div className={postCardStyles.actionBar}>
           <div>
@@ -47,20 +53,24 @@ export default function PostCard() {
           </div>
         </div>
         <div className={postCardStyles.latestCommentsPreviewContainer}>
-          <p className={postCardStyles.latestCommentPreview}>
-            Lorem ipsum dolor sit amet.
-          </p>
-          <p className={postCardStyles.latestCommentPreview}>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium,
-            et sequi? Dolore quibusdam id iusto a delectus saepe tempore at aut
-            consequatur, totam et repellat vero debitis inventore magnam illo
-            sequi, ea soluta.
-          </p>
-          <div className={postCardStyles.viewAllCommentsButtonContainer}>
-            <button className={buttonsStyles.textButton}>
-              View all 291 comments
-            </button>
-          </div>
+          {comments.length ? (
+            comments
+              .slice(0, comments.length >= 2 ? 2 : 1)
+              .map((comment) => (
+                <p className={postCardStyles.latestCommentPreview}>
+                  {comment.comment}
+                </p>
+              ))
+          ) : (
+            <p>No comments</p>
+          )}
+          {comments.length > 2 && (
+            <div className={postCardStyles.viewAllCommentsButtonContainer}>
+              <button className={buttonsStyles.textButton}>
+                View all {comments.length} comments
+              </button>
+            </div>
+          )}
         </div>
         <div className={postCardStyles.commentActionBar}>
           <input
