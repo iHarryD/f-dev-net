@@ -15,14 +15,15 @@
   gap: var(--MIN-GAP);
 }
 
-.homeNavbarButton {
+.homeNavbarLink {
   align-items: center;
+  cursor: pointer;
   display: flex;
   gap: var(--MEDIUM-GAP);
   padding: var(--MIN-PADDING) var(--MEDIUM-PADDING);
 }
 
-.navbarButtonIconContainer {
+.navbarLinkIconContainer {
   text-align: center;
   width: 1rem;
 }

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import logoStyles from "./Logo.module.css";
 
@@ -19,9 +20,11 @@ export default function Logo() {
   }, []);
 
   return (
-    <div className={logoStyles.logoContainer}>
-      <span>{currentWord}</span>
-      <span className={logoStyles.typingIndicator}></span>
-    </div>
+    <Link href="/">
+      <div className={logoStyles.logoContainer}>
+        <span>{currentWord}</span>
+        <span className={logoStyles.typingIndicator}></span>
+      </div>
+    </Link>
   );
 }

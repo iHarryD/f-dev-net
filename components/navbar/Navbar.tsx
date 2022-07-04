@@ -1,10 +1,12 @@
 import navbarStyles from "./Navbar.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBell, faMessage } from "@fortawesome/free-regular-svg-icons";
+import { faBell } from "@fortawesome/free-regular-svg-icons";
 import { faGear, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import Logo from "../logo/Logo";
+import { signOut, useSession } from "next-auth/react";
 
 export function MacroNavbar() {
+  const { data: session } = useSession();
   return (
     <nav className={navbarStyles.navbar}>
       <Logo />
@@ -25,11 +27,16 @@ export function MacroNavbar() {
             <FontAwesomeIcon icon={faGear} />
           </button>
         </li>
-        <li>
-          <button title="Log out">
-            <FontAwesomeIcon icon={faRightFromBracket} />
-          </button>
-        </li>
+        {session && (
+          <li>
+            <button
+              title="Log out"
+              onClick={() => signOut({ redirect: false })}
+            >
+              <FontAwesomeIcon icon={faRightFromBracket} />
+            </button>
+          </li>
+        )}
       </ul>
     </nav>
   );

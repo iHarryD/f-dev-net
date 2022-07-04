@@ -1,7 +1,6 @@
 .username {
   font-weight: 600;
   opacity: var(--FADED-TEXT-OPACITY);
-  text-transform: lowercase;
 }
 
 .authInput {

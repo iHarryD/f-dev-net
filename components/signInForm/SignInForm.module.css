@@ -1,0 +1,27 @@
+.authBoxSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--MEDIUM-GAP);
+}
+
+.authBoxSection button {
+  --ACCENT-CLR: var(--PRIMARY-BACKGROUND-CLR);
+}
+
+.sectionDivider {
+  background: currentColor;
+  height: 1px;
+  margin: 2rem 0;
+  position: relative;
+  width: 100%;
+}
+
+.sectionDivider::after {
+  background: var(--SECONDARY-BACKGROUND-CLR);
+  content: "OR";
+  padding: 10px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

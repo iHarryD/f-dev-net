@@ -19,14 +19,14 @@
 
 .profilePicture {
   aspect-ratio: 1;
-  background: var(--ACCENT-CLR);
+  display: block;
   border-radius: 50%;
+  margin: auto;
   width: 10rem;
 }
 
 .username {
-  font-weight: 600;
-  margin-top: var(--MIN-SPACING);
+  margin-top: var(--MEDIUM-SPACING);
   text-align: center;
 }
 
@@ -39,6 +39,10 @@
 .profileUpdatingInputContainer {
   margin-top: var(--LARGE-GAP);
   position: relative;
+}
+
+.profileUpdatingInputContainer.notAdmin {
+  pointer-events: none;
 }
 
 .profileUpdatingInputContainer label {

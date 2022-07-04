@@ -8,9 +8,24 @@
 
 .primaryButton {
   background: var(--ACCENT-CLR);
-  color: var(--PRIMARY-FONT-CLR);
   border-radius: var(--BORDER-RADIUS);
+  color: var(--PRIMARY-FONT-CLR);
   padding: 0.5rem 1rem;
+  position: relative;
+}
+
+.primaryButton::after {
+  background: #000;
+  opacity: 0.15;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.primaryButton:hover::after {
+  content: "";
 }
 
 .secondaryButton {
