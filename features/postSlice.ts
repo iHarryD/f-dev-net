@@ -12,10 +12,10 @@ export const postSlice = createSlice({
       state.push(...action.payload.newPosts);
     },
     refresh(state, action: PayloadAction<{ newPosts: Post[] }>) {
-      state = action.payload.newPosts;
+      return action.payload.newPosts;
     },
     reset(state) {
-      state = [];
+      return [];
     },
   },
 });
