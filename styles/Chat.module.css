@@ -1,4 +1,4 @@
-.chatPageMain {
+.chatPageContainer {
   display: flex;
   height: calc(100vh - var(--NAVBAR-HEIGHT));
   overflow: hidden;

@@ -3,6 +3,7 @@ import "../styles/variables.css";
 import type { AppProps } from "next/app";
 import Layout from "../components/layout/Layout";
 import { SessionProvider } from "next-auth/react";
+import AuthUIHandler from "../components/authUIHandler/AuthUIHandler";
 
 export default function MyApp({
   Component,
@@ -10,9 +11,11 @@ export default function MyApp({
 }: AppProps) {
   return (
     <SessionProvider session={session}>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+      <AuthUIHandler>
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </AuthUIHandler>
     </SessionProvider>
   );
 }

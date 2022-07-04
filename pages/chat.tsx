@@ -4,9 +4,9 @@ import chatStyles from "../styles/Chat.module.css";
 
 export default function Chat() {
   return (
-    <main className={chatStyles.chatPageMain}>
+    <div className={chatStyles.chatPageContainer}>
       <AllChats />
       <ChatScreen />
-    </main>
+    </div>
   );
 }
