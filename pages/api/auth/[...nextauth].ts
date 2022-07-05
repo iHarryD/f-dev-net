@@ -41,6 +41,7 @@ export const nextAuthConfig: NextAuthOptions = {
         .db()
         .collection("posts")
         .find({ postedBy: { username: user.username } });
+      connections.close();
       session.user.badges = await cursorToDoc(badges);
       session.user.bio = user.bio;
       session.user.connections = await cursorToDoc(connections);

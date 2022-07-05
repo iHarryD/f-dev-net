@@ -7,8 +7,8 @@ import connectToMongoDb from "../../lib/mongodb";
 import { cursorToDoc } from "../../helpers/cursorToDoc";
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
-  const connectionPromise: { connection: null | MongoClient } = {
-    connection: null,
+  const connection: { clientPromise: null | MongoClient } = {
+    clientPromise: null,
   };
   const { method } = req;
   switch (method) {
@@ -20,21 +20,21 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           (await unstable_getServerSession(req, res, nextAuthConfig))?.user
             .username;
         if (!username) throw new Error();
-        connectionPromise.connection = await (await connectToMongoDb).connect();
-        const userDoc = await connectionPromise.connection
+        connection.clientPromise = await (await connectToMongoDb).connect();
+        const userDoc = await connection.clientPromise
           .db()
           .collection("users")
           .findOne({ username });
         if (userDoc === null) throw new Error();
-        const badges = connectionPromise.connection
+        const badges = connection.clientPromise
           .db()
           .collection("badges")
           .find({ givenTo: username });
-        const connections = connectionPromise.connection
+        const connections = connection.clientPromise
           .db()
           .collection("connections")
           .find({ connectionBetween: { $in: [username] } });
-        const posts = connectionPromise.connection
+        const posts = connection.clientPromise
           .db()
           .collection("posts")
           .find({ postedBy: { username: username } });
@@ -50,8 +50,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       } catch (err) {
         return res.status(500).send(err);
       } finally {
-        if (connectionPromise.connection) {
-          connectionPromise.connection.close();
+        if (connection.clientPromise) {
+          connection.clientPromise.close();
         }
       }
     case "PATCH":
@@ -59,8 +59,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       if (session === null) return;
       const { name, bio } = req.body;
       try {
-        connectionPromise.connection = await (await connectToMongoDB).connect();
-        const updatedUser = await connectionPromise.connection
+        connection.clientPromise = await (await connectToMongoDB).connect();
+        const updatedUser = await connection.clientPromise
           .db()
           .collection("users")
           .findOneAndUpdate(
@@ -77,8 +77,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       } catch (err) {
         return res.status(500).send(err);
       } finally {
-        if (connectionPromise.connection) {
-          connectionPromise.connection.close();
+        if (connection.clientPromise) {
+          connection.clientPromise.close();
         }
       }
     default:
