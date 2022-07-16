@@ -55,7 +55,10 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           .updateOne(
             {
               _id: new ObjectId(chatID as string),
-              chatBetween: { $in: [session.user.username] },
+              $and: [
+                { "chatBetween.username": { $in: [session.user.username] } },
+                { "chatBetween.username": { $in: [sendTo] } },
+              ],
             },
             { $push: { conversation: completeMessage } }
           );

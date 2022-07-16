@@ -57,7 +57,12 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         const doesChatAlreadyExists = await connection.clientPromise
           .db()
           .collection("chats")
-          .findOne({ chatBetween: { $all: [session.user.username, sendTo] } });
+          .findOne({
+            $and: [
+              { "chatBetween.username": { $in: [session.user.username] } },
+              { "chatBetween.username": { $in: [sendTo] } },
+            ],
+          });
         if (doesChatAlreadyExists)
           return res
             .status(500)
