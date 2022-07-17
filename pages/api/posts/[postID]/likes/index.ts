@@ -7,7 +7,7 @@ import Cors from "cors";
 import corsMiddleware from "../../../../../helpers/corsMiddleware";
 
 const cors = Cors({
-  methods: ["GET", "POST"],
+  methods: ["POST", "DELETE"],
   credentials: true,
   origin: "http://localhost:3000",
 });
@@ -15,6 +15,7 @@ const cors = Cors({
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   await corsMiddleware(req, res, cors);
   const { method } = req;
+  const { postID } = req.query;
   const connection: { clientPromise: null | MongoClient } = {
     clientPromise: null,
   };
@@ -22,47 +23,34 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     const session = await unstable_getServerSession(req, res, nextAuthConfig);
     if (session === null) return res.status(401).json({ message: "Private" });
     switch (method) {
-      case "GET":
-        connection.clientPromise = await (await connectToMongoDb).connect();
-        const post = await connection.clientPromise
-          .db()
-          .collection("posts")
-          .findOne({ _id: new ObjectId(req.query.postID as string) });
-        if (post === null)
-          return res
-            .status(404)
-            .json({ message: "Post not found.", data: null });
-        return res
-          .status(200)
-          .json({ message: "Comments fetched.", data: post.comments });
       case "POST":
-        const { comment } = req.body;
         connection.clientPromise = await (await connectToMongoDb).connect();
-        const newComment = await connection.clientPromise
+        const likedPost = await connection.clientPromise
           .db()
           .collection("posts")
           .updateOne(
-            { _id: new ObjectId(req.query.postID as string) },
-            {
-              $push: {
-                comments: {
-                  comment,
-                  postedBy: session.user.username,
-                  timestamp: new Date(),
-                  _id: new ObjectId(),
-                },
-              },
-            }
+            { _id: new ObjectId(postID as string) },
+            { $addToSet: { likes: session.user.username } }
           );
-        if (newComment.modifiedCount > 0) {
-          return res
-            .status(200)
-            .json({ message: "Comment added.", data: newComment });
-        } else {
-          return res
-            .status(300)
-            .json({ message: "Could not add comment.", data: null });
-        }
+        return res
+          .status(200)
+          .json({ message: "Post liked.", data: likedPost });
+      case "DELETE":
+        connection.clientPromise = await (await connectToMongoDb).connect();
+        const unlikedPost = await connection.clientPromise
+          .db()
+          .collection("posts")
+          .updateOne(
+            { _id: new ObjectId(postID as string) },
+            { $pull: { likes: session.user.username } }
+          );
+        return res
+          .status(200)
+          .json({ message: "Post unliked.", data: unlikedPost });
+      default:
+        return res.status(404).json({
+          message: "Requested method is not allowed at this endpoint.",
+        });
     }
   } catch (err) {
     return res.status(500).json({ message: "Unknown error.", data: err });

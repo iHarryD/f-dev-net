@@ -1,34 +1,20 @@
 import { MongoClient } from "mongodb";
 import { NextApiRequest, NextApiResponse } from "next";
 import { unstable_getServerSession } from "next-auth";
+import corsMiddleware from "../../../helpers/corsMiddleware";
 import { postValidation } from "../../../joi/postValidation";
 import connectToMongoDb from "../../../lib/mongodb";
 import { nextAuthConfig } from "../auth/[...nextauth]";
 import Cors from "cors";
 
 const cors = Cors({
-  methods: ["GET", "POST", "DELETE"],
+  methods: ["POST"],
   credentials: true,
   origin: "http://localhost:3000",
 });
 
-function runMiddleware(
-  req: NextApiRequest,
-  res: NextApiResponse,
-  func: (req: NextApiRequest, res: NextApiResponse, callback: any) => any
-) {
-  return new Promise((resolve, reject) => {
-    func(req, res, (result: any) => {
-      if (result instanceof Error) {
-        return reject(result);
-      }
-      return resolve(result);
-    });
-  });
-}
-
 export default async function (req: NextApiRequest, res: NextApiResponse) {
-  await runMiddleware(req, res, cors);
+  await corsMiddleware(req, res, cors);
   const { method } = req;
   const connection: { clientPromise: null | MongoClient } = {
     clientPromise: null,

@@ -52,6 +52,7 @@ export const nextAuthConfig: NextAuthOptions = {
       session.user.connections = await cursorToDoc(connections);
       session.user.posts = await cursorToDoc(posts);
       session.user.username = user.username;
+      session.user.savedPosts = user.savedPosts;
       return session;
     },
   },

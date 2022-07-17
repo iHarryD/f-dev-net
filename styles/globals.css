@@ -55,3 +55,7 @@ main {
 ::-webkit-scrollbar-thumb:hover {
   background: rgb(37, 37, 37);
 }
+
+button:disabled {
+  opacity: 0.5;
+}

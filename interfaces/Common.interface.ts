@@ -20,10 +20,7 @@ export interface UserWithStats extends User {
 }
 
 export interface PostComment {
-  postedBy: {
-    name: string;
-    username: string;
-  };
+  postedBy: { image: string; name: string; username: string };
   comment: string;
   timestamp: Date;
 }
@@ -32,7 +29,7 @@ export interface Post {
   _id: string;
   caption: string;
   comments: PostComment[];
-  likes: { username: string; name: string }[];
+  likes: string[];
   media: string[];
   postedBy: {
     image: string;
