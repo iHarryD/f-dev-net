@@ -52,3 +52,14 @@
   font-size: var(--SMALL-FONT-SIZE);
   padding: 5px 10px;
 }
+
+.buttonLoaderContainer {
+  align-items: center;
+  aspect-ratio: 1;
+  cursor: default;
+  display: flex;
+  justify-content: center;
+  height: 1rem;
+  position: relative;
+  width: 3rem;
+}
