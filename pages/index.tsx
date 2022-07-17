@@ -48,7 +48,11 @@ export async function getServerSideProps({
 }) {
   const connection = await (await connectToMongoDb).connect();
   try {
-    const result = connection.db().collection("posts").find({});
+    const result = connection
+      .db()
+      .collection("posts")
+      .find({})
+      .sort({ timestamp: -1 });
     return {
       props: {
         posts: await cursorToDoc(result),

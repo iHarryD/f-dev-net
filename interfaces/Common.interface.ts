@@ -35,6 +35,7 @@ export interface Post {
   likes: { username: string; name: string }[];
   media: string[];
   postedBy: {
+    image: string;
     name: string;
     username: string;
   };

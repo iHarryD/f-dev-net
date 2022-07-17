@@ -41,7 +41,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           return res
             .status(500)
             .json({ message: validation.error.details[0].message });
-
         const session = await unstable_getServerSession(
           req,
           res,
@@ -50,7 +49,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         if (session === null)
           return res.status(300).json({ message: "Unauthorized" });
         connection.clientPromise = await (await connectToMongoDb).connect();
-        const newPost = await connection.clientPromise
+        const insertedDoc = await connection.clientPromise
           .db()
           .collection("posts")
           .insertOne({
@@ -61,10 +60,14 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             postedBy: {
               name: session.user.name,
               username: session.user.username,
+              image: session.user.image,
             },
           });
+        const newPost = await connection.clientPromise
+          .db()
+          .collection("posts")
+          .findOne({ _id: insertedDoc.insertedId });
         return res.status(200).json({ message: "Posted", data: newPost });
-
       default:
         return res.status(404).json({
           message: "Requested method is not allowed at this endpoint.",

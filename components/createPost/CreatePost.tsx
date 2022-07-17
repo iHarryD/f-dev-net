@@ -4,13 +4,55 @@ import commonStyles from "../../styles/Common.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImage, faSmile } from "@fortawesome/free-regular-svg-icons";
 import { faClose, faUserTag } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { isImage } from "../../helpers/isImage";
+import SyncLoader from "react-spinners/SyncLoader";
+import { loaderCSSOverrides } from "../../database/loaderCSS";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../store";
+import { append } from "../../features/postSlice";
 
 export default function CreatePost() {
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
   const [wordCount, setWordCount] = useState<number>(0);
   const wordsLimitForPostTextInput = 500;
+  const captionTextAreaRef = useRef<null | HTMLTextAreaElement>(null);
+  const categoryDropDownRef = useRef<null | HTMLSelectElement>(null);
+  const [isPosting, setIsPosting] = useState<boolean>(false);
+  const posts = useSelector((state: RootState) => state.postSlice);
+  const dispatch = useDispatch();
+
+  async function handleCreateNewPost() {
+    if (
+      captionTextAreaRef.current === null ||
+      categoryDropDownRef.current === null
+    )
+      return;
+    try {
+      setIsPosting(true);
+      const data = {
+        caption: captionTextAreaRef.current.value,
+        category: categoryDropDownRef.current.value,
+        media: uploadedImages,
+      };
+      const result = await fetch("http://127.0.0.1:3000/api/posts", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+      const resultJson = await result.json();
+      captionTextAreaRef.current.value = "";
+      setWordCount(0);
+      dispatch(append({ newPosts: [resultJson.data] }));
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsPosting(false);
+    }
+  }
 
   function removeImage(file: File) {
     setUploadedImages((prev) => prev.filter((item) => item !== file));
@@ -27,6 +69,7 @@ export default function CreatePost() {
       <div className={createPostStyles.postInputTextAreaContainer}>
         <textarea
           placeholder="Write something..."
+          ref={captionTextAreaRef}
           maxLength={wordsLimitForPostTextInput}
           className={createPostStyles.postInputTextArea}
           onChange={(e) => setWordCount(e.target.value.length)}
@@ -37,6 +80,7 @@ export default function CreatePost() {
       </div>
       <div className={createPostStyles.postCategoryDropdownContainer}>
         <select
+          ref={categoryDropDownRef}
           className={`${commonStyles.styledDropdown} ${createPostStyles.postCategoryDropdown}`}
         >
           <option value="general">General</option>
@@ -103,7 +147,23 @@ export default function CreatePost() {
             <FontAwesomeIcon icon={faSmile} />
           </button>
         </div>
-        <button className={buttonsStyles.primaryButton}>Post</button>
+        <button
+          className={buttonsStyles.primaryButton}
+          onClick={() => handleCreateNewPost()}
+        >
+          {isPosting ? (
+            <div className={commonStyles.buttonLoaderContainer}>
+              <SyncLoader
+                size="6"
+                color="#fff"
+                loading={isPosting}
+                cssOverride={loaderCSSOverrides}
+              />
+            </div>
+          ) : (
+            "Post"
+          )}
+        </button>
       </div>
     </div>
   );

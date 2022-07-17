@@ -18,7 +18,13 @@ export default function PostCard({
   return (
     <div className={postCardStyles.postCardContainer}>
       <div className={postCardStyles.postingAccountDetailsContainer}>
-        <div className={postCardStyles.profilePicturePreview}></div>
+        <div>
+          <img
+            src={postedBy.image}
+            alt={postedBy.username}
+            className={postCardStyles.profilePicturePreview}
+          />
+        </div>
         <div>
           <p>{postedBy.name}</p>
           <span className={commonStyles.username}>@{postedBy.username}</span>
