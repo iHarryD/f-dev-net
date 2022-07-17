@@ -36,11 +36,16 @@ export const nextAuthConfig: NextAuthOptions = {
       const connections = connection
         .db()
         .collection("connections")
-        .find({ connectionBetween: { $in: [user.username] } });
+        .find({
+          $and: [
+            { connectionBetween: { $in: [user.username] } },
+            { isActive: true },
+          ],
+        });
       const posts = connection
         .db()
         .collection("posts")
-        .find({ postedBy: { username: user.username } });
+        .find({ "postedBy.username": user.username });
       connections.close();
       session.user.badges = await cursorToDoc(badges);
       session.user.bio = user.bio;
