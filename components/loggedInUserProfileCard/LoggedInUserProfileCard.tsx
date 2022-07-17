@@ -5,6 +5,8 @@ import { useSession } from "next-auth/react";
 export default function LoggedInUserProfileCard() {
   const { data: session } = useSession();
 
+  console.log(session);
+
   return (
     <div className={loggedInUserProfileCardStyles.userProfileCard}>
       <div>

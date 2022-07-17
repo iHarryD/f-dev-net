@@ -1,11 +1,18 @@
-.profilePicturePreview {
+.profilePicturePreviewContainer {
   aspect-ratio: 1;
-  background: var(--ACCENT-CLR);
   border-radius: 50%;
+  overflow: hidden;
   width: 3rem;
 }
 
+.profilePicturePreview {
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
 .chatScreen {
+  display: flex;
+  flex-direction: column;
   flex-grow: 1;
   overflow-y: auto;
   position: relative;
@@ -39,6 +46,7 @@
 .chatBox {
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
   gap: var(--LARGE-GAP);
   padding: var(--MEDIUM-PADDING);
 }

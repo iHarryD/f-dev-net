@@ -24,7 +24,7 @@ export default function ProfileSection() {
       (async () => {
         try {
           const result = await fetch(
-            `http://127.0.0.1:3000/api/profile?user=${userQuery}`
+            `http://127.0.0.1:3000/api/profiles/${userQuery}`
           );
           const data = await JSON.parse(JSON.stringify(result));
           setUser(data);
@@ -50,7 +50,7 @@ export default function ProfileSection() {
       name,
       bio,
     };
-    fetch("/api/profile", {
+    fetch("http://127.0.0.1:3000/api/profiles", {
       method: "PATCH",
       body: JSON.stringify(data),
       headers: {
