@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { append } from "../../features/postSlice";
 import { getImageDataURL } from "../../helpers/getImageDataURL";
+import GiphyGrid from "../giphyGrid/GiphyGrid";
 
 export default function CreatePost() {
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
@@ -21,6 +22,8 @@ export default function CreatePost() {
   const categoryDropDownRef = useRef<null | HTMLSelectElement>(null);
   const [isPosting, setIsPosting] = useState<boolean>(false);
   const dispatch = useDispatch();
+  const [isGiphyActive, setIsGiphyActive] = useState<boolean>(false);
+  const [giphySearchQuery, setGiphySearchQuery] = useState<string>("shazam");
 
   async function handleCreateNewPost() {
     if (
@@ -80,7 +83,7 @@ export default function CreatePost() {
           {wordCount}/{wordsLimitForPostTextInput}
         </span>
       </div>
-      <div className={createPostStyles.postCategoryDropdownContainer}>
+      <div>
         <select
           ref={categoryDropDownRef}
           className={`${commonStyles.styledDropdown} ${createPostStyles.postCategoryDropdown}`}
@@ -89,6 +92,23 @@ export default function CreatePost() {
           <option value="query">Query</option>
         </select>
       </div>
+      {isGiphyActive && (
+        <div className={createPostStyles.giphyGridContainer}>
+          <div className={createPostStyles.giphyTopBar}>
+            <input
+              value={giphySearchQuery}
+              placeholder="search"
+              className={createPostStyles.giphySearchBar}
+              onChange={(e) => setGiphySearchQuery(e.target.value)}
+            />
+            <select className={commonStyles.styledDropdown}>
+              <option value="gifs">Gifs</option>
+              <option value="emojis">Emojis</option>
+            </select>
+          </div>
+          <GiphyGrid searchTerm={giphySearchQuery} />
+        </div>
+      )}
       {uploadedImage && (
         <div
           className={createPostStyles.individualUploadedImagePreviewContainer}
@@ -131,7 +151,7 @@ export default function CreatePost() {
               />
             </label>
           </button>
-          <button>
+          <button onClick={() => setIsGiphyActive((prev) => !prev)}>
             <FontAwesomeIcon icon={faSmile} />
           </button>
         </div>
