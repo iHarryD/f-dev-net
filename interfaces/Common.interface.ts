@@ -4,6 +4,13 @@ enum ChatMessageStatus {
   SEEN = "seen",
 }
 
+export enum ConnectionStatus {
+  CONNECTED = "connected",
+  NULL = "null",
+  PENDING = "pending",
+  SENT = "sent",
+}
+
 export interface User {
   bio: string;
   email: string;
@@ -15,8 +22,8 @@ export interface User {
 
 export interface UserWithStats extends User {
   badges: string[];
-  connections: string[];
-  posts: string[];
+  connections: Connection[];
+  posts: Post[];
 }
 
 export interface PostComment {
@@ -61,4 +68,11 @@ export interface ChatPreview {
   name: string;
   lastMessage: string;
   lastMessageTime: string;
+}
+
+export interface Connection {
+  connectionBetween: string[];
+  initiatedBy: string;
+  isActive: boolean;
+  timestamp: Date;
 }

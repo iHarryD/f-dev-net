@@ -3,8 +3,18 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { unstable_getServerSession } from "next-auth";
 import connectToMongoDb from "../../../lib/mongodb";
 import { nextAuthConfig } from "../auth/[...nextauth]";
+import Cors from "cors";
+import corsMiddleware from "../../../helpers/corsMiddleware";
+import { cursorToDoc } from "../../../helpers/cursorToDoc";
+
+const cors = Cors({
+  methods: ["GET", "POST"],
+  credentials: true,
+  origin: "http://localhost:3000",
+});
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
+  await corsMiddleware(req, res, cors);
   const { method } = req;
   const session = await unstable_getServerSession(req, res, nextAuthConfig);
   if (session === null) return res.status(401).json({ message: "Private" });
@@ -15,15 +25,16 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     switch (method) {
       case "GET":
         connection.clientPromise = await (await connectToMongoDb).connect();
-        const allConnections = await connection.clientPromise
+        const allConnections = connection.clientPromise
           .db()
           .collection("connections")
           .find({
             connectionBetween: { $in: [session.user.username] },
           });
-        return res
-          .status(200)
-          .json({ message: "Connections fetched", data: allConnections });
+        return res.status(200).json({
+          message: "Connections fetched",
+          data: await cursorToDoc(allConnections),
+        });
       case "POST":
         connection.clientPromise = await (await connectToMongoDb).connect();
         await connection.clientPromise

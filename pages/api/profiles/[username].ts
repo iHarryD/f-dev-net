@@ -1,11 +1,18 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { MongoClient } from "mongodb";
-import { unstable_getServerSession } from "next-auth";
-import { nextAuthConfig } from "../auth/[...nextauth]";
 import connectToMongoDb from "../../../lib/mongodb";
 import { cursorToDoc } from "../../../helpers/cursorToDoc";
+import Cors from "cors";
+import corsMiddleware from "../../../helpers/corsMiddleware";
+
+const cors = Cors({
+  methods: ["GET"],
+  credentials: true,
+  origin: "http://localhost:3000",
+});
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
+  await corsMiddleware(req, res, cors);
   const { method } = req;
   const { username } = req.query;
   const connection: { clientPromise: null | MongoClient } = {
@@ -30,11 +37,11 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         const connections = connection.clientPromise
           .db()
           .collection("connections")
-          .find({ connectionBetween: { $in: [username] } });
+          .find({ connectionBetween: { $in: [username] }, isActive: true });
         const posts = connection.clientPromise
           .db()
           .collection("posts")
-          .find({ postedBy: { username: username } });
+          .find({ "postedBy.username": username });
         const userDetails = {
           badges: await cursorToDoc(badges),
           connections: await cursorToDoc(connections),

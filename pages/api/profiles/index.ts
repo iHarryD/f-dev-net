@@ -36,7 +36,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         const posts = connection.clientPromise
           .db()
           .collection("posts")
-          .find({ postedBy: { username: session.user.username } });
+          .find({ "postedBy.username": session.user.username });
         const userDetails = {
           badges: await cursorToDoc(badges),
           connections: await cursorToDoc(connections),
