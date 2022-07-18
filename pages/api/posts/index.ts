@@ -6,6 +6,7 @@ import { postValidation } from "../../../joi/postValidation";
 import connectToMongoDb from "../../../lib/mongodb";
 import { nextAuthConfig } from "../auth/[...nextauth]";
 import Cors from "cors";
+import { uploadImage } from "../../../cloudinary";
 
 const cors = Cors({
   methods: ["POST"],
@@ -35,6 +36,10 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         if (session === null)
           return res.status(300).json({ message: "Unauthorized" });
         connection.clientPromise = await (await connectToMongoDb).connect();
+        if (req.body.media) {
+          const publicID = await uploadImage(req.body.media);
+          req.body.media = publicID.secure_url;
+        }
         const insertedDoc = await connection.clientPromise
           .db()
           .collection("posts")

@@ -11,6 +11,7 @@ import { loaderCSSOverrides } from "../../database/loaderCSS";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { append } from "../../features/postSlice";
+import { getImageDataURL } from "../../helpers/getImageDataURL";
 
 export default function CreatePost() {
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
@@ -19,7 +20,6 @@ export default function CreatePost() {
   const captionTextAreaRef = useRef<null | HTMLTextAreaElement>(null);
   const categoryDropDownRef = useRef<null | HTMLSelectElement>(null);
   const [isPosting, setIsPosting] = useState<boolean>(false);
-  const posts = useSelector((state: RootState) => state.postSlice);
   const dispatch = useDispatch();
 
   async function handleCreateNewPost() {
@@ -30,10 +30,13 @@ export default function CreatePost() {
       return;
     try {
       setIsPosting(true);
+      const base64ImageURL = uploadedImage
+        ? await getImageDataURL(uploadedImage)
+        : "";
       const data = {
         caption: captionTextAreaRef.current.value,
         category: categoryDropDownRef.current.value,
-        media: uploadedImage,
+        media: base64ImageURL,
       };
       const result = await fetch("http://127.0.0.1:3000/api/posts", {
         method: "POST",
@@ -43,10 +46,13 @@ export default function CreatePost() {
         },
         credentials: "include",
       });
-      const resultJson = await result.json();
-      captionTextAreaRef.current.value = "";
-      setWordCount(0);
-      dispatch(append({ newPosts: [resultJson.data] }));
+      if (result.status === 200) {
+        const resultJson = await result.json();
+        captionTextAreaRef.current.value = "";
+        setUploadedImage(null);
+        setWordCount(0);
+        dispatch(append({ newPosts: [resultJson.data] }));
+      }
     } catch (err) {
       console.log(err);
     } finally {

@@ -181,8 +181,14 @@ export default function PostCard({
           <span className={commonStyles.username}>@{postedBy.username}</span>
         </div>
       </div>
-      {media.length > 0 && (
-        <div className={postCardStyles.demoPostPicture}></div>
+      {media && (
+        <div>
+          <img
+            src={media}
+            alt={media}
+            className={postCardStyles.demoPostPicture}
+          />
+        </div>
       )}
       <div className={postCardStyles.postTextContentContainer}>
         <div className={postCardStyles.postWrittenTextContainer}>

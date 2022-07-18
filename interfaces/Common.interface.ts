@@ -30,7 +30,7 @@ export interface Post {
   caption: string;
   comments: PostComment[];
   likes: string[];
-  media: string[];
+  media: string;
   postedBy: {
     image: string;
     name: string;

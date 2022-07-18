@@ -20,7 +20,9 @@
 
 .demoPostPicture {
   aspect-ratio: 1;
-  background: rgb(255, 133, 133);
+  object-fit: cover;
+  pointer-events: none;
+  width: 100%;
 }
 
 .postWrittenTextContainer {
