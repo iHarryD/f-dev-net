@@ -13,7 +13,7 @@ import { RootState } from "../../store";
 import { append } from "../../features/postSlice";
 
 export default function CreatePost() {
-  const [uploadedImages, setUploadedImages] = useState<File[]>([]);
+  const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [wordCount, setWordCount] = useState<number>(0);
   const wordsLimitForPostTextInput = 500;
   const captionTextAreaRef = useRef<null | HTMLTextAreaElement>(null);
@@ -33,7 +33,7 @@ export default function CreatePost() {
       const data = {
         caption: captionTextAreaRef.current.value,
         category: categoryDropDownRef.current.value,
-        media: uploadedImages,
+        media: uploadedImage,
       };
       const result = await fetch("http://127.0.0.1:3000/api/posts", {
         method: "POST",
@@ -52,10 +52,6 @@ export default function CreatePost() {
     } finally {
       setIsPosting(false);
     }
-  }
-
-  function removeImage(file: File) {
-    setUploadedImages((prev) => prev.filter((item) => item !== file));
   }
 
   return (
@@ -87,29 +83,20 @@ export default function CreatePost() {
           <option value="query">Query</option>
         </select>
       </div>
-      {uploadedImages && (
-        <div className={createPostStyles.uploadedImagesPreviewsContainer}>
-          {uploadedImages.map((file) => (
-            <div
-              key={file.name}
-              className={
-                createPostStyles.individualUploadedImagePreviewsContainer
-              }
-            >
-              <button
-                className={createPostStyles.uploadedImagePreviewRemoveButton}
-              >
-                <FontAwesomeIcon
-                  icon={faClose}
-                  onClick={() => removeImage(file)}
-                />
-              </button>
-              <img
-                className={createPostStyles.uploadedImagePreview}
-                src={URL.createObjectURL(file)}
-              />
-            </div>
-          ))}
+      {uploadedImage && (
+        <div
+          className={createPostStyles.individualUploadedImagePreviewContainer}
+        >
+          <button className={createPostStyles.uploadedImagePreviewRemoveButton}>
+            <FontAwesomeIcon
+              icon={faClose}
+              onClick={() => setUploadedImage(null)}
+            />
+          </button>
+          <img
+            className={createPostStyles.uploadedImagePreview}
+            src={URL.createObjectURL(uploadedImage)}
+          />
         </div>
       )}
       <div className={createPostStyles.utilitiesContainer}>
@@ -129,15 +116,10 @@ export default function CreatePost() {
                 id="post-image"
                 className={createPostStyles.inputForPostImage}
                 onChange={(e) => {
-                  console.log(e.target.files![0]);
-                  if (uploadedImages.length === 3) return;
-                  if (e.target.files === null) return;
-                  if (e.target.files.length === 0) return;
-                  if (isImage(e.target.files[e.target.files.length - 1])) {
-                    setUploadedImages((prev) => [
-                      ...prev,
-                      e.target.files![e.target.files!.length - 1],
-                    ]);
+                  if (e.target.files) {
+                    if (isImage(e.target.files[0])) {
+                      setUploadedImage(e.target.files[0]);
+                    }
                   }
                 }}
               />
