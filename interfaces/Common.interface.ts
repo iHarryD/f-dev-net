@@ -27,7 +27,8 @@ export interface UserWithStats extends User {
 }
 
 export interface PostComment {
-  postedBy: { image: string; name: string; username: string };
+  _id: string;
+  postedBy: string;
   comment: string;
   timestamp: Date;
 }

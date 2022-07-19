@@ -15,6 +15,7 @@ import commonStyles from "../../styles/Common.module.css";
 import { Post } from "../../interfaces/Common.interface";
 import { useSession } from "next-auth/react";
 import { useRef, useState } from "react";
+import CommentBox from "../commentBox/CommentBox";
 
 export default function PostCard({
   details: { _id, caption, comments, likes, media, postedBy, timestamp },
@@ -32,6 +33,7 @@ export default function PostCard({
     session ? session.user.savedPosts.includes(_id) : false
   );
   const [isBookmarking, setIsBookmarking] = useState<boolean>(false);
+  const [isCommentBoxOpen, setIsCommentBoxOpen] = useState<boolean>(false);
 
   async function handleLikePost() {
     if (session === null) return;
@@ -208,7 +210,11 @@ export default function PostCard({
                 <FontAwesomeIcon icon={faRHeart} />
               </button>
             )}
-            <button>
+            <button
+              onClick={() => {
+                if (comments.length) setIsCommentBoxOpen((prev) => !prev);
+              }}
+            >
               <FontAwesomeIcon icon={faComment} />
             </button>
           </div>
@@ -234,7 +240,11 @@ export default function PostCard({
           </div>
         </div>
         <div className={postCardStyles.latestCommentsPreviewContainer}>
-          {comments.length ? (
+          {comments.length === 0 ? (
+            <p>No comments</p>
+          ) : isCommentBoxOpen && comments.length > 2 ? (
+            <CommentBox comments={comments} />
+          ) : (
             comments
               .slice(0, comments.length >= 2 ? 2 : 1)
               .map((comment) => (
@@ -242,15 +252,6 @@ export default function PostCard({
                   {comment.comment}
                 </p>
               ))
-          ) : (
-            <p>No comments</p>
-          )}
-          {comments.length > 2 && (
-            <div className={postCardStyles.viewAllCommentsButtonContainer}>
-              <button className={buttonsStyles.textButton}>
-                View all {comments.length} comments
-              </button>
-            </div>
           )}
         </div>
         <div className={postCardStyles.commentActionBar}>
