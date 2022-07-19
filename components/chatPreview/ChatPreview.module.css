@@ -3,7 +3,6 @@
   display: flex;
   gap: var(--MEDIUM-GAP);
   padding: var(--MIN-PADDING) var(--MEDIUM-PADDING);
-  width: 20rem;
 }
 
 .lastMessagePreview {
@@ -11,20 +10,37 @@
   opacity: var(--FADED-TEXT-OPACITY);
 }
 
+.smallProfilePicturePreviewContainer {
+  width: 3rem;
+}
+
 .smallProfilePicturePreview {
   aspect-ratio: 1;
-  background: var(--ACCENT-CLR);
   border-radius: 50%;
-  width: 3rem;
+  object-fit: cover;
 }
 
 .userName {
   font-weight: 600;
 }
 
-.userNameAndMessagePreviewContainer {
+.nameTimeChatPreview {
+  cursor: default;
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
   gap: var(--MIN-GAP);
   justify-content: center;
+}
+
+.nameAndTimeContainer {
+  align-items: center;
+  display: flex;
+  gap: var(--MIN-GAP);
+  justify-content: space-between;
+}
+
+.lastMessageTime {
+  font-size: var(--SMALL-FONT-SIZE);
+  opacity: var(--FADED-TEXT-OPACITY);
 }

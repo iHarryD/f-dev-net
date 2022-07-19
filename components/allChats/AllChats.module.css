@@ -1,3 +1,22 @@
 .chatSidebar {
+  border-right: 1px solid currentColor;
   overflow-y: auto;
+}
+
+.emptyChatText {
+  font-size: var(--SMALL-FONT-SIZE);
+  font-weight: var(--MID-TEXT-BOLD);
+  opacity: var(--FADED-TEXT-OPACITY);
+}
+
+.emptyTextContainer {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  height: 100%;
+}
+
+.chatPreviewButton {
+  cursor: default;
+  width: 100%;
 }

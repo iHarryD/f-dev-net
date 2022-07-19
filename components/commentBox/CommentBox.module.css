@@ -1,0 +1,11 @@
+.commentsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--MIN-GAP);
+  max-height: 15rem;
+  overflow: hidden auto;
+}
+
+.commentPostedBy {
+  margin-inline-end: 5px;
+}

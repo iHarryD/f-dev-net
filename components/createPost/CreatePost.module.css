@@ -1,6 +1,9 @@
 .createPostContainer {
   background: #f0f8ff;
   border-radius: calc(var(--BORDER-RADIUS) + var(--MEDIUM-PADDING));
+  display: flex;
+  flex-direction: column;
+  gap: var(--MEDIUM-GAP);
   padding: var(--MEDIUM-PADDING) var(--LARGE-PADDING);
   width: min(100%, 35rem);
 }
@@ -8,7 +11,6 @@
 .postInputTextAreaContainer {
   background: #0001;
   border-radius: var(--BORDER-RADIUS);
-  margin: 1rem 0;
   position: relative;
 }
 
@@ -44,20 +46,13 @@
   justify-content: space-between;
 }
 
-.uploadedImagesPreviewsContainer {
-  display: flex;
-  gap: var(--MEDIUM-GAP);
-  justify-content: center;
-  margin: 1rem 0;
-}
-
-.individualUploadedImagePreviewsContainer {
+.individualUploadedImagePreviewContainer {
   border-radius: var(--BORDER-RADIUS);
   overflow: hidden;
   position: relative;
 }
 
-.individualUploadedImagePreviewsContainer::after {
+.individualUploadedImagePreviewContainer::after {
   background: #000;
   content: "";
   opacity: 0;
@@ -71,26 +66,26 @@
   z-index: 1;
 }
 
-.individualUploadedImagePreviewsContainer:hover::after {
+.individualUploadedImagePreviewContainer:hover::after {
   opacity: 0.3;
 }
 
-.individualUploadedImagePreviewsContainer img {
+.individualUploadedImagePreviewContainer img {
   display: block;
 }
 
 .uploadedImagePreviewRemoveButton {
   color: #fff;
   position: absolute;
-  top: var(--MIN-PADDING);
-  right: var(--MIN-PADDING);
+  top: var(--MEDIUM-PADDING);
+  right: var(--MEDIUM-PADDING);
   z-index: 2;
 }
 
 .uploadedImagePreview {
   aspect-ratio: 1;
   object-fit: cover;
-  width: 5rem;
+  width: 100%;
 }
 
 .labelForPostImage {
@@ -104,10 +99,26 @@
   left: -200vw;
 }
 
-.postCategoryDropdownContainer {
-  margin-bottom: 0.5rem;
-}
-
 .postCategoryDropdown {
   background: #e0e7ee;
+}
+
+.giphyGridContainer {
+  max-height: 25rem;
+  overflow: hidden auto;
+}
+
+.giphyTopBar {
+  align-items: center;
+  display: flex;
+  gap: var(--MEDIUM-GAP);
+  margin-bottom: var(--MIN-SPACING);
+}
+
+.giphySearchBar {
+  background: #0001;
+  border-radius: var(--BORDER-RADIUS);
+  flex-grow: 1;
+  padding: var(--MIN-PADDING);
+  text-align: center;
 }

@@ -1,6 +1,5 @@
 .postCardContainer {
   box-shadow: 0px 0px 10px #0002;
-  margin: 2rem 0;
   padding: var(--MEDIUM-PADDING);
   width: min(100%, 35rem);
 }
@@ -14,14 +13,15 @@
 
 .profilePicturePreview {
   aspect-ratio: 1;
-  background: var(--ACCENT-CLR);
   border-radius: 50%;
   width: 2rem;
 }
 
 .demoPostPicture {
   aspect-ratio: 1;
-  background: rgb(255, 133, 133);
+  object-fit: cover;
+  pointer-events: none;
+  width: 100%;
 }
 
 .postWrittenTextContainer {

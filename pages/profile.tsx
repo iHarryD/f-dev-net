@@ -3,8 +3,8 @@ import profileStyles from "../styles/Profile.module.css";
 
 export default function Profile() {
   return (
-    <main className={profileStyles.profilePageMain}>
+    <div className={profileStyles.profilePageContainer}>
       <ProfileSection />
-    </main>
+    </div>
   );
 }

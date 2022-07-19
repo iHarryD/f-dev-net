@@ -23,7 +23,7 @@ export default function HomePageNavbar() {
           </Link>
         </li>
         <li>
-          <Link href="/feed">
+          <Link href="/">
             <div className={homePageNavbarStyles.homeNavbarLink}>
               <span className={homePageNavbarStyles.navbarLinkIconContainer}>
                 <FontAwesomeIcon icon={faBookmark} />

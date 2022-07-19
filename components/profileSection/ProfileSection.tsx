@@ -6,17 +6,25 @@ import { faShareNodes } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
-import { UserWithStats } from "../../interfaces/Common.interface";
+import {
+  Connection,
+  ConnectionStatus,
+  UserWithStats,
+} from "../../interfaces/Common.interface";
+import ConnectionButton from "../connectionButton/ConnectionButton";
 
 export default function ProfileSection() {
   const {
-    query: { user: userQuery },
+    query: { username: userQuery },
   } = useRouter();
   const { data: session } = useSession();
   const [user, setUser] = useState<UserWithStats | null>(null);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const nameInputRef = useRef<HTMLInputElement | null>(null);
   const bioInputRef = useRef<HTMLTextAreaElement | null>(null);
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(
+    ConnectionStatus.NULL
+  );
   // const imageInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -24,14 +32,39 @@ export default function ProfileSection() {
       (async () => {
         try {
           const result = await fetch(
-            `http://127.0.0.1:3000/api/profile?user=${userQuery}`
+            `http://127.0.0.1:3000/api/profiles/${userQuery}`
           );
-          const data = await JSON.parse(JSON.stringify(result));
-          setUser(data);
-          if (session?.user.username === userQuery) {
-            setIsAdmin(true);
-          } else {
-            setIsAdmin(false);
+          if (result.status === 200) {
+            const resultJson: { message: string; data: UserWithStats } =
+              await result.json();
+            setUser(resultJson.data);
+            if (session?.user.username === userQuery) {
+              setIsAdmin(true);
+            } else {
+              const connectionStatusWithUser = resultJson.data.connections.find(
+                (connection) =>
+                  connection.connectionBetween.includes(
+                    resultJson.data.username
+                  )
+              );
+              if (connectionStatusWithUser) {
+                if (connectionStatusWithUser.isActive) {
+                  setConnectionStatus(ConnectionStatus.CONNECTED);
+                } else {
+                  if (
+                    connectionStatusWithUser.initiatedBy ===
+                    session?.user.username
+                  ) {
+                    setConnectionStatus(ConnectionStatus.SENT);
+                  } else {
+                    setConnectionStatus(ConnectionStatus.PENDING);
+                  }
+                }
+              } else {
+                setConnectionStatus(ConnectionStatus.NULL);
+              }
+              setIsAdmin(false);
+            }
           }
         } catch (err) {
           console.error(err);
@@ -50,7 +83,7 @@ export default function ProfileSection() {
       name,
       bio,
     };
-    fetch("/api/profile", {
+    fetch("http://127.0.0.1:3000/api/profiles", {
       method: "PATCH",
       body: JSON.stringify(data),
       headers: {
@@ -58,6 +91,7 @@ export default function ProfileSection() {
       },
     });
   }
+
   return (
     <>
       {user ? (
@@ -113,7 +147,7 @@ export default function ProfileSection() {
               <button className={profileSectionStyles.shareProfileButton}>
                 <FontAwesomeIcon icon={faShareNodes} />
               </button>
-              {isAdmin && (
+              {isAdmin ? (
                 <button
                   className={buttonsStyles.primaryButton}
                   onClick={() => {
@@ -130,6 +164,11 @@ export default function ProfileSection() {
                 >
                   Update
                 </button>
+              ) : (
+                <ConnectionButton
+                  connectionStatus={connectionStatus}
+                  user={user}
+                />
               )}
             </div>
           </div>

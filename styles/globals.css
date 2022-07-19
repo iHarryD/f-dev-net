@@ -13,7 +13,6 @@ body {
   background: var(--PRIMARY-BACKGROUND-CLR);
   color: var(--PRIMARY-FONT-CLR);
   font-family: "Inter", sans-serif;
-  padding-top: var(--NAVBAR-HEIGHT);
 }
 
 a,
@@ -31,7 +30,12 @@ button {
 }
 
 img {
+  display: block;
   max-width: 100%;
+}
+
+main {
+  padding-top: var(--NAVBAR-HEIGHT);
 }
 
 ::-webkit-scrollbar {
@@ -50,4 +54,8 @@ img {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgb(37, 37, 37);
+}
+
+button:disabled {
+  opacity: 0.5;
 }

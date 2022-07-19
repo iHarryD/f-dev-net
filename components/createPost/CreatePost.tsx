@@ -4,16 +4,63 @@ import commonStyles from "../../styles/Common.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImage, faSmile } from "@fortawesome/free-regular-svg-icons";
 import { faClose, faUserTag } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { isImage } from "../../helpers/isImage";
+import SyncLoader from "react-spinners/SyncLoader";
+import { loaderCSSOverrides } from "../../database/loaderCSS";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../store";
+import { append } from "../../features/postSlice";
+import { getImageDataURL } from "../../helpers/getImageDataURL";
+import GiphyGrid from "../giphyGrid/GiphyGrid";
 
 export default function CreatePost() {
-  const [uploadedImages, setUploadedImages] = useState<File[]>([]);
+  const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [wordCount, setWordCount] = useState<number>(0);
   const wordsLimitForPostTextInput = 500;
+  const captionTextAreaRef = useRef<null | HTMLTextAreaElement>(null);
+  const categoryDropDownRef = useRef<null | HTMLSelectElement>(null);
+  const [isPosting, setIsPosting] = useState<boolean>(false);
+  const dispatch = useDispatch();
+  const [isGiphyActive, setIsGiphyActive] = useState<boolean>(false);
+  const [giphySearchQuery, setGiphySearchQuery] = useState<string>("shazam");
 
-  function removeImage(file: File) {
-    setUploadedImages((prev) => prev.filter((item) => item !== file));
+  async function handleCreateNewPost() {
+    if (
+      captionTextAreaRef.current === null ||
+      categoryDropDownRef.current === null
+    )
+      return;
+    try {
+      setIsPosting(true);
+      const base64ImageURL = uploadedImage
+        ? await getImageDataURL(uploadedImage)
+        : "";
+      const data = {
+        caption: captionTextAreaRef.current.value,
+        category: categoryDropDownRef.current.value,
+        media: base64ImageURL,
+      };
+      const result = await fetch("http://127.0.0.1:3000/api/posts", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+      if (result.status === 200) {
+        const resultJson = await result.json();
+        captionTextAreaRef.current.value = "";
+        setUploadedImage(null);
+        setWordCount(0);
+        dispatch(append({ newPosts: [resultJson.data] }));
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsPosting(false);
+    }
   }
 
   return (
@@ -27,6 +74,7 @@ export default function CreatePost() {
       <div className={createPostStyles.postInputTextAreaContainer}>
         <textarea
           placeholder="Write something..."
+          ref={captionTextAreaRef}
           maxLength={wordsLimitForPostTextInput}
           className={createPostStyles.postInputTextArea}
           onChange={(e) => setWordCount(e.target.value.length)}
@@ -35,37 +83,46 @@ export default function CreatePost() {
           {wordCount}/{wordsLimitForPostTextInput}
         </span>
       </div>
-      <div className={createPostStyles.postCategoryDropdownContainer}>
+      <div>
         <select
+          ref={categoryDropDownRef}
           className={`${commonStyles.styledDropdown} ${createPostStyles.postCategoryDropdown}`}
         >
           <option value="general">General</option>
           <option value="query">Query</option>
         </select>
       </div>
-      {uploadedImages && (
-        <div className={createPostStyles.uploadedImagesPreviewsContainer}>
-          {uploadedImages.map((file) => (
-            <div
-              key={file.name}
-              className={
-                createPostStyles.individualUploadedImagePreviewsContainer
-              }
-            >
-              <button
-                className={createPostStyles.uploadedImagePreviewRemoveButton}
-              >
-                <FontAwesomeIcon
-                  icon={faClose}
-                  onClick={() => removeImage(file)}
-                />
-              </button>
-              <img
-                className={createPostStyles.uploadedImagePreview}
-                src={URL.createObjectURL(file)}
-              />
-            </div>
-          ))}
+      {isGiphyActive && (
+        <div className={createPostStyles.giphyGridContainer}>
+          <div className={createPostStyles.giphyTopBar}>
+            <input
+              value={giphySearchQuery}
+              placeholder="search"
+              className={createPostStyles.giphySearchBar}
+              onChange={(e) => setGiphySearchQuery(e.target.value)}
+            />
+            <select className={commonStyles.styledDropdown}>
+              <option value="gifs">Gifs</option>
+              <option value="emojis">Emojis</option>
+            </select>
+          </div>
+          <GiphyGrid searchTerm={giphySearchQuery} />
+        </div>
+      )}
+      {uploadedImage && (
+        <div
+          className={createPostStyles.individualUploadedImagePreviewContainer}
+        >
+          <button className={createPostStyles.uploadedImagePreviewRemoveButton}>
+            <FontAwesomeIcon
+              icon={faClose}
+              onClick={() => setUploadedImage(null)}
+            />
+          </button>
+          <img
+            className={createPostStyles.uploadedImagePreview}
+            src={URL.createObjectURL(uploadedImage)}
+          />
         </div>
       )}
       <div className={createPostStyles.utilitiesContainer}>
@@ -85,25 +142,36 @@ export default function CreatePost() {
                 id="post-image"
                 className={createPostStyles.inputForPostImage}
                 onChange={(e) => {
-                  console.log(e.target.files![0]);
-                  if (uploadedImages.length === 3) return;
-                  if (e.target.files === null) return;
-                  if (e.target.files.length === 0) return;
-                  if (isImage(e.target.files[e.target.files.length - 1])) {
-                    setUploadedImages((prev) => [
-                      ...prev,
-                      e.target.files![e.target.files!.length - 1],
-                    ]);
+                  if (e.target.files) {
+                    if (isImage(e.target.files[0])) {
+                      setUploadedImage(e.target.files[0]);
+                    }
                   }
                 }}
               />
             </label>
           </button>
-          <button>
+          <button onClick={() => setIsGiphyActive((prev) => !prev)}>
             <FontAwesomeIcon icon={faSmile} />
           </button>
         </div>
-        <button className={buttonsStyles.primaryButton}>Post</button>
+        <button
+          className={buttonsStyles.primaryButton}
+          onClick={() => handleCreateNewPost()}
+        >
+          {isPosting ? (
+            <div className={commonStyles.buttonLoaderContainer}>
+              <SyncLoader
+                size="6"
+                color="#fff"
+                loading={isPosting}
+                cssOverride={loaderCSSOverrides}
+              />
+            </div>
+          ) : (
+            "Post"
+          )}
+        </button>
       </div>
     </div>
   );

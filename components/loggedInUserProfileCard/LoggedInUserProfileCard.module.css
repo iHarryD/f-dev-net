@@ -20,7 +20,6 @@
 
 .profilePicturePreview {
   aspect-ratio: 1;
-  background: var(--ACCENT-CLR);
   border-radius: 50%;
   width: 5rem;
 }

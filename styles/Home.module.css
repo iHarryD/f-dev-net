@@ -1,7 +1,0 @@
-.homePostsSection {
-  padding: var(--MEDIUM-PADDING);
-  margin: 0 var(--HOME-SIDEBARS-WIDTH);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}

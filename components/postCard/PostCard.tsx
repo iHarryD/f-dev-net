@@ -1,75 +1,270 @@
 import {
-  faBookmark,
+  faBookmark as faRBookmark,
   faComment,
-  faHeart,
+  faHeart as faRHeart,
 } from "@fortawesome/free-regular-svg-icons";
-import { faShareNodes } from "@fortawesome/free-solid-svg-icons";
+import {
+  faShareNodes,
+  faHeart as faSHeart,
+  faBookmark as faSBookmark,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import postCardStyles from "./PostCard.module.css";
 import buttonsStyles from "../../styles/Buttons.module.css";
 import commonStyles from "../../styles/Common.module.css";
+import { Post } from "../../interfaces/Common.interface";
+import { useSession } from "next-auth/react";
+import { useRef, useState } from "react";
+import CommentBox from "../commentBox/CommentBox";
 
-export default function PostCard() {
+export default function PostCard({
+  details: { _id, caption, comments, likes, media, postedBy, timestamp },
+}: {
+  details: Post;
+}) {
+  const { data: session } = useSession();
+  const [isPostingComment, setIsPostingComment] = useState<boolean>(false);
+  const commentInputRef = useRef<HTMLInputElement | null>(null);
+  const [isLiked, setIsLiked] = useState<boolean>(
+    session ? likes.includes(session.user.username) : false
+  );
+  const [isLiking, setIsLiking] = useState<boolean>(false);
+  const [isBookmarked, setIsBookmarked] = useState<boolean>(
+    session ? session.user.savedPosts.includes(_id) : false
+  );
+  const [isBookmarking, setIsBookmarking] = useState<boolean>(false);
+  const [isCommentBoxOpen, setIsCommentBoxOpen] = useState<boolean>(false);
+
+  async function handleLikePost() {
+    if (session === null) return;
+    try {
+      setIsLiked(true);
+      setIsLiking(true);
+      const result = await fetch(
+        `http://127.0.0.1:3000/api/posts/${_id}/likes`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+      const resultJson = await result.json();
+      console.log(resultJson);
+    } catch (err) {
+      console.log(err);
+      setIsLiked(false);
+    } finally {
+      setIsLiking(false);
+    }
+  }
+
+  async function handleUnlikePost() {
+    if (session === null) return;
+    try {
+      setIsLiked(false);
+      setIsLiking(true);
+      const result = await fetch(
+        `http://127.0.0.1:3000/api/posts/${_id}/likes`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+      const resultJson = await result.json();
+      console.log(resultJson);
+    } catch (err) {
+      console.log(err);
+      setIsLiked(true);
+    } finally {
+      setIsLiking(false);
+    }
+  }
+
+  async function handleBookmarkPost() {
+    if (session === null) return;
+    try {
+      setIsBookmarked(true);
+      setIsBookmarking(true);
+      const result = await fetch(
+        `http://127.0.0.1:3000/api/profiles/bookmarks`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            postID: _id,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+      const resultJson = await result.json();
+      console.log(resultJson);
+    } catch (err) {
+      console.log(err);
+      setIsBookmarked(false);
+    } finally {
+      setIsBookmarking(false);
+    }
+  }
+
+  async function handleRemoveBookmark() {
+    if (session === null) return;
+    try {
+      setIsBookmarked(false);
+      setIsBookmarking(true);
+      const result = await fetch(
+        `http://127.0.0.1:3000/api/profiles/bookmarks`,
+        {
+          method: "DELETE",
+          body: JSON.stringify({
+            postID: _id,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+      const resultJson = await result.json();
+      console.log(resultJson);
+    } catch (err) {
+      console.log(err);
+      setIsBookmarked(true);
+    } finally {
+      setIsBookmarking(false);
+    }
+  }
+
+  async function handlePostComment() {
+    if (!commentInputRef.current?.value.replaceAll(" ", "")) return;
+    try {
+      const data = {
+        comment: commentInputRef.current.value,
+      };
+      setIsPostingComment(true);
+      const result = await fetch(
+        `http://127.0.0.1:3000/api/posts/${_id}/comments`,
+        {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const resultJson = await result.json();
+      commentInputRef.current.value = "";
+      console.log(resultJson);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsPostingComment(false);
+    }
+  }
+
   return (
     <div className={postCardStyles.postCardContainer}>
       <div className={postCardStyles.postingAccountDetailsContainer}>
-        <div className={postCardStyles.profilePicturePreview}></div>
         <div>
-          <p>Harry</p>
-          <span className={commonStyles.username}>@harry</span>
+          <img
+            src={postedBy.image}
+            alt={postedBy.username}
+            className={postCardStyles.profilePicturePreview}
+          />
+        </div>
+        <div>
+          <p>{postedBy.name}</p>
+          <span className={commonStyles.username}>@{postedBy.username}</span>
         </div>
       </div>
-      <div className={postCardStyles.demoPostPicture}></div>
+      {media && (
+        <div>
+          <img
+            src={media}
+            alt={media}
+            className={postCardStyles.demoPostPicture}
+          />
+        </div>
+      )}
       <div className={postCardStyles.postTextContentContainer}>
         <div className={postCardStyles.postWrittenTextContainer}>
-          <p>
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Optio,
-            adipisci!
-          </p>
-          <span className={postCardStyles.postAge}>2 days ago</span>
+          <p>{caption}</p>
+          <span className={postCardStyles.postAge}>
+            {new Date(timestamp).toLocaleDateString()}
+          </span>
         </div>
         <div className={postCardStyles.actionBar}>
           <div>
-            <button>
-              <FontAwesomeIcon icon={faHeart} />
-            </button>
-            <button>
+            {isLiked ? (
+              <button disabled={isLiking} onClick={() => handleUnlikePost()}>
+                <FontAwesomeIcon icon={faSHeart} color="#fd3b3b" />
+              </button>
+            ) : (
+              <button disabled={isLiking} onClick={() => handleLikePost()}>
+                <FontAwesomeIcon icon={faRHeart} />
+              </button>
+            )}
+            <button
+              onClick={() => {
+                if (comments.length) setIsCommentBoxOpen((prev) => !prev);
+              }}
+            >
               <FontAwesomeIcon icon={faComment} />
             </button>
           </div>
           <div>
-            <button>
-              <FontAwesomeIcon icon={faBookmark} />
-            </button>
+            {isBookmarked ? (
+              <button
+                disabled={isBookmarking}
+                onClick={() => handleRemoveBookmark()}
+              >
+                <FontAwesomeIcon icon={faSBookmark} />
+              </button>
+            ) : (
+              <button
+                disabled={isBookmarking}
+                onClick={() => handleBookmarkPost()}
+              >
+                <FontAwesomeIcon icon={faRBookmark} />
+              </button>
+            )}
             <button>
               <FontAwesomeIcon icon={faShareNodes} />
             </button>
           </div>
         </div>
         <div className={postCardStyles.latestCommentsPreviewContainer}>
-          <p className={postCardStyles.latestCommentPreview}>
-            Lorem ipsum dolor sit amet.
-          </p>
-          <p className={postCardStyles.latestCommentPreview}>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Laudantium,
-            et sequi? Dolore quibusdam id iusto a delectus saepe tempore at aut
-            consequatur, totam et repellat vero debitis inventore magnam illo
-            sequi, ea soluta.
-          </p>
-          <div className={postCardStyles.viewAllCommentsButtonContainer}>
-            <button className={buttonsStyles.textButton}>
-              View all 291 comments
-            </button>
-          </div>
+          {comments.length === 0 ? (
+            <p>No comments</p>
+          ) : isCommentBoxOpen && comments.length > 2 ? (
+            <CommentBox comments={comments} />
+          ) : (
+            comments
+              .slice(0, comments.length >= 2 ? 2 : 1)
+              .map((comment) => (
+                <p className={postCardStyles.latestCommentPreview}>
+                  {comment.comment}
+                </p>
+              ))
+          )}
         </div>
         <div className={postCardStyles.commentActionBar}>
           <input
+            ref={commentInputRef}
             className={postCardStyles.addCommentInput}
             type="text"
             placeholder="Add a comment"
           />
           <button
+            disabled={isPostingComment}
             className={`${buttonsStyles.primaryButton} ${postCardStyles.commentButton}`}
+            onClick={() => handlePostComment()}
           >
             Comment
           </button>

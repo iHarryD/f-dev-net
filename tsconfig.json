@@ -16,6 +16,6 @@
     "incremental": true,
     "typeRoots": ["./interfaces"]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "cloudinary/index.ts"],
   "exclude": ["node_modules"]
 }

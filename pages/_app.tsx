@@ -3,6 +3,9 @@ import "../styles/variables.css";
 import type { AppProps } from "next/app";
 import Layout from "../components/layout/Layout";
 import { SessionProvider } from "next-auth/react";
+import AuthUIHandler from "../components/authUIHandler/AuthUIHandler";
+import { Provider as StoreProvider } from "react-redux";
+import { store } from "../store";
 
 export default function MyApp({
   Component,
@@ -10,9 +13,13 @@ export default function MyApp({
 }: AppProps) {
   return (
     <SessionProvider session={session}>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+      <StoreProvider store={store}>
+        <AuthUIHandler>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </AuthUIHandler>
+      </StoreProvider>
     </SessionProvider>
   );
 }
