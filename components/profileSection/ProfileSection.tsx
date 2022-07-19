@@ -12,6 +12,8 @@ import {
   UserWithStats,
 } from "../../interfaces/Common.interface";
 import ConnectionButton from "../connectionButton/ConnectionButton";
+import { isImage } from "../../helpers/isImage";
+import { getImageDataURL } from "../../helpers/getImageDataURL";
 
 export default function ProfileSection() {
   const {
@@ -25,7 +27,7 @@ export default function ProfileSection() {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(
     ConnectionStatus.NULL
   );
-  // const imageInputRef = useRef<HTMLInputElement>(null)
+  const [updatedImage, setUpdatedImage] = useState<File | null>(null);
 
   useEffect(() => {
     if (userQuery) {
@@ -78,11 +80,18 @@ export default function ProfileSection() {
     }
   }, [userQuery, session]);
 
-  async function handleUpdateUser(name: string, bio: string) {
-    const data = {
+  async function handleUpdateUser(
+    name: string,
+    bio: string,
+    image: File | null
+  ) {
+    const data: { name: string; bio: string; image?: string } = {
       name,
       bio,
     };
+    if (image) {
+      data.image = (await getImageDataURL(image)) as string;
+    }
     fetch("http://127.0.0.1:3000/api/profiles", {
       method: "PATCH",
       body: JSON.stringify(data),
@@ -100,12 +109,56 @@ export default function ProfileSection() {
             <div
               className={profileSectionStyles.profilePictureUsernameContainer}
             >
-              <div>
-                <img
-                  src={user.image}
-                  alt="profile-picture"
-                  className={profileSectionStyles.profilePicture}
-                />
+              <div
+                className={profileSectionStyles.profilePictureUpdateContainer}
+              >
+                {isAdmin ? (
+                  <>
+                    <div
+                      className={
+                        profileSectionStyles.profilePictureUpdateOverlay
+                      }
+                    >
+                      <span
+                        className={
+                          profileSectionStyles.profilePictureUpdateOverlayText
+                        }
+                      >
+                        Change
+                      </span>
+                    </div>
+                    <label htmlFor="update-profile-picture">
+                      <img
+                        src={
+                          updatedImage
+                            ? URL.createObjectURL(updatedImage)
+                            : user.image
+                        }
+                        alt="profile-picture"
+                        className={profileSectionStyles.profilePicture}
+                      />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        id="update-profile-picture"
+                        className={profileSectionStyles.profilePictureInput}
+                        onChange={(e) => {
+                          if (e.target.files) {
+                            if (isImage(e.target.files[0])) {
+                              setUpdatedImage(e.target.files[0]);
+                            }
+                          }
+                        }}
+                      />
+                    </label>
+                  </>
+                ) : (
+                  <img
+                    src={user.image}
+                    alt="profile-picture"
+                    className={profileSectionStyles.profilePicture}
+                  />
+                )}
               </div>
               <p
                 className={`${profileSectionStyles.username} ${commonStyles.username}`}
@@ -158,7 +211,8 @@ export default function ProfileSection() {
                       return;
                     handleUpdateUser(
                       nameInputRef.current.value,
-                      bioInputRef.current.value
+                      bioInputRef.current.value,
+                      updatedImage
                     );
                   }}
                 >

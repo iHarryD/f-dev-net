@@ -5,8 +5,18 @@ import { unstable_getServerSession } from "next-auth";
 import { nextAuthConfig } from "../auth/[...nextauth]";
 import connectToMongoDb from "../../../lib/mongodb";
 import { cursorToDoc } from "../../../helpers/cursorToDoc";
+import { uploadImage } from "../../../cloudinary";
+import Cors from "cors";
+import corsMiddleware from "../../../helpers/corsMiddleware";
+
+const cors = Cors({
+  methods: ["GET", "PATCH"],
+  credentials: true,
+  origin: "http://localhost:3000",
+});
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
+  await corsMiddleware(req, res, cors);
   const { method } = req;
   const session = await unstable_getServerSession(req, res, nextAuthConfig);
   if (session === null)
@@ -47,18 +57,23 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           .status(200)
           .json({ message: "User fetched.", data: userDetails });
       case "PATCH":
-        const { name, bio } = req.body;
+        const { name, bio, image } = req.body;
         connection.clientPromise = await (await connectToMongoDB).connect();
+        const update: { name: string; bio: string; image?: string } = {
+          name,
+          bio,
+        };
+        if (image) {
+          const publicID = await uploadImage(image);
+          update.image = publicID.secure_url;
+        }
         const updatedUser = await connection.clientPromise
           .db()
           .collection("users")
           .updateOne(
             { username: session.user.username },
             {
-              $set: {
-                name: name,
-                bio: bio,
-              },
+              $set: update,
             }
           );
         return res.json({ message: "Profile updated.", data: updatedUser });
