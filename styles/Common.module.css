@@ -71,3 +71,31 @@
   flex-direction: column;
   align-items: center;
 }
+
+.chipContainer {
+  display: flex;
+  gap: var(--MEDIUM-GAP);
+  margin: 1rem 0;
+}
+
+.chip {
+  background: #0001;
+  border-radius: var(--BORDER-RADIUS);
+  padding: var(--MIN-PADDING);
+}
+
+.chipActive {
+  background: var(--SECONDARY-BACKGROUND-CLR);
+  color: var(--SECONDARY-FONT-CLR);
+}
+
+.chip:hover {
+  background: #0005;
+}
+
+.postsContainer {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--LARGE-GAP);
+}

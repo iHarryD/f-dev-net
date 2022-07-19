@@ -7,9 +7,10 @@ import connectToMongoDb from "../../../lib/mongodb";
 import { nextAuthConfig } from "../auth/[...nextauth]";
 import Cors from "cors";
 import { uploadImage } from "../../../cloudinary";
+import { cursorToDoc } from "../../../helpers/cursorToDoc";
 
 const cors = Cors({
-  methods: ["POST"],
+  methods: ["GET", "POST"],
   credentials: true,
   origin: "http://localhost:3000",
 });
@@ -22,6 +23,24 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   };
   try {
     switch (method) {
+      case "GET":
+        connection.clientPromise = await (await connectToMongoDb).connect();
+        const filter: { category?: "query" | "general" } = {};
+        if (req.query.filter === "query") {
+          filter.category = "query";
+        } else if (req.query.filter === "general") {
+          filter.category = "general";
+        }
+        const result = connection.clientPromise
+          .db()
+          .collection("posts")
+          .find(filter)
+          .sort(
+            req.query.sort === "trending" ? { likes: -1 } : { timestamp: -1 }
+          );
+        return res
+          .status(200)
+          .json({ message: "Posts fetched.", data: await cursorToDoc(result) });
       case "POST":
         const validation = postValidation(req.body);
         if (validation.error)

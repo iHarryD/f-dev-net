@@ -9,17 +9,36 @@ import connectToMongoDb from "../lib/mongodb";
 import { cursorToDoc } from "../helpers/cursorToDoc";
 import { Post } from "../interfaces/Common.interface";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { refresh } from "../features/postSlice";
 import { RootState } from "../store";
 
 export default function Home({ posts: newPosts }: { posts: Post[] }) {
   const posts = useSelector((state: RootState) => state.postSlice);
   const dispatch = useDispatch();
+  const [sortedBy, setSortedBy] = useState<"date" | "trending">("date");
+  const [filterBy, setFilterBy] = useState<"general" | "query" | null>(null);
+  const inititalFetch = useRef(false);
 
   useEffect(() => {
     dispatch(refresh({ newPosts }));
   }, []);
+
+  useEffect(() => {
+    if (inititalFetch.current === false) {
+      inititalFetch.current = true;
+    } else {
+      (async () => {
+        const result = await fetch(
+          `http://127.0.0.1:3000/api/posts?sort=${sortedBy}&filter=${filterBy}`
+        );
+        const resultJson: { message: string; data: Post[] } =
+          await result.json();
+        console.log(resultJson);
+        dispatch(refresh({ newPosts: resultJson.data }));
+      })();
+    }
+  }, [sortedBy, filterBy]);
 
   return (
     <>
@@ -30,9 +49,70 @@ export default function Home({ posts: newPosts }: { posts: Post[] }) {
       <HomePageSidebar />
       <div className={commonStyles.pagePostsSection}>
         <CreatePost />
-        {posts.map((post) => (
-          <PostCard key={post._id} details={post} />
-        ))}
+        <div className={commonStyles.chipContainer}>
+          <div
+            className={`${commonStyles.chip} ${
+              sortedBy === "date" ? commonStyles.chipActive : ""
+            }`}
+          >
+            <label>
+              <input
+                defaultChecked
+                type="checkbox"
+                name="post-sort-by"
+                onChange={() => setSortedBy("date")}
+              />
+              date
+            </label>
+          </div>
+          <div
+            className={`${commonStyles.chip} ${
+              sortedBy === "trending" ? commonStyles.chipActive : ""
+            }`}
+          >
+            <label>
+              <input
+                type="checkbox"
+                name="post-sort-by"
+                onChange={() => setSortedBy("trending")}
+              />
+              trending
+            </label>
+          </div>
+          <div
+            className={`${commonStyles.chip} ${
+              filterBy === "general" ? commonStyles.chipActive : ""
+            }`}
+          >
+            <label>
+              <input
+                type="checkbox"
+                name="post-filter-by"
+                onChange={() => setFilterBy("general")}
+              />
+              general
+            </label>
+          </div>
+          <div
+            className={`${commonStyles.chip} ${
+              filterBy === "query" ? commonStyles.chipActive : ""
+            }`}
+          >
+            <label>
+              <input
+                type="checkbox"
+                name="post-filter-by"
+                onChange={() => setFilterBy("query")}
+              />
+              query
+            </label>
+          </div>
+        </div>
+        <div className={commonStyles.postsContainer}>
+          {posts.map((post) => (
+            <PostCard key={post._id} details={post} />
+          ))}
+        </div>
       </div>
       <HomePageNavbar />
     </>
