@@ -1,10 +1,10 @@
 import { MongoClient, ObjectId } from "mongodb";
-import { NextApiRequest, NextApiResponse } from "next";
-import { unstable_getServerSession } from "next-auth";
+import { NextApiResponse } from "next";
 import connectToMongoDb from "../../../../lib/mongodb";
-import { nextAuthConfig } from "../../auth/[...nextauth]";
 import Cors from "cors";
 import corsMiddleware from "../../../../helpers/corsMiddleware";
+import verifyToken from "../../../../helpers/verifyToken";
+import { RequestWithUser } from "../../../../interfaces/Common.type";
 
 const cors = Cors({
   methods: ["GET", "POST"],
@@ -12,19 +12,26 @@ const cors = Cors({
   origin: "http://localhost:3000",
 });
 
-export default async function (req: NextApiRequest, res: NextApiResponse) {
+export default async function (req: RequestWithUser, res: NextApiResponse) {
   await corsMiddleware(req, res, cors);
+  await verifyToken(req, res);
   const { method } = req;
   const { connectionID } = req.query;
-  const session = await unstable_getServerSession(req, res, nextAuthConfig);
-  if (session === null) return res.status(401).json({ message: "Private" });
   const connection: { clientPromise: null | MongoClient } = {
     clientPromise: null,
   };
   try {
+    connection.clientPromise = await (await connectToMongoDb).connect();
+    const otherUser = await connection.clientPromise
+      .db()
+      .collection("users")
+      .findOne({
+        username: req.body.otherUser,
+      });
+    if (otherUser === null)
+      return res.status(303).json({ message: "User not found.", data: null });
     switch (method) {
       case "PATCH":
-        connection.clientPromise = await (await connectToMongoDb).connect();
         const establishedConnection = await connection.clientPromise
           .db()
           .collection("connections")
@@ -32,9 +39,9 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             {
               _id: new ObjectId(connectionID as string),
               connectionBetween: {
-                $all: [session.user.username, req.body.otherUser],
+                $all: [req.user, otherUser.username],
               },
-              initiatedBy: req.body.otherUser,
+              initiatedBy: otherUser.username,
             },
             {
               $set: { isActive: true },
@@ -52,7 +59,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           .findOneAndDelete({
             _id: new ObjectId(connectionID as string),
             connectionBetween: {
-              $all: [session.user.username, req.body.otherUser],
+              $all: [req.user, otherUser.username],
             },
           });
         return res

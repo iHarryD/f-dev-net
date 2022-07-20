@@ -31,45 +31,48 @@ import {
 } from "../../features/postSlice";
 import UsernameLink from "../usernameLink/UsernameLink";
 import Tooltip from "../tooltip/Tooltip";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function PostCard({
   details: { _id, caption, comments, likes, media, postedBy, timestamp },
 }: {
   details: Post;
 }) {
-  const { data: session } = useSession();
+  const { userCredentials } = useAuth();
   const [isPostingComment, setIsPostingComment] = useState<boolean>(false);
   const commentInputRef = useRef<HTMLInputElement | null>(null);
   const [isLiking, setIsLiking] = useState<boolean>(false);
   const [isBookmarked, setIsBookmarked] = useState<boolean>(
-    session ? session.user.savedPosts.includes(_id) : false
+    userCredentials.user ? userCredentials.user.savedPosts.includes(_id) : false
   );
   const [isBookmarking, setIsBookmarking] = useState<boolean>(false);
   const [isCommentBoxOpen, setIsCommentBoxOpen] = useState<boolean>(false);
   const dispatch = useDispatch();
 
   function handleLikePost() {
-    if (session === null) return;
-    dispatch(like({ postID: _id, username: session.user.username }));
+    if (userCredentials.user === null) return;
+    dispatch(like({ postID: _id, username: userCredentials.user.username }));
     likePost(_id, setIsLiking, undefined, () =>
-      dispatch(unlike({ postID: _id, username: session.user.username }))
+      dispatch(
+        unlike({ postID: _id, username: userCredentials.user!.username })
+      )
     );
   }
 
   function handleUnlikePost() {
-    if (session === null) return;
-    dispatch(unlike({ postID: _id, username: session.user.username }));
+    if (userCredentials.user === null) return;
+    dispatch(unlike({ postID: _id, username: userCredentials.user.username }));
     unlikePost(_id, setIsLiking, undefined, () =>
-      dispatch(like({ postID: _id, username: session.user.username }))
+      dispatch(like({ postID: _id, username: userCredentials.user!.username }))
     );
   }
 
   function handleBookmarkPost() {
-    if (session === null) return;
+    if (userCredentials.user === null) return;
     bookmarkPost(_id, setIsBookmarking);
   }
   function handleRemoveBookmark() {
-    if (session === null) return;
+    if (userCredentials.user === null) return;
     bookmarkPost(_id, setIsBookmarking);
   }
 
@@ -108,7 +111,7 @@ export default function PostCard({
             <UsernameLink username={postedBy.username} />
           </div>
         </div>
-        {session?.user.username === postedBy.username && (
+        {userCredentials.user?.username === postedBy.username && (
           <div>
             <Tooltip
               tooltipItems={[
@@ -139,7 +142,11 @@ export default function PostCard({
         </div>
         <div className={postCardStyles.actionBar}>
           <div>
-            {(session ? likes.includes(session.user.username) : false) ? (
+            {(
+              userCredentials.user
+                ? likes.includes(userCredentials.user.username)
+                : false
+            ) ? (
               <button disabled={isLiking} onClick={() => handleUnlikePost()}>
                 <FontAwesomeIcon icon={faSHeart} color="#fd3b3b" />
               </button>

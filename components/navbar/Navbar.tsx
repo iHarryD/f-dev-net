@@ -3,10 +3,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-regular-svg-icons";
 import { faGear, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import Logo from "../logo/Logo";
-import { signOut, useSession } from "next-auth/react";
+import { useAuth } from "../../contexts/AuthContext";
 
 export function MacroNavbar() {
-  const { data: session } = useSession();
+  const { status, logout } = useAuth();
   return (
     <nav className={navbarStyles.navbar}>
       <Logo />
@@ -27,12 +27,9 @@ export function MacroNavbar() {
             <FontAwesomeIcon icon={faGear} />
           </button>
         </li>
-        {session && (
+        {status === "authenticated" && (
           <li>
-            <button
-              title="Log out"
-              onClick={() => signOut({ redirect: false })}
-            >
+            <button title="Log out" onClick={() => logout()}>
               <FontAwesomeIcon icon={faRightFromBracket} />
             </button>
           </li>

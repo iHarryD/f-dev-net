@@ -1,9 +1,10 @@
 import { MongoClient, ObjectId } from "mongodb";
-import { NextApiRequest, NextApiResponse } from "next";
-import { unstable_getServerSession } from "next-auth";
+import { NextApiResponse } from "next";
 import connectToMongoDb from "../../../../../lib/mongodb";
-import { nextAuthConfig } from "../../../auth/[...nextauth]";
 import Cors from "cors";
+import { RequestWithUser } from "../../../../../interfaces/Common.type";
+import corsMiddleware from "../../../../../helpers/corsMiddleware";
+import verifyToken from "../../../../../helpers/verifyToken";
 
 const cors = Cors({
   methods: ["GET", "POST", "DELETE"],
@@ -11,27 +12,11 @@ const cors = Cors({
   origin: "http://localhost:3000",
 });
 
-function runMiddleware(
-  req: NextApiRequest,
-  res: NextApiResponse,
-  func: (req: NextApiRequest, res: NextApiResponse, callback: any) => any
-) {
-  return new Promise((resolve, reject) => {
-    func(req, res, (result: any) => {
-      if (result instanceof Error) {
-        return reject(result);
-      }
-      return resolve(result);
-    });
-  });
-}
-
-export default async function (req: NextApiRequest, res: NextApiResponse) {
-  await runMiddleware(req, res, cors);
+export default async function (req: RequestWithUser, res: NextApiResponse) {
+  await corsMiddleware(req, res, cors);
+  await verifyToken(req, res);
   const { method } = req;
   const { chatID, messageID } = req.query;
-  const session = await unstable_getServerSession(req, res, nextAuthConfig);
-  if (session === null) return res.status(401).json({ message: "Private" });
   const connection: { clientPromise: null | MongoClient } = {
     clientPromise: null,
   };
@@ -47,7 +32,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             {
               $and: [
                 { _id: new ObjectId(chatID as string) },
-                { "chatBetween.username": { $in: [session.user.username] } },
+                { "chatBetween.username": { $in: [req.user] } },
                 { "conversation._id": new ObjectId(messageID as string) },
               ],
             },
@@ -65,7 +50,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             {
               $and: [
                 { _id: new ObjectId(chatID as string) },
-                { "chatBetween.username": { $in: [session.user.username] } },
+                { "chatBetween.username": { $in: [req.user] } },
               ],
             },
             {

@@ -5,11 +5,11 @@ import chatStyles from "../styles/Chat.module.css";
 import connectToMongoDb from "../lib/mongodb";
 import { cursorToDoc } from "../helpers/cursorToDoc";
 import { unstable_getServerSession } from "next-auth";
-import { nextAuthConfig } from "./api/auth/[...nextauth]";
 import { Chat as IChat } from "../interfaces/Common.interface";
 import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import { refresh } from "../features/chatSlice";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Chat({ chats: newChats }: { chats: IChat[] }) {
   const dispatch = useDispatch();
@@ -37,20 +37,23 @@ export async function getServerSideProps({
   req: NextApiRequest;
   res: NextApiResponse;
 }) {
-  const session = await unstable_getServerSession(req, res, nextAuthConfig);
-  if (session === null)
+  const { userCredentials } = useAuth();
+  if (userCredentials.user === null) {
     return {
       props: {
-        chats: [],
+        posts: [],
       },
     };
+  }
   const connection = await (await connectToMongoDb).connect();
   try {
     const userChats = connection
       .db()
       .collection("chats")
       .find({
-        chatBetween: { $elemMatch: { username: session.user.username } },
+        chatBetween: {
+          $elemMatch: { username: userCredentials.user.username },
+        },
       });
     return {
       props: {

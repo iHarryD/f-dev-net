@@ -1,13 +1,13 @@
-import { MongoClient } from "mongodb";
-import { NextApiRequest, NextApiResponse } from "next";
-import { unstable_getServerSession } from "next-auth";
+import { MongoClient, ObjectId } from "mongodb";
+import { NextApiResponse } from "next";
 import corsMiddleware from "../../../helpers/corsMiddleware";
 import { postValidation } from "../../../joi/postValidation";
 import connectToMongoDb from "../../../lib/mongodb";
-import { nextAuthConfig } from "../auth/[...nextauth]";
 import Cors from "cors";
 import { uploadImage } from "../../../cloudinary";
 import { cursorToDoc } from "../../../helpers/cursorToDoc";
+import { RequestWithUser } from "../../../interfaces/Common.type";
+import verifyToken from "../../../helpers/verifyToken";
 
 const cors = Cors({
   methods: ["GET", "POST"],
@@ -15,8 +15,9 @@ const cors = Cors({
   origin: "http://localhost:3000",
 });
 
-export default async function (req: NextApiRequest, res: NextApiResponse) {
+export default async function (req: RequestWithUser, res: NextApiResponse) {
   await corsMiddleware(req, res, cors);
+
   const { method } = req;
   const connection: { clientPromise: null | MongoClient } = {
     clientPromise: null,
@@ -42,22 +43,25 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           .status(200)
           .json({ message: "Posts fetched.", data: await cursorToDoc(result) });
       case "POST":
+        await verifyToken(req, res);
         const validation = postValidation(req.body);
         if (validation.error)
           return res
             .status(500)
             .json({ message: validation.error.details[0].message });
-        const session = await unstable_getServerSession(
-          req,
-          res,
-          nextAuthConfig
-        );
-        if (session === null)
-          return res.status(300).json({ message: "Unauthorized" });
         connection.clientPromise = await (await connectToMongoDb).connect();
         if (req.body.media) {
           const publicID = await uploadImage(req.body.media);
           req.body.media = publicID.secure_url;
+        }
+        const user = await connection.clientPromise
+          .db()
+          .collection("users")
+          .findOne({ username: req.user });
+        if (user === null) {
+          return res
+            .status(404)
+            .json({ message: "User not found.", data: null });
         }
         const insertedDoc = await connection.clientPromise
           .db()
@@ -68,9 +72,9 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             comments: [],
             timestamp: new Date(),
             postedBy: {
-              name: session.user.name,
-              username: session.user.username,
-              image: session.user.image,
+              username: user.username,
+              name: user.name,
+              image: user.image,
             },
           });
         const newPost = await connection.clientPromise
