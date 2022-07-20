@@ -1,14 +1,18 @@
 import LoggedInHomeSidebar from "../loggedInHomeSidebar/LoggedInHomeSidebar";
 import LoggedOutHomeSidebar from "../loggedOutHomeSidebar/LoggedOutHomeSidebar";
 import homePageSidebarStyles from "./HomePageSidebar.module.css";
-import { useSession } from "next-auth/react";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function HomePageSidebar() {
-  const { data: session } = useSession();
+  const { status } = useAuth();
 
   return (
     <div className={homePageSidebarStyles.homeSidebar}>
-      {session ? <LoggedInHomeSidebar /> : <LoggedOutHomeSidebar />}
+      {status === "authenticated" ? (
+        <LoggedInHomeSidebar />
+      ) : (
+        <LoggedOutHomeSidebar />
+      )}
     </div>
   );
 }

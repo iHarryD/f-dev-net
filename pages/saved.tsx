@@ -4,11 +4,10 @@ import HomePageSidebar from "../components/homePageSidebar/HomePageSidebar";
 import { cursorToDoc } from "../helpers/cursorToDoc";
 import commonStyles from "../styles/Common.module.css";
 import connectToMongoDb from "../lib/mongodb";
-import { unstable_getServerSession } from "next-auth";
-import { nextAuthConfig } from "./api/auth/[...nextauth]";
 import { Post } from "../interfaces/Common.interface";
 import PostCard from "../components/postCard/PostCard";
 import { ObjectId } from "mongodb";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Saved({ posts }: { posts: Post[] }) {
   return (
@@ -31,21 +30,23 @@ export async function getServerSideProps({
   req: NextApiRequest;
   res: NextApiResponse;
 }) {
+  const { userCredentials } = useAuth();
+  if (userCredentials.user === null) {
+    return {
+      props: {
+        posts: [],
+      },
+    };
+  }
   const connection = await (await connectToMongoDb).connect();
   try {
-    const session = await unstable_getServerSession(req, res, nextAuthConfig);
-    if (session === null) {
-      return {
-        props: {
-          posts: [],
-        },
-      };
-    }
     const result = connection
       .db()
       .collection("posts")
       .find({
-        _id: { $all: session.user.savedPosts.map((id) => new ObjectId(id)) },
+        _id: {
+          $all: userCredentials.user.savedPosts.map((id) => new ObjectId(id)),
+        },
       })
       .sort({ timestamp: -1 });
     return {
