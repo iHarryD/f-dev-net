@@ -1,0 +1,9 @@
+.username {
+  cursor: pointer;
+  font-weight: 600;
+  opacity: var(--FADED-TEXT-OPACITY);
+}
+
+.username:hover {
+  text-decoration: underline;
+}

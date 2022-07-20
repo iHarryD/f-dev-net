@@ -24,6 +24,8 @@ import {
 } from "../../services/postServices";
 import { useDispatch } from "react-redux";
 import { updateComments, like, unlike } from "../../features/postSlice";
+import Link from "next/link";
+import UsernameLink from "../usernameLink/UsernameLink";
 
 export default function PostCard({
   details: { _id, caption, comments, likes, media, postedBy, timestamp },
@@ -89,9 +91,10 @@ export default function PostCard({
             className={postCardStyles.profilePicturePreview}
           />
         </div>
+
         <div>
           <p>{postedBy.name}</p>
-          <span className={commonStyles.username}>@{postedBy.username}</span>
+          <UsernameLink username={postedBy.username} />
         </div>
       </div>
       {media && (
