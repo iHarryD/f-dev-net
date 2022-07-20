@@ -14,6 +14,7 @@ import {
 import ConnectionButton from "../connectionButton/ConnectionButton";
 import { isImage } from "../../helpers/isImage";
 import { getImageDataURL } from "../../helpers/getImageDataURL";
+import { updateUser } from "../../services/profileServices";
 
 export default function ProfileSection() {
   const {
@@ -80,25 +81,16 @@ export default function ProfileSection() {
     }
   }, [userQuery, session]);
 
-  async function handleUpdateUser(
-    name: string,
-    bio: string,
-    image: File | null
-  ) {
-    const data: { name: string; bio: string; image?: string } = {
-      name,
-      bio,
+  function handleUpdateUser() {
+    if (nameInputRef.current === null || bioInputRef.current === null) return;
+    const updatedUser: { name: string; bio: string; image?: File } = {
+      name: nameInputRef.current.value,
+      bio: bioInputRef.current.value,
     };
-    if (image) {
-      data.image = (await getImageDataURL(image)) as string;
+    if (updatedImage) {
+      updatedUser.image = updatedImage;
     }
-    fetch("http://127.0.0.1:3000/api/profiles", {
-      method: "PATCH",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    updateUser(updatedUser);
   }
 
   return (
@@ -203,18 +195,7 @@ export default function ProfileSection() {
               {isAdmin ? (
                 <button
                   className={buttonsStyles.primaryButton}
-                  onClick={() => {
-                    if (
-                      nameInputRef.current === null ||
-                      bioInputRef.current === null
-                    )
-                      return;
-                    handleUpdateUser(
-                      nameInputRef.current.value,
-                      bioInputRef.current.value,
-                      updatedImage
-                    );
-                  }}
+                  onClick={() => handleUpdateUser()}
                 >
                   Update
                 </button>
