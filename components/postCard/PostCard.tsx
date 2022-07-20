@@ -11,21 +11,26 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import postCardStyles from "./PostCard.module.css";
 import buttonsStyles from "../../styles/Buttons.module.css";
-import commonStyles from "../../styles/Common.module.css";
 import { Post } from "../../interfaces/Common.interface";
 import { useSession } from "next-auth/react";
 import { useRef, useState } from "react";
 import CommentBox from "../commentBox/CommentBox";
 import {
   bookmarkPost,
+  deletePost,
   likePost,
   postComment,
   unlikePost,
 } from "../../services/postServices";
 import { useDispatch } from "react-redux";
-import { updateComments, like, unlike } from "../../features/postSlice";
-import Link from "next/link";
+import {
+  updateComments,
+  like,
+  unlike,
+  deletePost as deletePostAction,
+} from "../../features/postSlice";
 import UsernameLink from "../usernameLink/UsernameLink";
+import Tooltip from "../tooltip/Tooltip";
 
 export default function PostCard({
   details: { _id, caption, comments, likes, media, postedBy, timestamp },
@@ -81,21 +86,40 @@ export default function PostCard({
     );
   }
 
+  function handleDeletePost() {
+    deletePost(_id, undefined, (result) => {
+      dispatch(deletePostAction({ postID: _id }));
+    });
+  }
+
   return (
     <div className={postCardStyles.postCardContainer}>
-      <div className={postCardStyles.postingAccountDetailsContainer}>
-        <div>
-          <img
-            src={postedBy.image}
-            alt={postedBy.username}
-            className={postCardStyles.profilePicturePreview}
-          />
+      <div className={postCardStyles.postCardHeader}>
+        <div className={postCardStyles.postingAccountDetailsContainer}>
+          <div>
+            <img
+              src={postedBy.image}
+              alt={postedBy.username}
+              className={postCardStyles.profilePicturePreview}
+            />
+          </div>
+          <div>
+            <p>{postedBy.name}</p>
+            <UsernameLink username={postedBy.username} />
+          </div>
         </div>
-
-        <div>
-          <p>{postedBy.name}</p>
-          <UsernameLink username={postedBy.username} />
-        </div>
+        {session?.user.username === postedBy.username && (
+          <div>
+            <Tooltip
+              tooltipItems={[
+                {
+                  tooltipChild: <span>Delete </span>,
+                  tooltipOnClickHandler: handleDeletePost,
+                },
+              ]}
+            />
+          </div>
+        )}
       </div>
       {media && (
         <div>

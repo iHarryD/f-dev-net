@@ -19,8 +19,15 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     clientPromise: null,
   };
   try {
-    const session = await unstable_getServerSession(req, res, nextAuthConfig);
-    if (session === null) return res.status(401).json({ message: "Private" });
+    // const session = await unstable_getServerSession(req, res, nextAuthConfig);
+    // if (session === null) return res.status(401).json({ message: "Private" });
+    const session = {
+      user: {
+        username: "iharryd",
+        name: "Harry",
+        image: "https://avatars.githubusercontent.com/u/89729383?v=4",
+      },
+    };
     switch (method) {
       case "GET":
         connection.clientPromise = await (await connectToMongoDb).connect();
@@ -55,9 +62,14 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             }
           );
         if (newComment.modifiedCount > 0) {
-          return res
-            .status(200)
-            .json({ message: "Comment added.", data: newComment });
+          const updatedComments = await connection.clientPromise
+            .db()
+            .collection("posts")
+            .findOne({ _id: new ObjectId(req.query.postID as string) });
+          return res.status(200).json({
+            message: "Comment added.",
+            data: updatedComments?.comments,
+          });
         } else {
           return res
             .status(300)

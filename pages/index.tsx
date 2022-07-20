@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
 import { refresh } from "../features/postSlice";
 import { RootState } from "../store";
+import { getPosts } from "../services/postServices";
 
 export default function Home({ posts: newPosts }: { posts: Post[] }) {
   const posts = useSelector((state: RootState) => state.postSlice);
@@ -29,13 +30,9 @@ export default function Home({ posts: newPosts }: { posts: Post[] }) {
       inititalFetch.current = true;
     } else {
       (async () => {
-        const result = await fetch(
-          `http://127.0.0.1:3000/api/posts?sort=${sortedBy}&filter=${filterBy}`
-        );
-        const resultJson: { message: string; data: Post[] } =
-          await result.json();
-        console.log(resultJson);
-        dispatch(refresh({ newPosts: resultJson.data }));
+        await getPosts(sortedBy, filterBy, undefined, (result) => {
+          dispatch(refresh({ newPosts: result.data.data }));
+        });
       })();
     }
   }, [sortedBy, filterBy]);

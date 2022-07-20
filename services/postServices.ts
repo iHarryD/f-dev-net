@@ -147,10 +147,28 @@ export async function postComment(
 ) {
   try {
     if (loadingState) loadingState(true);
-    const result = await baseAxiosInstance().post(
-      `http://127.0.0.1:3000/api/posts/${postID}/comments`,
-      { comment }
-    );
+    const result = await baseAxiosInstance().post(`/posts/${postID}/comments`, {
+      comment,
+    });
+    if (successCallback) successCallback(result);
+  } catch (err) {
+    if (failureCallback) failureCallback(err);
+  } finally {
+    if (loadingState) loadingState(false);
+  }
+}
+
+export async function deletePost(
+  postID: string,
+  loadingState?: Dispatch<SetStateAction<boolean>>,
+  successCallback?: (
+    result: AxiosResponse<{ message: string; data: null }>
+  ) => void,
+  failureCallback?: (err: unknown) => void
+) {
+  try {
+    if (loadingState) loadingState(true);
+    const result = await baseAxiosInstance().delete(`/posts/${postID}`);
     if (successCallback) successCallback(result);
   } catch (err) {
     if (failureCallback) failureCallback(err);

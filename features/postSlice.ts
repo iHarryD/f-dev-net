@@ -35,6 +35,9 @@ export const postSlice = createSlice({
         );
       }
     },
+    deletePost(state, action: PayloadAction<{ postID: string }>) {
+      return state.filter((post) => post._id !== action.payload.postID);
+    },
     updateComments(
       state,
       action: PayloadAction<{ postID: string; comments: PostComment[] }>
@@ -49,7 +52,14 @@ export const postSlice = createSlice({
   },
 });
 
-export const { append, refresh, reset, like, unlike, updateComments } =
-  postSlice.actions;
+export const {
+  append,
+  refresh,
+  reset,
+  like,
+  unlike,
+  deletePost,
+  updateComments,
+} = postSlice.actions;
 
 export default postSlice.reducer;
