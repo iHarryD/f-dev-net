@@ -12,6 +12,9 @@ import {
   UserWithStats,
 } from "../../interfaces/Common.interface";
 import ConnectionButton from "../connectionButton/ConnectionButton";
+import { isImage } from "../../helpers/isImage";
+import { getImageDataURL } from "../../helpers/getImageDataURL";
+import { updateUser } from "../../services/profileServices";
 
 export default function ProfileSection() {
   const {
@@ -25,7 +28,7 @@ export default function ProfileSection() {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(
     ConnectionStatus.NULL
   );
-  // const imageInputRef = useRef<HTMLInputElement>(null)
+  const [updatedImage, setUpdatedImage] = useState<File | null>(null);
 
   useEffect(() => {
     if (userQuery) {
@@ -78,18 +81,16 @@ export default function ProfileSection() {
     }
   }, [userQuery, session]);
 
-  async function handleUpdateUser(name: string, bio: string) {
-    const data = {
-      name,
-      bio,
+  function handleUpdateUser() {
+    if (nameInputRef.current === null || bioInputRef.current === null) return;
+    const updatedUser: { name: string; bio: string; image?: File } = {
+      name: nameInputRef.current.value,
+      bio: bioInputRef.current.value,
     };
-    fetch("http://127.0.0.1:3000/api/profiles", {
-      method: "PATCH",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    if (updatedImage) {
+      updatedUser.image = updatedImage;
+    }
+    updateUser(updatedUser);
   }
 
   return (
@@ -100,12 +101,56 @@ export default function ProfileSection() {
             <div
               className={profileSectionStyles.profilePictureUsernameContainer}
             >
-              <div>
-                <img
-                  src={user.image}
-                  alt="profile-picture"
-                  className={profileSectionStyles.profilePicture}
-                />
+              <div
+                className={profileSectionStyles.profilePictureUpdateContainer}
+              >
+                {isAdmin ? (
+                  <>
+                    <div
+                      className={
+                        profileSectionStyles.profilePictureUpdateOverlay
+                      }
+                    >
+                      <span
+                        className={
+                          profileSectionStyles.profilePictureUpdateOverlayText
+                        }
+                      >
+                        Change
+                      </span>
+                    </div>
+                    <label htmlFor="update-profile-picture">
+                      <img
+                        src={
+                          updatedImage
+                            ? URL.createObjectURL(updatedImage)
+                            : user.image
+                        }
+                        alt="profile-picture"
+                        className={profileSectionStyles.profilePicture}
+                      />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        id="update-profile-picture"
+                        className={profileSectionStyles.profilePictureInput}
+                        onChange={(e) => {
+                          if (e.target.files) {
+                            if (isImage(e.target.files[0])) {
+                              setUpdatedImage(e.target.files[0]);
+                            }
+                          }
+                        }}
+                      />
+                    </label>
+                  </>
+                ) : (
+                  <img
+                    src={user.image}
+                    alt="profile-picture"
+                    className={profileSectionStyles.profilePicture}
+                  />
+                )}
               </div>
               <p
                 className={`${profileSectionStyles.username} ${commonStyles.username}`}
@@ -150,17 +195,7 @@ export default function ProfileSection() {
               {isAdmin ? (
                 <button
                   className={buttonsStyles.primaryButton}
-                  onClick={() => {
-                    if (
-                      nameInputRef.current === null ||
-                      bioInputRef.current === null
-                    )
-                      return;
-                    handleUpdateUser(
-                      nameInputRef.current.value,
-                      bioInputRef.current.value
-                    );
-                  }}
+                  onClick={() => handleUpdateUser()}
                 >
                   Update
                 </button>

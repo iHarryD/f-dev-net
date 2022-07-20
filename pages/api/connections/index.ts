@@ -1,11 +1,11 @@
-import { MongoClient } from "mongodb";
-import { NextApiRequest, NextApiResponse } from "next";
-import { unstable_getServerSession } from "next-auth";
+import { MongoClient, ObjectId } from "mongodb";
+import { NextApiResponse } from "next";
 import connectToMongoDb from "../../../lib/mongodb";
-import { nextAuthConfig } from "../auth/[...nextauth]";
 import Cors from "cors";
 import corsMiddleware from "../../../helpers/corsMiddleware";
 import { cursorToDoc } from "../../../helpers/cursorToDoc";
+import { RequestWithUser } from "../../../interfaces/Common.type";
+import verifyToken from "../../../helpers/verifyToken";
 
 const cors = Cors({
   methods: ["GET", "POST"],
@@ -13,37 +13,35 @@ const cors = Cors({
   origin: "http://localhost:3000",
 });
 
-export default async function (req: NextApiRequest, res: NextApiResponse) {
+export default async function (req: RequestWithUser, res: NextApiResponse) {
   await corsMiddleware(req, res, cors);
+  await verifyToken(req, res);
   const { method } = req;
-  const session = await unstable_getServerSession(req, res, nextAuthConfig);
-  if (session === null) return res.status(401).json({ message: "Private" });
   const connection: { clientPromise: null | MongoClient } = {
     clientPromise: null,
   };
   try {
+    connection.clientPromise = await (await connectToMongoDb).connect();
     switch (method) {
       case "GET":
-        connection.clientPromise = await (await connectToMongoDb).connect();
         const allConnections = connection.clientPromise
           .db()
           .collection("connections")
           .find({
-            connectionBetween: { $in: [session.user.username] },
+            connectionBetween: { $in: [req.user] },
           });
         return res.status(200).json({
           message: "Connections fetched",
           data: await cursorToDoc(allConnections),
         });
       case "POST":
-        connection.clientPromise = await (await connectToMongoDb).connect();
         await connection.clientPromise
           .db()
           .collection("connections")
           .insertOne({
-            connectionBetween: [session.user.username, req.body.otherUser],
+            connectionBetween: [req.user, req.body.otherUser],
             isActive: false,
-            initiatedBy: session.user.username,
+            initiatedBy: req.user,
             timestamp: new Date(),
           });
         return res

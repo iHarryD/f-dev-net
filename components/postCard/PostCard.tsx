@@ -11,177 +11,118 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import postCardStyles from "./PostCard.module.css";
 import buttonsStyles from "../../styles/Buttons.module.css";
-import commonStyles from "../../styles/Common.module.css";
 import { Post } from "../../interfaces/Common.interface";
 import { useSession } from "next-auth/react";
 import { useRef, useState } from "react";
 import CommentBox from "../commentBox/CommentBox";
+import {
+  bookmarkPost,
+  deletePost,
+  likePost,
+  postComment,
+  unlikePost,
+} from "../../services/postServices";
+import { useDispatch } from "react-redux";
+import {
+  updateComments,
+  like,
+  unlike,
+  deletePost as deletePostAction,
+} from "../../features/postSlice";
+import UsernameLink from "../usernameLink/UsernameLink";
+import Tooltip from "../tooltip/Tooltip";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function PostCard({
   details: { _id, caption, comments, likes, media, postedBy, timestamp },
 }: {
   details: Post;
 }) {
-  const { data: session } = useSession();
+  const { userCredentials } = useAuth();
   const [isPostingComment, setIsPostingComment] = useState<boolean>(false);
   const commentInputRef = useRef<HTMLInputElement | null>(null);
-  const [isLiked, setIsLiked] = useState<boolean>(
-    session ? likes.includes(session.user.username) : false
-  );
   const [isLiking, setIsLiking] = useState<boolean>(false);
   const [isBookmarked, setIsBookmarked] = useState<boolean>(
-    session ? session.user.savedPosts.includes(_id) : false
+    userCredentials.user ? userCredentials.user.savedPosts.includes(_id) : false
   );
   const [isBookmarking, setIsBookmarking] = useState<boolean>(false);
   const [isCommentBoxOpen, setIsCommentBoxOpen] = useState<boolean>(false);
+  const dispatch = useDispatch();
 
-  async function handleLikePost() {
-    if (session === null) return;
-    try {
-      setIsLiked(true);
-      setIsLiking(true);
-      const result = await fetch(
-        `http://127.0.0.1:3000/api/posts/${_id}/likes`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
-      const resultJson = await result.json();
-      console.log(resultJson);
-    } catch (err) {
-      console.log(err);
-      setIsLiked(false);
-    } finally {
-      setIsLiking(false);
-    }
+  function handleLikePost() {
+    if (userCredentials.user === null) return;
+    dispatch(like({ postID: _id, username: userCredentials.user.username }));
+    likePost(_id, setIsLiking, undefined, () =>
+      dispatch(
+        unlike({ postID: _id, username: userCredentials.user!.username })
+      )
+    );
   }
 
-  async function handleUnlikePost() {
-    if (session === null) return;
-    try {
-      setIsLiked(false);
-      setIsLiking(true);
-      const result = await fetch(
-        `http://127.0.0.1:3000/api/posts/${_id}/likes`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
-      const resultJson = await result.json();
-      console.log(resultJson);
-    } catch (err) {
-      console.log(err);
-      setIsLiked(true);
-    } finally {
-      setIsLiking(false);
-    }
+  function handleUnlikePost() {
+    if (userCredentials.user === null) return;
+    dispatch(unlike({ postID: _id, username: userCredentials.user.username }));
+    unlikePost(_id, setIsLiking, undefined, () =>
+      dispatch(like({ postID: _id, username: userCredentials.user!.username }))
+    );
   }
 
-  async function handleBookmarkPost() {
-    if (session === null) return;
-    try {
-      setIsBookmarked(true);
-      setIsBookmarking(true);
-      const result = await fetch(
-        `http://127.0.0.1:3000/api/profiles/bookmarks`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            postID: _id,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
-      const resultJson = await result.json();
-      console.log(resultJson);
-    } catch (err) {
-      console.log(err);
-      setIsBookmarked(false);
-    } finally {
-      setIsBookmarking(false);
-    }
+  function handleBookmarkPost() {
+    if (userCredentials.user === null) return;
+    bookmarkPost(_id, setIsBookmarking);
+  }
+  function handleRemoveBookmark() {
+    if (userCredentials.user === null) return;
+    bookmarkPost(_id, setIsBookmarking);
   }
 
-  async function handleRemoveBookmark() {
-    if (session === null) return;
-    try {
-      setIsBookmarked(false);
-      setIsBookmarking(true);
-      const result = await fetch(
-        `http://127.0.0.1:3000/api/profiles/bookmarks`,
-        {
-          method: "DELETE",
-          body: JSON.stringify({
-            postID: _id,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
-      const resultJson = await result.json();
-      console.log(resultJson);
-    } catch (err) {
-      console.log(err);
-      setIsBookmarked(true);
-    } finally {
-      setIsBookmarking(false);
-    }
-  }
-
-  async function handlePostComment() {
+  function handlePostComment() {
     if (!commentInputRef.current?.value.replaceAll(" ", "")) return;
-    try {
-      const data = {
-        comment: commentInputRef.current.value,
-      };
-      setIsPostingComment(true);
-      const result = await fetch(
-        `http://127.0.0.1:3000/api/posts/${_id}/comments`,
-        {
-          method: "POST",
-          body: JSON.stringify(data),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const resultJson = await result.json();
-      commentInputRef.current.value = "";
-      console.log(resultJson);
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setIsPostingComment(false);
-    }
+    postComment(
+      commentInputRef.current.value,
+      _id,
+      setIsPostingComment,
+      (result) => {
+        dispatch(updateComments({ postID: _id, comments: result.data.data }));
+        commentInputRef.current!.value = "";
+      }
+    );
+  }
+
+  function handleDeletePost() {
+    deletePost(_id, undefined, (result) => {
+      dispatch(deletePostAction({ postID: _id }));
+    });
   }
 
   return (
     <div className={postCardStyles.postCardContainer}>
-      <div className={postCardStyles.postingAccountDetailsContainer}>
-        <div>
-          <img
-            src={postedBy.image}
-            alt={postedBy.username}
-            className={postCardStyles.profilePicturePreview}
-          />
+      <div className={postCardStyles.postCardHeader}>
+        <div className={postCardStyles.postingAccountDetailsContainer}>
+          <div>
+            <img
+              src={postedBy.image}
+              alt={postedBy.username}
+              className={postCardStyles.profilePicturePreview}
+            />
+          </div>
+          <div>
+            <p>{postedBy.name}</p>
+            <UsernameLink username={postedBy.username} />
+          </div>
         </div>
-        <div>
-          <p>{postedBy.name}</p>
-          <span className={commonStyles.username}>@{postedBy.username}</span>
-        </div>
+        {userCredentials.user?.username === postedBy.username && (
+          <div>
+            <Tooltip
+              tooltipItems={[
+                {
+                  tooltipChild: <span>Delete </span>,
+                  tooltipOnClickHandler: handleDeletePost,
+                },
+              ]}
+            />
+          </div>
+        )}
       </div>
       {media && (
         <div>
@@ -201,7 +142,11 @@ export default function PostCard({
         </div>
         <div className={postCardStyles.actionBar}>
           <div>
-            {isLiked ? (
+            {(
+              userCredentials.user
+                ? likes.includes(userCredentials.user.username)
+                : false
+            ) ? (
               <button disabled={isLiking} onClick={() => handleUnlikePost()}>
                 <FontAwesomeIcon icon={faSHeart} color="#fd3b3b" />
               </button>

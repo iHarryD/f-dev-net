@@ -1,18 +1,24 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiResponse } from "next";
 import connectToMongoDB from "../../../lib/mongodb";
 import { MongoClient } from "mongodb";
-import { unstable_getServerSession } from "next-auth";
-import { nextAuthConfig } from "../auth/[...nextauth]";
 import connectToMongoDb from "../../../lib/mongodb";
 import { cursorToDoc } from "../../../helpers/cursorToDoc";
+import { uploadImage } from "../../../cloudinary";
+import Cors from "cors";
+import corsMiddleware from "../../../helpers/corsMiddleware";
+import verifyToken from "../../../helpers/verifyToken";
+import { RequestWithUser } from "../../../interfaces/Common.type";
 
-export default async function (req: NextApiRequest, res: NextApiResponse) {
+const cors = Cors({
+  methods: ["GET", "PATCH"],
+  credentials: true,
+  origin: "http://localhost:3000",
+});
+
+export default async function (req: RequestWithUser, res: NextApiResponse) {
+  await corsMiddleware(req, res, cors);
+  await verifyToken(req, res);
   const { method } = req;
-  const session = await unstable_getServerSession(req, res, nextAuthConfig);
-  if (session === null)
-    return res
-      .status(401)
-      .json({ message: "You are not authenticated.", data: null });
   const connection: { clientPromise: null | MongoClient } = {
     clientPromise: null,
   };
@@ -23,20 +29,20 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         const userDoc = await connection.clientPromise
           .db()
           .collection("users")
-          .findOne({ username: session.user.username });
+          .findOne({ username: req.user });
         if (userDoc === null) throw new Error("User not found.");
         const badges = connection.clientPromise
           .db()
           .collection("badges")
-          .find({ givenTo: session.user.username });
+          .find({ givenTo: req.user });
         const connections = connection.clientPromise
           .db()
           .collection("connections")
-          .find({ connectionBetween: { $in: [session.user.username] } });
+          .find({ connectionBetween: { $in: [req.user] } });
         const posts = connection.clientPromise
           .db()
           .collection("posts")
-          .find({ "postedBy.username": session.user.username });
+          .find({ "postedBy.username": req.user });
         const userDetails = {
           badges: await cursorToDoc(badges),
           connections: await cursorToDoc(connections),
@@ -47,18 +53,23 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           .status(200)
           .json({ message: "User fetched.", data: userDetails });
       case "PATCH":
-        const { name, bio } = req.body;
+        const { name, bio, image } = req.body;
         connection.clientPromise = await (await connectToMongoDB).connect();
+        const updates: { name: string; bio: string; image?: string } = {
+          name,
+          bio,
+        };
+        if (image) {
+          const publicID = await uploadImage(image);
+          updates.image = publicID.secure_url;
+        }
         const updatedUser = await connection.clientPromise
           .db()
           .collection("users")
           .updateOne(
-            { username: session.user.username },
+            { username: req.user },
             {
-              $set: {
-                name: name,
-                bio: bio,
-              },
+              $set: updates,
             }
           );
         return res.json({ message: "Profile updated.", data: updatedUser });

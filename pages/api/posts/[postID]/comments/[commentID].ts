@@ -1,16 +1,24 @@
 import { MongoClient, ObjectId } from "mongodb";
-import { NextApiRequest, NextApiResponse } from "next";
-import { unstable_getServerSession } from "next-auth";
+import { NextApiResponse } from "next";
+import corsMiddleware from "../../../../../helpers/corsMiddleware";
+import verifyToken from "../../../../../helpers/verifyToken";
+import { RequestWithUser } from "../../../../../interfaces/Common.type";
 import connectToMongoDb from "../../../../../lib/mongodb";
-import { nextAuthConfig } from "../../../auth/[...nextauth]";
+import Cors from "cors";
 
-export default async function (req: NextApiRequest, res: NextApiResponse) {
+const cors = Cors({
+  methods: ["GET", "POST"],
+  credentials: true,
+  origin: "http://localhost:3000",
+});
+
+export default async function (req: RequestWithUser, res: NextApiResponse) {
+  await corsMiddleware(req, res, cors);
+  await verifyToken(req, res);
   const { method } = req;
   const connection: { clientPromise: null | MongoClient } = {
     clientPromise: null,
   };
-  const session = await unstable_getServerSession(req, res, nextAuthConfig);
-  if (session === null) return res.status(401).json({ message: "Private" });
   try {
     switch (method) {
       case "DELETE":
@@ -27,7 +35,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
               $pull: {
                 comments: {
                   _id: new ObjectId(commentID as string),
-                  postedBy: session.user.username,
+                  postedBy: req.user,
                 },
               },
             }

@@ -1,8 +1,16 @@
+import { useState } from "react";
+import { SyncLoader } from "react-spinners";
+import { loaderCSSOverrides } from "../../database/loaderCSS";
 import {
   ConnectionStatus,
   UserWithStats,
 } from "../../interfaces/Common.interface";
+import {
+  acceptConnection,
+  initiateConnection,
+} from "../../services/connectionServices";
 import buttonsStyles from "../../styles/Buttons.module.css";
+import commonStyles from "../../styles/Common.module.css";
 
 export default function ConnectionButton({
   connectionID,
@@ -13,56 +21,37 @@ export default function ConnectionButton({
   connectionStatus: ConnectionStatus;
   user: UserWithStats;
 }) {
-  async function initiateConnection() {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  function handleInitiateConnection() {
     if (user === null) return;
-    try {
-      const data = {
-        otherUser: user.username,
-      };
-      const result = await fetch("http://127.0.0.1:3000/api/connections", {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const resultJson = await result.json();
-      console.log(resultJson);
-    } catch (err) {
-      console.error(err);
-    }
+    initiateConnection(user.username, setIsLoading);
   }
 
-  async function acceptConnection() {
+  function hanleAcceptConnection() {
     if (user === null || connectionID === undefined) return;
-    try {
-      const data = {
-        otherUser: user.username,
-      };
-      const result = await fetch(
-        `http://127.0.0.1:3000/api/connections/${connectionID}`,
-        {
-          method: "PATCH",
-          body: JSON.stringify(data),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const resultJson = await result.json();
-      console.log(resultJson);
-    } catch (err) {
-      console.error(err);
-    }
+    acceptConnection(user.username, connectionID, setIsLoading);
   }
 
   if (connectionStatus === ConnectionStatus.PENDING) {
     return (
       <button
+        disabled={isLoading}
         className={buttonsStyles.primaryButton}
-        onClick={() => acceptConnection()}
+        onClick={() => hanleAcceptConnection()}
       >
-        Accept
+        {isLoading ? (
+          <div className={commonStyles.buttonLoaderContainer}>
+            <SyncLoader
+              size="6"
+              color="#fff"
+              loading={isLoading}
+              cssOverride={loaderCSSOverrides}
+            />
+          </div>
+        ) : (
+          "Accept"
+        )}
       </button>
     );
   } else if (connectionStatus === ConnectionStatus.SENT) {
@@ -76,10 +65,22 @@ export default function ConnectionButton({
   } else {
     return (
       <button
+        disabled={isLoading}
         className={buttonsStyles.primaryButton}
-        onClick={() => initiateConnection()}
+        onClick={() => handleInitiateConnection()}
       >
-        Connect
+        {isLoading ? (
+          <div className={commonStyles.buttonLoaderContainer}>
+            <SyncLoader
+              size="6"
+              color="#fff"
+              loading={isLoading}
+              cssOverride={loaderCSSOverrides}
+            />
+          </div>
+        ) : (
+          "Connect"
+        )}
       </button>
     );
   }

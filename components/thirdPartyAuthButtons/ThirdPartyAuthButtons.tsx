@@ -12,14 +12,12 @@ export default function ThirdPartyAuthButtons() {
     <>
       <button
         className={`${buttonsStyles.iconWithTextButton} ${buttonsStyles.primaryButton}`}
-        onClick={() => handleSignIn("twitter")}
       >
         <FontAwesomeIcon icon={faTwitter} />
         <span>Continue with Twitter</span>
       </button>
       <button
         className={`${buttonsStyles.iconWithTextButton} ${buttonsStyles.primaryButton}`}
-        onClick={() => handleSignIn("github")}
       >
         <FontAwesomeIcon icon={faGithub} />
         <span>Continue with Github</span>

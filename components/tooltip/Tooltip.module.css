@@ -1,0 +1,25 @@
+.tooltipContainer {
+  position: relative;
+}
+
+.tooltipMenu {
+  background: #000000d4;
+  display: flex;
+  color: #fff;
+  flex-direction: column;
+  margin: 1rem;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 12rem;
+}
+
+.tooltipMenuItem {
+  padding: var(--MIN-PADDING) var(--MEDIUM-PADDING);
+  transition: background 150ms;
+}
+
+.tooltipMenuItem:hover {
+  background: #000000d6;
+  cursor: pointer;
+}

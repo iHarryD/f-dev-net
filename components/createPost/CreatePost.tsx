@@ -8,11 +8,10 @@ import { useRef, useState } from "react";
 import { isImage } from "../../helpers/isImage";
 import SyncLoader from "react-spinners/SyncLoader";
 import { loaderCSSOverrides } from "../../database/loaderCSS";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../store";
+import { useDispatch } from "react-redux";
 import { append } from "../../features/postSlice";
-import { getImageDataURL } from "../../helpers/getImageDataURL";
 import GiphyGrid from "../giphyGrid/GiphyGrid";
+import { createNewPost } from "../../services/postServices";
 
 export default function CreatePost() {
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
@@ -31,36 +30,23 @@ export default function CreatePost() {
       categoryDropDownRef.current === null
     )
       return;
-    try {
-      setIsPosting(true);
-      const base64ImageURL = uploadedImage
-        ? await getImageDataURL(uploadedImage)
-        : "";
-      const data = {
-        caption: captionTextAreaRef.current.value,
-        category: categoryDropDownRef.current.value,
-        media: base64ImageURL,
-      };
-      const result = await fetch("http://127.0.0.1:3000/api/posts", {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
-      if (result.status === 200) {
-        const resultJson = await result.json();
-        captionTextAreaRef.current.value = "";
-        setUploadedImage(null);
-        setWordCount(0);
-        dispatch(append({ newPosts: [resultJson.data] }));
-      }
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setIsPosting(false);
+    const postDetails: {
+      caption: string;
+      category: string;
+      media?: File;
+    } = {
+      caption: captionTextAreaRef.current.value,
+      category: categoryDropDownRef.current.value,
+    };
+    if (uploadedImage) {
+      postDetails.media = uploadedImage;
     }
+    createNewPost(postDetails, setIsPosting, (result) => {
+      captionTextAreaRef.current!.value = "";
+      setUploadedImage(null);
+      setWordCount(0);
+      dispatch(append({ newPosts: [result.data.data] }));
+    });
   }
 
   return (

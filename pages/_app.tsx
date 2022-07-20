@@ -2,17 +2,17 @@ import "../styles/globals.css";
 import "../styles/variables.css";
 import type { AppProps } from "next/app";
 import Layout from "../components/layout/Layout";
-import { SessionProvider } from "next-auth/react";
 import AuthUIHandler from "../components/authUIHandler/AuthUIHandler";
 import { Provider as StoreProvider } from "react-redux";
 import { store } from "../store";
+import { AuthProvider } from "../contexts/AuthContext";
 
 export default function MyApp({
   Component,
   pageProps: { session, ...pageProps },
 }: AppProps) {
   return (
-    <SessionProvider session={session}>
+    <AuthProvider>
       <StoreProvider store={store}>
         <AuthUIHandler>
           <Layout>
@@ -20,6 +20,6 @@ export default function MyApp({
           </Layout>
         </AuthUIHandler>
       </StoreProvider>
-    </SessionProvider>
+    </AuthProvider>
   );
 }

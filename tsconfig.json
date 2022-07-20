@@ -16,6 +16,13 @@
     "incremental": true,
     "typeRoots": ["./interfaces"]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "cloudinary/index.ts"],
+  "include": [
+    "contexts/AuthContext.jsx",
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "cloudinary/index.ts",
+    "types/**/*.ts"
+  ],
   "exclude": ["node_modules"]
 }
