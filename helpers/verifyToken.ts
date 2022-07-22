@@ -9,9 +9,12 @@ export default async function verifyToken(
   const token = req.headers.authorization;
   if (token === undefined)
     return res.status(403).json({ message: "Unauthorized.", data: null });
-  jwt.verify(token, process.env.JWT_SECRET as string, (err, data) => {
-    if (err || data === undefined)
-      return res.status(401).json({ message: "Invalid token!", data: null });
-    req.user = data.user;
-  });
+  const decodedToken = jwt.verify(token, process.env.JWT_SECRET as string) as {
+    user?: string;
+  };
+  if (decodedToken?.user) {
+    req.user = decodedToken.user;
+  } else {
+    return res.status(401).json({ message: "Invalid token!", data: null });
+  }
 }
