@@ -13,8 +13,6 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { useEffect, useRef, useState } from "react";
 import { Chat } from "../../interfaces/Common.interface";
-import { useSession } from "next-auth/react";
-import { Session } from "next-auth";
 import SyncLoader from "react-spinners/SyncLoader";
 import commonStyles from "../../styles/Common.module.css";
 import { loaderCSSOverrides } from "../../database/loaderCSS";
@@ -25,7 +23,6 @@ export default function ChatScreen({
   activeChatID: string | null;
 }) {
   const chats = useSelector((state: RootState) => state.chatSlice);
-  const { data: session } = useSession() as { data: Session };
   const [chat, setChat] = useState<Chat | null>(null);
   const messageInputRef = useRef<HTMLInputElement | null>(null);
   const [otherUser, setOtherUser] = useState<{
@@ -41,43 +38,6 @@ export default function ChatScreen({
       setChat(chat);
     }
   }, [activeChatID]);
-
-  useEffect(() => {
-    if (chat === null) return;
-    const user = chat.chatBetween.find(
-      (user) => user.username !== session.user.username
-    );
-    setOtherUser(
-      user as {
-        username: string;
-        name: string;
-        image: string;
-      }
-    );
-  }, [chat]);
-
-  async function handleSendMessage(messageText: string) {
-    if (chat === null || messageInputRef.current === null) return;
-    setIsSendingMessage(true);
-    const message = {
-      message: messageText,
-      sendTo: chat.chatBetween.find(
-        (user) => user.username !== session.user.username
-      )?.username,
-    };
-    const result = await fetch(`http://127.0.0.1:3000/api/chats/${chat._id}`, {
-      method: "POST",
-      body: JSON.stringify(message),
-      credentials: "same-origin",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    setIsSendingMessage(false);
-    if (result.status === 200) {
-      messageInputRef.current.value = "";
-    }
-  }
 
   return chat && otherUser ? (
     <div className={chatScreenStyles.chatScreen}>
@@ -106,15 +66,7 @@ export default function ChatScreen({
           </button>
         </div>
       </div>
-      <div className={chatScreenStyles.chatBox}>
-        {chat?.conversation.map(({ sender, message }) =>
-          sender === session.user.username ? (
-            <SentMessage message={message} />
-          ) : (
-            <ReceivedMessage message={message} />
-          )
-        )}
-      </div>
+      <div className={chatScreenStyles.chatBox}></div>
       <div className={chatScreenStyles.messageInputBarContainer}>
         <div className={chatScreenStyles.messageInputBarButtonContainer}>
           <button>
@@ -129,14 +81,7 @@ export default function ChatScreen({
           placeholder="message..."
           className={chatScreenStyles.messageInput}
         />
-        <button
-          disabled={isSendingMessage}
-          onClick={() => {
-            if (messageInputRef.current) {
-              handleSendMessage(messageInputRef.current.value);
-            }
-          }}
-        >
+        <button disabled={isSendingMessage}>
           {isSendingMessage ? (
             <div className={commonStyles.buttonLoaderContainer}>
               <SyncLoader
