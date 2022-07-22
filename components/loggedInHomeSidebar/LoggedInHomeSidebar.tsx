@@ -15,7 +15,10 @@ export default function LoggedInHomeSidebar() {
           className={`${loggedInHomeSidebarStyles.listContainer} ${loggedInHomeSidebarStyles.trendingTagsListContainer}`}
         >
           {["React", "Next", "Web3"].map((item) => (
-            <li className={loggedInHomeSidebarStyles.sidebarListItems}>
+            <li
+              key={item}
+              className={loggedInHomeSidebarStyles.sidebarListItems}
+            >
               <SidebarTagSuggestion tag={item} />
             </li>
           ))}
@@ -25,8 +28,11 @@ export default function LoggedInHomeSidebar() {
         <h3>Users you may know</h3>
         <ul className={loggedInHomeSidebarStyles.listContainer}>
           {[{ name: "Harry" }, { name: "Harry" }, { name: "Harry" }].map(
-            ({ name }) => (
-              <li className={loggedInHomeSidebarStyles.sidebarListItems}>
+            ({ name }, index) => (
+              <li
+                key={index}
+                className={loggedInHomeSidebarStyles.sidebarListItems}
+              >
                 <SidebarUserSuggestion name={name} />
               </li>
             )

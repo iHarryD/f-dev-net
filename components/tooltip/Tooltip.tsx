@@ -19,8 +19,8 @@ export default function Tooltip({
       </button>
       {isMenuVisible && (
         <ul className={tooltipStyles.tooltipMenu}>
-          {tooltipItems.map((item) => (
-            <li className={tooltipStyles.tooltipMenuItem}>
+          {tooltipItems.map((item, index) => (
+            <li key={index} className={tooltipStyles.tooltipMenuItem}>
               <button onClick={() => item.tooltipOnClickHandler()}>
                 {item.tooltipChild}
               </button>

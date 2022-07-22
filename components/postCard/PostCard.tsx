@@ -190,13 +190,14 @@ export default function PostCard({
           ) : isCommentBoxOpen && comments.length > 2 ? (
             <CommentBox comments={comments} />
           ) : (
-            comments
-              .slice(0, comments.length >= 2 ? 2 : 1)
-              .map((comment) => (
-                <p className={postCardStyles.latestCommentPreview}>
-                  {comment.comment}
-                </p>
-              ))
+            comments.slice(0, comments.length >= 2 ? 2 : 1).map((comment) => (
+              <p
+                key={comment._id}
+                className={postCardStyles.latestCommentPreview}
+              >
+                {comment.comment}
+              </p>
+            ))
           )}
         </div>
         <div className={postCardStyles.commentActionBar}>
