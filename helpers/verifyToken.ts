@@ -9,7 +9,7 @@ export default async function verifyToken(
   const token = req.headers.authorization;
   if (token === undefined)
     return res.status(403).json({ message: "Unauthorized.", data: null });
-  jwt.verify(token, process.env.JWT as string, (err, data) => {
+  jwt.verify(token, process.env.JWT_SECRET as string, (err, data) => {
     if (err || data === undefined)
       return res.status(401).json({ message: "Invalid token!", data: null });
     req.user = data.user;

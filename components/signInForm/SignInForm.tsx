@@ -3,8 +3,13 @@ import commonStyles from "../../styles/Common.module.css";
 import ThirdPartyAuthButtons from "../thirdPartyAuthButtons/ThirdPartyAuthButtons";
 import buttonsStyles from "../../styles/Buttons.module.css";
 import signInFormStyles from "./SignInForm.module.css";
-import { login } from "../../services/authServices";
+import { login, signup } from "../../services/authServices";
 import { useAuth } from "../../contexts/AuthContext";
+
+const testingCredentials = {
+  username: "Harry",
+  password: "strongpassword",
+};
 
 export default function SignInForm() {
   const { setUserCredentials } = useAuth();
@@ -25,6 +30,9 @@ export default function SignInForm() {
         });
       });
     } else {
+      signup({ name, email, username, password }, undefined, () =>
+        setAuthMode("login")
+      );
     }
   }
 
@@ -130,8 +138,8 @@ export default function SignInForm() {
           <button
             className={buttonsStyles.textButton}
             onClick={() => {
-              setUsername("harry");
-              setPassword("shazam");
+              setUsername(testingCredentials.username);
+              setPassword(testingCredentials.password);
             }}
           >
             Login using test credentials.

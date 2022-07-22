@@ -3,11 +3,30 @@ import { Dispatch, SetStateAction } from "react";
 import { getImageDataURL } from "../helpers/getImageDataURL";
 import baseAxiosInstance from "./baseAxiosInstance";
 
+export async function getUser(
+  username: string,
+  loadingState?: Dispatch<SetStateAction<boolean>>,
+  successCallback?: (
+    result: AxiosResponse<{ message: string; data: any }>
+  ) => void,
+  failureCallback?: (err: unknown) => void
+) {
+  try {
+    if (loadingState) loadingState(true);
+    const result = await baseAxiosInstance().get(`/profiles/${username}`);
+    if (successCallback) successCallback(result);
+  } catch (err) {
+    if (failureCallback) failureCallback(err);
+  } finally {
+    if (loadingState) loadingState(false);
+  }
+}
+
 export async function updateUser(
   updatedUserDetails: {
     name: string;
     bio: string;
-    profilePicture?: File;
+    image?: File;
   },
   loadingState?: Dispatch<SetStateAction<boolean>>,
   successCallback?: (
@@ -17,13 +36,13 @@ export async function updateUser(
 ) {
   try {
     if (loadingState) loadingState(true);
-    const base64ImageURL = updatedUserDetails.profilePicture
-      ? await getImageDataURL(updatedUserDetails.profilePicture)
+    const base64ImageURL = updatedUserDetails.image
+      ? await getImageDataURL(updatedUserDetails.image)
       : "";
     const data = {
       name: updatedUserDetails.name,
       bio: updatedUserDetails.bio,
-      media: base64ImageURL,
+      image: base64ImageURL,
     };
     const result = await baseAxiosInstance().patch("/profiles", data);
     if (successCallback) successCallback(result);

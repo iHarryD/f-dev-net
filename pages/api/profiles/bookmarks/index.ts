@@ -7,7 +7,7 @@ import verifyToken from "../../../../helpers/verifyToken";
 import { RequestWithUser } from "../../../../interfaces/Common.type";
 
 const cors = Cors({
-  methods: ["POST", "DELETE"],
+  methods: ["GET", "POST", "DELETE"],
   credentials: true,
   origin: "http://localhost:3000",
 });
@@ -22,13 +22,27 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
   };
   try {
     switch (method) {
+      case "GET":
+        connection.clientPromise = await (await connectToMongoDb).connect();
+        const bookmark = await connection.clientPromise
+          .db()
+          .collection("bookmarks")
+          .findOne({ belongsTo: req.user });
+        const allBookmarkedPosts = await connection.clientPromise
+          .db()
+          .collection("posts")
+          .findOne({ _id: { $all: bookmark } });
+        return res.status(200).json({
+          message: "Bookmarked posts fetched.",
+          data: allBookmarkedPosts,
+        });
       case "POST":
         connection.clientPromise = await (await connectToMongoDb).connect();
         const bookmarkedPost = await connection.clientPromise
           .db()
-          .collection("users")
+          .collection("bookmarks")
           .updateOne(
-            { username: req.user },
+            { belongsTo: req.user },
             { $addToSet: { savedPosts: postID } }
           );
         return res
@@ -38,8 +52,11 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
         connection.clientPromise = await (await connectToMongoDb).connect();
         await connection.clientPromise
           .db()
-          .collection("users")
-          .updateOne({ username: req.user }, { $pull: { savedPosts: postID } });
+          .collection("bookmarks")
+          .updateOne(
+            { belongsTo: req.user },
+            { $pull: { savedPosts: postID } }
+          );
         return res
           .status(200)
           .json({ message: "Post removed from bookmarks.", data: null });

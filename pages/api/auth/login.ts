@@ -4,6 +4,7 @@ import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import Cors from "cors";
 import corsMiddleware from "../../../helpers/corsMiddleware";
+import { cursorToDoc } from "../../../helpers/cursorToDoc";
 
 const invalidCredentialsMessage = "Invalid credentials.";
 
@@ -63,9 +64,9 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             data: {
               user: {
                 ...user,
-                badges,
-                connections,
-                posts,
+                badges: await cursorToDoc(badges),
+                connections: await cursorToDoc(connections),
+                posts: await cursorToDoc(posts),
               },
               token,
             },

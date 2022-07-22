@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShareNodes } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
-import { useSession } from "next-auth/react";
 import {
   Connection,
   ConnectionStatus,
@@ -14,13 +13,14 @@ import {
 import ConnectionButton from "../connectionButton/ConnectionButton";
 import { isImage } from "../../helpers/isImage";
 import { getImageDataURL } from "../../helpers/getImageDataURL";
-import { updateUser } from "../../services/profileServices";
+import { getUser, updateUser } from "../../services/profileServices";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function ProfileSection() {
   const {
     query: { username: userQuery },
   } = useRouter();
-  const { data: session } = useSession();
+  const { userCredentials } = useAuth();
   const [user, setUser] = useState<UserWithStats | null>(null);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const nameInputRef = useRef<HTMLInputElement | null>(null);
@@ -32,56 +32,44 @@ export default function ProfileSection() {
 
   useEffect(() => {
     if (userQuery) {
-      (async () => {
-        try {
-          const result = await fetch(
-            `http://127.0.0.1:3000/api/profiles/${userQuery}`
-          );
-          if (result.status === 200) {
-            const resultJson: { message: string; data: UserWithStats } =
-              await result.json();
-            setUser(resultJson.data);
-            if (session?.user.username === userQuery) {
-              setIsAdmin(true);
+      getUser(userQuery as string, undefined, (result) => {
+        if (result.data.data.username === userCredentials.user?.username) {
+          setIsAdmin(true);
+          return;
+        }
+        const connectionStatusWithUser = result.data.data.data.connections.find(
+          (connection: Connection) =>
+            connection.connectionBetween.includes(
+              result.data.data.data.username
+            )
+        );
+        if (connectionStatusWithUser) {
+          if (connectionStatusWithUser.isActive) {
+            setConnectionStatus(ConnectionStatus.CONNECTED);
+          } else {
+            if (
+              connectionStatusWithUser.initiatedBy ===
+              userCredentials.user?.username
+            ) {
+              setConnectionStatus(ConnectionStatus.SENT);
             } else {
-              const connectionStatusWithUser = resultJson.data.connections.find(
-                (connection) =>
-                  connection.connectionBetween.includes(
-                    resultJson.data.username
-                  )
-              );
-              if (connectionStatusWithUser) {
-                if (connectionStatusWithUser.isActive) {
-                  setConnectionStatus(ConnectionStatus.CONNECTED);
-                } else {
-                  if (
-                    connectionStatusWithUser.initiatedBy ===
-                    session?.user.username
-                  ) {
-                    setConnectionStatus(ConnectionStatus.SENT);
-                  } else {
-                    setConnectionStatus(ConnectionStatus.PENDING);
-                  }
-                }
-              } else {
-                setConnectionStatus(ConnectionStatus.NULL);
-              }
-              setIsAdmin(false);
+              setConnectionStatus(ConnectionStatus.PENDING);
             }
           }
-        } catch (err) {
-          console.error(err);
+        } else {
+          setConnectionStatus(ConnectionStatus.NULL);
         }
-      })();
+        setIsAdmin(false);
+      });
     } else {
-      if (session) {
-        setUser(session.user);
+      if (userCredentials) {
+        setUser(userCredentials.user);
         setIsAdmin(true);
       }
     }
-  }, [userQuery, session]);
+  }, [userQuery, userCredentials]);
 
-  function handleUpdateUser() {
+  async function handleUpdateUser() {
     if (nameInputRef.current === null || bioInputRef.current === null) return;
     const updatedUser: { name: string; bio: string; image?: File } = {
       name: nameInputRef.current.value,

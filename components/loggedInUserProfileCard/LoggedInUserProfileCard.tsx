@@ -1,38 +1,43 @@
 import loggedInUserProfileCardStyles from "./LoggedInUserProfileCard.module.css";
 import commonStyles from "../../styles/Common.module.css";
-import { useSession } from "next-auth/react";
+import { useAuth } from "../../contexts/AuthContext";
+import { useEffect } from "react";
 
 export default function LoggedInUserProfileCard() {
-  const { data: session } = useSession();
+  const { userCredentials } = useAuth();
+
+  useEffect(() => console.log(userCredentials), []);
 
   return (
     <div className={loggedInUserProfileCardStyles.userProfileCard}>
       <div>
         <img
-          src={session?.user.image!}
+          src={userCredentials.user?.image!}
           className={loggedInUserProfileCardStyles.profilePicturePreview}
         />
       </div>
       <div className={loggedInUserProfileCardStyles.nameUsernameContainer}>
-        <span>{session?.user.name}</span>
-        <span className={commonStyles.username}>{session?.user.username}</span>
+        <span>{userCredentials.user?.name}</span>
+        <span className={commonStyles.username}>
+          {userCredentials.user?.username}
+        </span>
       </div>
       <div className={loggedInUserProfileCardStyles.userStatsContainer}>
         <div className={loggedInUserProfileCardStyles.userStatsBox}>
           <span className={loggedInUserProfileCardStyles.statsNumber}>
-            {session?.user.badges.length}
+            {userCredentials.user?.badges.length}
           </span>
           badges
         </div>
         <div className={loggedInUserProfileCardStyles.userStatsBox}>
           <span className={loggedInUserProfileCardStyles.statsNumber}>
-            {session?.user.connections.length}
+            {userCredentials.user?.connections.length}
           </span>
           connections
         </div>
         <div className={loggedInUserProfileCardStyles.userStatsBox}>
           <span className={loggedInUserProfileCardStyles.statsNumber}>
-            {session?.user.posts.length}
+            {userCredentials.user?.posts.length}
           </span>
           <span>posts</span>
         </div>

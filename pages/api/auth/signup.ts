@@ -2,7 +2,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import connectToMongoDb from "../../../lib/mongodb";
 import * as bcrypt from "bcrypt";
 
-const invalidCredentialsMessage = "Invalid credentials.";
 import Cors from "cors";
 import corsMiddleware from "../../../helpers/corsMiddleware";
 
@@ -16,15 +15,15 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   await corsMiddleware(req, res, cors);
   const {
     method,
-    body: { username, password, email, fullName },
+    body: { username, password, email, name },
   } = req;
   try {
     switch (method) {
       case "POST":
-        if (!username || !password || !email || !fullName) {
+        if (!username || !password || !email || !name) {
           return res
             .status(401)
-            .json({ message: invalidCredentialsMessage, data: null });
+            .json({ message: "Incomplete data received.", data: null });
         }
         const mongodbConnection = await (await connectToMongoDb).connect();
         const user = await mongodbConnection.db().collection("users").findOne({
@@ -45,6 +44,9 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           .collection("users")
           .insertOne({
             ...req.body,
+            bio: "",
+            image: "",
+            savedPosts: [],
             password: encryptedPassword,
             timestamp: new Date(),
           });

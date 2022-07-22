@@ -6,6 +6,7 @@ import {
   SetStateAction,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { UserWithStats } from "../interfaces/Common.interface";
@@ -35,8 +36,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<
     "loading" | "authenticated" | "unauthenticated"
   >("loading");
+  const hasUserBeenInitiated = useRef<boolean>(false);
 
   useEffect(() => {
+    if (hasUserBeenInitiated.current === false) {
+      const user = localStorage.getItem("user");
+      const token = localStorage.getItem("token");
+      if (user && token) {
+        setUserCredentials({ user: JSON.parse(user), token: token });
+        setStatus("authenticated");
+        axios.defaults.headers.common["authorization"] = token;
+      }
+      hasUserBeenInitiated.current = true;
+      if (status === "loading") setStatus("unauthenticated");
+      return;
+    }
     if (userCredentials.token && userCredentials.user) {
       localStorage.setItem("user", JSON.stringify(userCredentials.user));
       localStorage.setItem("token", userCredentials.token);
