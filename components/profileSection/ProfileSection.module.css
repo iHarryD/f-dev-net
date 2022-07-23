@@ -121,3 +121,12 @@ textarea.profileUpdatingInput {
   pointer-events: none;
   transition: background 250ms;
 }
+
+.userDetailCategoryButton {
+  border-radius: var(--BORDER-RADIUS);
+  padding: var(--MIN-PADDING) var(--MEDIUM-PADDING);
+}
+
+.userDetailCategoryButton.isShowing {
+  background: var(--LIGHT-GREY-CLR);
+}

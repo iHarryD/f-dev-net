@@ -12,9 +12,14 @@ import {
 } from "../../interfaces/Common.interface";
 import ConnectionButton from "../connectionButton/ConnectionButton";
 import { isImage } from "../../helpers/isImage";
-import { getImageDataURL } from "../../helpers/getImageDataURL";
 import { getUser, updateUser } from "../../services/profileServices";
 import { useAuth } from "../../contexts/AuthContext";
+
+enum UserDetailCategories {
+  BADGES = "BADGES",
+  CONNECTIONS = "CONNECTIONS",
+  POSTS = "POSTS",
+}
 
 export default function ProfileSection() {
   const {
@@ -29,6 +34,8 @@ export default function ProfileSection() {
     ConnectionStatus.NULL
   );
   const [updatedImage, setUpdatedImage] = useState<File | null>(null);
+  const [userDetailCategory, setUserDetailCategory] =
+    useState<UserDetailCategories>(UserDetailCategories.BADGES);
 
   useEffect(() => {
     if (userQuery) {
@@ -196,9 +203,38 @@ export default function ProfileSection() {
             </div>
           </div>
           <div className={profileSectionStyles.userStatsContainer}>
-            <p>{user.badges.length} badges</p>
-            <p>{user.connections.length} connections</p>
-            <p>{user.posts.length} posts</p>
+            <button
+              className={`${profileSectionStyles.userDetailCategoryButton} ${
+                userDetailCategory === UserDetailCategories.BADGES
+                  ? profileSectionStyles.isShowing
+                  : ""
+              }`}
+              onClick={() => setUserDetailCategory(UserDetailCategories.BADGES)}
+            >
+              {user.badges.length} badges
+            </button>
+            <button
+              className={`${profileSectionStyles.userDetailCategoryButton} ${
+                userDetailCategory === UserDetailCategories.CONNECTIONS
+                  ? profileSectionStyles.isShowing
+                  : ""
+              }`}
+              onClick={() =>
+                setUserDetailCategory(UserDetailCategories.CONNECTIONS)
+              }
+            >
+              {user.connections.length} connections
+            </button>
+            <button
+              className={`${profileSectionStyles.userDetailCategoryButton} ${
+                userDetailCategory === UserDetailCategories.POSTS
+                  ? profileSectionStyles.isShowing
+                  : ""
+              }`}
+              onClick={() => setUserDetailCategory(UserDetailCategories.POSTS)}
+            >
+              {user.posts.length} posts
+            </button>
           </div>
         </section>
       ) : (
