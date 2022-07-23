@@ -1,7 +1,6 @@
 import { BasicAxiosError } from "../interfaces/Common.interface";
 
 export function axiosErrorHandler(errorBody: BasicAxiosError) {
-  console.log(errorBody);
   const errorMessage = errorBody.response?.data?.message;
   if (errorMessage) return errorMessage;
   switch (errorBody.response?.status) {
