@@ -44,11 +44,11 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
           .json({ message: "Posts fetched.", data: await cursorToDoc(result) });
       case "POST":
         await verifyToken(req, res);
-        const validation = postValidation(req.body);
-        if (validation.error)
+        const { error } = postValidation(req.body);
+        if (error)
           return res
             .status(500)
-            .json({ message: validation.error.details[0].message });
+            .json({ message: error.details[0].message, data: error });
         connection.clientPromise = await (await connectToMongoDb).connect();
         if (req.body.media) {
           const publicID = await uploadImage(req.body.media);

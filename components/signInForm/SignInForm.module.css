@@ -30,7 +30,8 @@
   align-items: center;
   display: flex;
   flex-direction: column;
-  gap: var(--MIN-GAP);
+  gap: var(--MEDIUM-GAP);
+  margin-top: 0.5rem;
 }
 
 .formErrorText {

@@ -4,6 +4,8 @@ import * as bcrypt from "bcrypt";
 
 import Cors from "cors";
 import corsMiddleware from "../../../helpers/corsMiddleware";
+import { cursorToDoc } from "../../../helpers/cursorToDoc";
+import { userValidation } from "../../../joi/userValidation";
 
 const cors = Cors({
   methods: ["POST"],
@@ -20,19 +22,23 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   try {
     switch (method) {
       case "POST":
-        if (!username || !password || !email || !name) {
+        const { error } = userValidation(req.body);
+        if (error)
           return res
-            .status(401)
-            .json({ message: "Incomplete data received.", data: null });
-        }
+            .status(400)
+            .json({ message: error.details[0].message, data: error });
         const mongodbConnection = await (await connectToMongoDb).connect();
-        const user = await mongodbConnection.db().collection("users").findOne({
-          username,
-        });
+        const user = await mongodbConnection
+          .db()
+          .collection("users")
+          .findOne({
+            $or: [{ username }, { email }],
+          });
         if (user) {
+          const userDoc = await cursorToDoc(user);
           let errorMessage: string = "";
-          if (user.username === username) {
-            errorMessage = "Username taken.";
+          if (userDoc.username === username) {
+            errorMessage = "This username is not available.";
           } else {
             errorMessage = "This email is already registered with us.";
           }
@@ -54,9 +60,9 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           .status(200)
           .json({ message: "Successfully registered.", data: newUser });
     }
-  } catch {
+  } catch (err) {
     return res
       .status(500)
-      .json({ message: "Something went wrong.", data: null });
+      .json({ message: "Something went wrong.", data: err });
   }
 }
