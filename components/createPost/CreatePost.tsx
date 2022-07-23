@@ -3,11 +3,9 @@ import buttonsStyles from "../../styles/Buttons.module.css";
 import commonStyles from "../../styles/Common.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImage, faSmile } from "@fortawesome/free-regular-svg-icons";
-import { faClose, faUserTag } from "@fortawesome/free-solid-svg-icons";
+import { faClose, faTrash, faUserTag } from "@fortawesome/free-solid-svg-icons";
 import { useRef, useState } from "react";
 import { isImage } from "../../helpers/isImage";
-import SyncLoader from "react-spinners/SyncLoader";
-import { loaderCSSOverrides } from "../../database/loaderCSS";
 import { useDispatch } from "react-redux";
 import { append } from "../../features/postSlice";
 import GiphyGrid from "../giphyGrid/GiphyGrid";
@@ -25,12 +23,19 @@ export default function CreatePost() {
   const [isGiphyActive, setIsGiphyActive] = useState<boolean>(false);
   const [giphySearchQuery, setGiphySearchQuery] = useState<string>("shazam");
 
+  function clearForm() {
+    captionTextAreaRef.current!.value = "";
+    setUploadedImage(null);
+    setWordCount(0);
+  }
+
   async function handleCreateNewPost() {
     if (
       captionTextAreaRef.current === null ||
       categoryDropDownRef.current === null
     )
       return;
+    if (!captionTextAreaRef.current.value.replaceAll(" ", "")) return;
     const postDetails: {
       caption: string;
       category: string;
@@ -43,9 +48,7 @@ export default function CreatePost() {
       postDetails.media = uploadedImage;
     }
     createNewPost(postDetails, setIsPosting, (result) => {
-      captionTextAreaRef.current!.value = "";
-      setUploadedImage(null);
-      setWordCount(0);
+      clearForm();
       dispatch(append({ newPosts: [result.data.data] }));
     });
   }
@@ -54,8 +57,12 @@ export default function CreatePost() {
     <div className={createPostStyles.createPostContainer}>
       <div className={createPostStyles.headingAndCloseButtonContainer}>
         <h3>Create new post</h3>
-        <button className={buttonsStyles.closeIconButton}>
-          <FontAwesomeIcon icon={faClose} />
+        <button
+          title="clear"
+          className={buttonsStyles.trashIconButton}
+          onClick={() => clearForm()}
+        >
+          <FontAwesomeIcon icon={faTrash} />
         </button>
       </div>
       <div className={createPostStyles.postInputTextAreaContainer}>

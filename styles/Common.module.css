@@ -32,6 +32,12 @@
   transform: translateY(-100%) scale(0.9);
 }
 
+.animatedInputLabelContainer .sideButton {
+  position: absolute;
+  right: var(--INPUT-PADDING);
+  top: var(--INPUT-PADDING);
+}
+
 .authBoxContainer {
   margin: auto;
 }

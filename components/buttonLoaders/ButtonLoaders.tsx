@@ -1,5 +1,5 @@
 import SyncLoader from "react-spinners/SyncLoader";
-import { loaderCSSOverrides } from "../../database/loaderCSS";
+import { loaderCSSOverrides } from "../../data/loaderCSS";
 
 export function ButtonSyncLoader() {
   return (

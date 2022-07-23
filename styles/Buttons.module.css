@@ -51,14 +51,15 @@
   color: var(--PRIMARY-FONT-CLR);
 }
 
-.closeIconButton {
+.trashIconButton {
   aspect-ratio: 1;
   background: var(--RED-CLR);
   border-radius: 50%;
   color: #fff;
+  font-size: var(--SMALL-FONT-SIZE);
   padding: 5px;
   text-align: center;
-  width: 19px;
+  width: 20px;
 }
 
 .buttonWithBadge {

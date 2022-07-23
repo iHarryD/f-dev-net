@@ -15,7 +15,7 @@ import { useEffect, useRef, useState } from "react";
 import { Chat } from "../../interfaces/Common.interface";
 import SyncLoader from "react-spinners/SyncLoader";
 import commonStyles from "../../styles/Common.module.css";
-import { loaderCSSOverrides } from "../../database/loaderCSS";
+import { loaderCSSOverrides } from "../../data/loaderCSS";
 
 export default function ChatScreen({
   activeChatID,

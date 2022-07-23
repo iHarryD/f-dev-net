@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { SyncLoader } from "react-spinners";
-import { loaderCSSOverrides } from "../../database/loaderCSS";
+import { loaderCSSOverrides } from "../../data/loaderCSS";
 import {
   ConnectionStatus,
   UserWithStats,
@@ -11,6 +10,7 @@ import {
 } from "../../services/connectionServices";
 import buttonsStyles from "../../styles/Buttons.module.css";
 import commonStyles from "../../styles/Common.module.css";
+import { ButtonSyncLoader } from "../buttonLoaders/ButtonLoaders";
 
 export default function ConnectionButton({
   connectionID,
@@ -40,18 +40,7 @@ export default function ConnectionButton({
         className={buttonsStyles.primaryButton}
         onClick={() => hanleAcceptConnection()}
       >
-        {isLoading ? (
-          <div className={commonStyles.buttonLoaderContainer}>
-            <SyncLoader
-              size="6"
-              color="#fff"
-              loading={isLoading}
-              cssOverride={loaderCSSOverrides}
-            />
-          </div>
-        ) : (
-          "Accept"
-        )}
+        {isLoading ? <ButtonSyncLoader /> : "Accept"}
       </button>
     );
   } else if (connectionStatus === ConnectionStatus.SENT) {
@@ -69,18 +58,7 @@ export default function ConnectionButton({
         className={buttonsStyles.primaryButton}
         onClick={() => handleInitiateConnection()}
       >
-        {isLoading ? (
-          <div className={commonStyles.buttonLoaderContainer}>
-            <SyncLoader
-              size="6"
-              color="#fff"
-              loading={isLoading}
-              cssOverride={loaderCSSOverrides}
-            />
-          </div>
-        ) : (
-          "Connect"
-        )}
+        {isLoading ? <ButtonSyncLoader /> : "Connect"}
       </button>
     );
   }
