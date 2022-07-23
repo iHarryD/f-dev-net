@@ -12,7 +12,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import postCardStyles from "./PostCard.module.css";
 import buttonsStyles from "../../styles/Buttons.module.css";
 import { Post } from "../../interfaces/Common.interface";
-import { useSession } from "next-auth/react";
 import { useRef, useState } from "react";
 import CommentBox from "../commentBox/CommentBox";
 import {
@@ -147,12 +146,32 @@ export default function PostCard({
                 ? likes.includes(userCredentials.user.username)
                 : false
             ) ? (
-              <button disabled={isLiking} onClick={() => handleUnlikePost()}>
+              <button
+                disabled={isLiking}
+                className={buttonsStyles.buttonWithBadge}
+                onClick={() => handleUnlikePost()}
+              >
                 <FontAwesomeIcon icon={faSHeart} color="#fd3b3b" />
+                <span
+                  title={String(likes.length)}
+                  className={buttonsStyles.buttonBadge}
+                >
+                  {likes.length}
+                </span>
               </button>
             ) : (
-              <button disabled={isLiking} onClick={() => handleLikePost()}>
+              <button
+                disabled={isLiking}
+                className={buttonsStyles.buttonWithBadge}
+                onClick={() => handleLikePost()}
+              >
                 <FontAwesomeIcon icon={faRHeart} />
+                <span
+                  title={String(likes.length)}
+                  className={buttonsStyles.buttonBadge}
+                >
+                  {likes.length}
+                </span>
               </button>
             )}
             <button

@@ -1,12 +1,9 @@
 import loggedInUserProfileCardStyles from "./LoggedInUserProfileCard.module.css";
 import commonStyles from "../../styles/Common.module.css";
 import { useAuth } from "../../contexts/AuthContext";
-import { useEffect } from "react";
 
 export default function LoggedInUserProfileCard() {
   const { userCredentials } = useAuth();
-
-  useEffect(() => console.log(userCredentials), []);
 
   return (
     <div className={loggedInUserProfileCardStyles.userProfileCard}>

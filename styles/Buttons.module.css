@@ -76,10 +76,11 @@
   font-size: var(--SMALL-FONT-SIZE);
   font-weight: 700;
   opacity: var(--FADED-TEXT-OPACITY);
+  overflow: hidden;
   justify-content: center;
   position: absolute;
   top: 0;
   right: 0;
   transform: translate(50%, -30%);
-  width: 1rem;
+  width: 1.2rem;
 }
