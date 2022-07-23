@@ -5,6 +5,7 @@ import buttonsStyles from "../../styles/Buttons.module.css";
 import signInFormStyles from "./SignInForm.module.css";
 import { login, signup } from "../../services/authServices";
 import { useAuth } from "../../contexts/AuthContext";
+import { ButtonSyncLoader } from "../buttonLoaders/ButtonLoaders";
 
 const testingCredentials = {
   username: "Harry",
@@ -114,8 +115,12 @@ export default function SignInForm() {
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-        <button type="submit" className={buttonsStyles.primaryButton}>
-          Sign in
+        <button
+          type="submit"
+          disabled={isLoading}
+          className={buttonsStyles.primaryButton}
+        >
+          {isLoading ? <ButtonSyncLoader /> : "Sign In"}
         </button>
 
         <button

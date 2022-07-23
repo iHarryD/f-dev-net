@@ -12,6 +12,7 @@ import { useDispatch } from "react-redux";
 import { append } from "../../features/postSlice";
 import GiphyGrid from "../giphyGrid/GiphyGrid";
 import { createNewPost } from "../../services/postServices";
+import { ButtonSyncLoader } from "../buttonLoaders/ButtonLoaders";
 
 export default function CreatePost() {
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
@@ -145,18 +146,7 @@ export default function CreatePost() {
           className={buttonsStyles.primaryButton}
           onClick={() => handleCreateNewPost()}
         >
-          {isPosting ? (
-            <div className={commonStyles.buttonLoaderContainer}>
-              <SyncLoader
-                size="6"
-                color="#fff"
-                loading={isPosting}
-                cssOverride={loaderCSSOverrides}
-              />
-            </div>
-          ) : (
-            "Post"
-          )}
+          {isPosting ? <ButtonSyncLoader /> : "Post"}
         </button>
       </div>
     </div>
