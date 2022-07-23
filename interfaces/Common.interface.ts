@@ -1,3 +1,5 @@
+import { AxiosError } from "axios";
+
 enum ChatMessageStatus {
   SEDNING = "sending",
   SENT = "sent",
@@ -77,3 +79,7 @@ export interface Connection {
   isActive: boolean;
   timestamp: Date;
 }
+
+export type BasicAxiosError = AxiosError<
+  { message: string; data: unknown } | undefined
+>;
