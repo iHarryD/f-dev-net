@@ -1,4 +1,4 @@
-import HomePageNavbar from "../components/homePageNavbar/HomePageNavbar";
+import HomePageNavbar from "../components/macroPageNavbar/MacroPageNavbar";
 import HomePageSidebar from "../components/homePageSidebar/HomePageSidebar";
 import commonStyles from "../styles/Common.module.css";
 import PostCard from "../components/postCard/PostCard";

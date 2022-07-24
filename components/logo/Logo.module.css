@@ -1,9 +1,10 @@
 .logoContainer {
+  align-items: center;
   color: var(--ACCENT-CLR);
   cursor: default;
   display: flex;
   font-family: "Share Tech Mono", monospace;
-  font-size: 1.5rem;
+  font-size: var(--LARGE-FONT-SIZE);
   font-weight: 600;
   text-transform: uppercase;
   width: 7ch;

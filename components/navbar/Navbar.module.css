@@ -12,12 +12,12 @@
   background: var(--DARK-GREY-CLR);
   border-radius: var(--BORDER-RADIUS);
   font-size: var(--SMALL-FONT-SIZE);
+  width: 30vw;
   padding: var(--MIN-PADDING);
-  width: 20rem;
 }
 
 .buttonContainer {
   display: flex;
-  font-size: 1.3rem;
-  gap: 3rem;
+  font-size: var(--LARGE-FONT-SIZE);
+  gap: clamp(1.5rem, 2vw + 1rem, 3rem);
 }

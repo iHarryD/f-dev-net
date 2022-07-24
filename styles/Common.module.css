@@ -106,3 +106,9 @@
   gap: var(--LARGE-GAP);
   width: 100%;
 }
+
+@media (max-width: 950px) {
+  .pagePostsSection {
+    margin: 0;
+  }
+}
