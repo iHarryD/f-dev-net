@@ -5,6 +5,7 @@ import Cors from "cors";
 import corsMiddleware from "../../../../helpers/corsMiddleware";
 import verifyToken from "../../../../helpers/verifyToken";
 import { RequestWithUser } from "../../../../interfaces/Common.type";
+import { cursorToDoc } from "../../../../helpers/cursorToDoc";
 
 const cors = Cors({
   methods: ["GET", "POST", "DELETE"],
@@ -28,14 +29,24 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
           .db()
           .collection("bookmarks")
           .findOne({ belongsTo: req.user });
-        const allBookmarkedPosts = await connection.clientPromise
-          .db()
-          .collection("posts")
-          .findOne({ _id: { $all: bookmark } });
-        return res.status(200).json({
-          message: "Bookmarked posts fetched.",
-          data: allBookmarkedPosts,
-        });
+        if (bookmark) {
+          const allBookmarkedPostsID = bookmark.savedPosts.map(
+            (id: string) => new ObjectId(id)
+          );
+          const allBookmarkedPosts = connection.clientPromise
+            .db()
+            .collection("posts")
+            .find({ _id: { $all: allBookmarkedPostsID } });
+          return res.status(200).json({
+            message: "Bookmarked posts fetched.",
+            data: await cursorToDoc(allBookmarkedPosts),
+          });
+        } else {
+          return res.status(200).json({
+            message: "Bookmarked posts fetched.",
+            data: [],
+          });
+        }
       case "POST":
         connection.clientPromise = await (await connectToMongoDb).connect();
         const bookmarkedPost = await connection.clientPromise
@@ -43,7 +54,8 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
           .collection("bookmarks")
           .updateOne(
             { belongsTo: req.user },
-            { $addToSet: { savedPosts: postID } }
+            { $addToSet: { savedPosts: postID } },
+            { upsert: true }
           );
         return res
           .status(200)
@@ -66,6 +78,8 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
         });
     }
   } catch (err) {
-    return res.status(500).json({ message: "Unknown error.", data: err });
+    return res
+      .status(500)
+      .json({ message: "Something went wrong.", data: err });
   }
 }

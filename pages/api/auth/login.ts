@@ -55,6 +55,10 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             .db()
             .collection("posts")
             .find({ "postedBy.username": user.username });
+          const savedPosts = await mongodbConnection
+            .db()
+            .collection("bookmarks")
+            .findOne({ belongsTo: user.username });
           const token = jwt.sign(
             { user: user.username },
             process.env.JWT_SECRET as string
@@ -66,6 +70,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                 ...user,
                 badges: await cursorToDoc(badges),
                 connections: await cursorToDoc(connections),
+                savedPosts: savedPosts ? savedPosts.savedPosts : [],
                 posts: await cursorToDoc(posts),
               },
               token,

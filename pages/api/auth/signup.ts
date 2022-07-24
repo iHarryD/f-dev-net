@@ -52,7 +52,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             ...req.body,
             bio: "",
             image: "",
-            savedPosts: [],
             password: encryptedPassword,
             timestamp: new Date(),
           });

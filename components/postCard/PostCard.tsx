@@ -12,10 +12,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import postCardStyles from "./PostCard.module.css";
 import buttonsStyles from "../../styles/Buttons.module.css";
 import { Post } from "../../interfaces/Common.interface";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CommentBox from "../commentBox/CommentBox";
 import {
-  bookmarkPost,
   deletePost,
   likePost,
   postComment,
@@ -31,6 +30,10 @@ import {
 import UsernameLink from "../usernameLink/UsernameLink";
 import Tooltip from "../tooltip/Tooltip";
 import { useAuth } from "../../contexts/AuthContext";
+import {
+  addToBookmark,
+  removeFromBookmark,
+} from "../../services/bookmarkServices";
 
 export default function PostCard({
   details: { _id, caption, comments, likes, media, postedBy, timestamp },
@@ -41,12 +44,20 @@ export default function PostCard({
   const [isPostingComment, setIsPostingComment] = useState<boolean>(false);
   const commentInputRef = useRef<HTMLInputElement | null>(null);
   const [isLiking, setIsLiking] = useState<boolean>(false);
-  const [isBookmarked, setIsBookmarked] = useState<boolean>(
-    userCredentials.user ? userCredentials.user.savedPosts.includes(_id) : false
-  );
+  const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
   const [isBookmarking, setIsBookmarking] = useState<boolean>(false);
   const [isCommentBoxOpen, setIsCommentBoxOpen] = useState<boolean>(false);
   const dispatch = useDispatch();
+
+  useEffect(
+    () =>
+      setIsBookmarked(
+        userCredentials.user
+          ? userCredentials.user.savedPosts.includes(_id)
+          : false
+      ),
+    []
+  );
 
   function handleLikePost() {
     if (userCredentials.user === null) return;
@@ -68,11 +79,17 @@ export default function PostCard({
 
   function handleBookmarkPost() {
     if (userCredentials.user === null) return;
-    bookmarkPost(_id, setIsBookmarking);
+    setIsBookmarked(true);
+    addToBookmark(_id, setIsBookmarking, undefined, () =>
+      setIsBookmarked(false)
+    );
   }
   function handleRemoveBookmark() {
     if (userCredentials.user === null) return;
-    bookmarkPost(_id, setIsBookmarking);
+    setIsBookmarked(false);
+    removeFromBookmark(_id, setIsBookmarking, undefined, () =>
+      setIsBookmarked(true)
+    );
   }
 
   function handlePostComment() {

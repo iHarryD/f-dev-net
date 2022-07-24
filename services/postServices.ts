@@ -94,48 +94,6 @@ export async function unlikePost(
   }
 }
 
-export async function bookmarkPost(
-  postID: string,
-  loadingState?: Dispatch<SetStateAction<boolean>>,
-  successCallback?: (
-    result: AxiosResponse<{ message: string; data: Post }>
-  ) => void,
-  failureCallback?: (err: unknown) => void
-) {
-  try {
-    if (loadingState) loadingState(true);
-    const result = await baseAxiosInstance().post("/profiles/bookmarks", {
-      postID,
-    });
-    if (successCallback) successCallback(result);
-  } catch (err) {
-    if (failureCallback) failureCallback(err);
-  } finally {
-    if (loadingState) loadingState(false);
-  }
-}
-
-export async function removePostBookmark(
-  postID: string,
-  loadingState?: Dispatch<SetStateAction<boolean>>,
-  successCallback?: (
-    result: AxiosResponse<{ message: string; data: Post }>
-  ) => void,
-  failureCallback?: (err: unknown) => void
-) {
-  try {
-    if (loadingState) loadingState(true);
-    const result = await baseAxiosInstance().delete("/profiles/bookmarks", {
-      data: { postID },
-    });
-    if (successCallback) successCallback(result);
-  } catch (err) {
-    if (failureCallback) failureCallback(err);
-  } finally {
-    if (loadingState) loadingState(false);
-  }
-}
-
 export async function postComment(
   comment: string,
   postID: string,
