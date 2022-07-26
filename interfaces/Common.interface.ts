@@ -18,7 +18,6 @@ export interface User {
   email: string;
   image: string;
   name: string;
-  savedPosts: string[];
   username: string;
 }
 

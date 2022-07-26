@@ -12,7 +12,7 @@
   background: var(--DARK-GREY-CLR);
   border-radius: var(--BORDER-RADIUS);
   font-size: var(--SMALL-FONT-SIZE);
-  width: 30vw;
+  width: min(30vw, 25rem);
   padding: var(--MIN-PADDING);
 }
 
@@ -20,4 +20,63 @@
   display: flex;
   font-size: var(--LARGE-FONT-SIZE);
   gap: clamp(1.5rem, 2vw + 1rem, 3rem);
+}
+
+.searchBarAndResultsContainer {
+  position: relative;
+}
+
+.searchResultsContainer {
+  background: var(--SECONDARY-BACKGROUND-CLR);
+  border-radius: var(--BORDER-RADIUS);
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+
+.profilePicturePreview {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  width: 3rem;
+}
+
+.searchResult {
+  display: flex;
+  cursor: pointer;
+  gap: var(--MEDIUM-GAP);
+  padding: var(--MIN-PADDING) var(--MEDIUM-PADDING);
+  width: calc(100% - calc(var(--MEDIUM-PADDING) * 2));
+}
+
+.nameUsernameContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.username {
+  font-weight: 700;
+  opacity: var(--FADED-TEXT-OPACITY);
+}
+
+.closeButton {
+  align-items: center;
+  display: flex;
+  font-size: var(--SMALL-FONT-SIZE);
+  justify-content: center;
+  opacity: var(--FADED-TEXT-OPACITY);
+  position: absolute;
+  top: var(--INPUT-PADDING);
+  right: var(--INPUT-PADDING);
+}
+
+.infoTextContainer {
+  background: var(--SECONDARY-BACKGROUND-CLR);
+  border-radius: var(--BORDER-RADIUS);
+  color: var(--LIGHT-GREY-CLR);
+  padding: 1rem;
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
 }
