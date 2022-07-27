@@ -1,7 +1,11 @@
 import { AxiosResponse } from "axios";
 import { Dispatch, SetStateAction } from "react";
 import { getImageDataURL } from "../helpers/getImageDataURL";
-import { Post, PostComment } from "../interfaces/Common.interface";
+import {
+  Post,
+  PostCategories,
+  PostComment,
+} from "../interfaces/Common.interface";
 import baseAxiosInstance from "./baseAxiosInstance";
 
 export async function getPosts(
@@ -28,7 +32,7 @@ export async function getPosts(
 export async function createNewPost(
   postDetails: {
     caption: string;
-    category: string;
+    category: PostCategories;
     media?: File;
   },
   loadingState?: Dispatch<SetStateAction<boolean>>,

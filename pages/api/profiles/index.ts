@@ -29,8 +29,14 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
         const userDoc = await connection.clientPromise
           .db()
           .collection("users")
-          .findOne({ username: req.user });
-        if (userDoc === null) throw new Error("User not found.");
+          .findOne(
+            { username: req.user },
+            { projection: { email: 0, password: 0, timestamp: 0 } }
+          );
+        if (userDoc === null)
+          return res
+            .status(404)
+            .json({ message: "User not found.", data: null });
         const badges = connection.clientPromise
           .db()
           .collection("badges")
@@ -43,11 +49,16 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
           .db()
           .collection("posts")
           .find({ "postedBy.username": req.user });
+        const savedPosts = await connection.clientPromise
+          .db()
+          .collection("bookmarks")
+          .findOne({ belongsTo: req.user });
         const userDetails = {
+          ...userDoc,
           badges: await cursorToDoc(badges),
           connections: await cursorToDoc(connections),
+          savedPosts: savedPosts ? savedPosts.savedPosts : [],
           posts: await cursorToDoc(posts),
-          ...(await cursorToDoc(userDoc)),
         };
         return res
           .status(200)

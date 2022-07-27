@@ -6,7 +6,7 @@ export default function UsernameLink({ username }: { username: string }) {
     <Link
       href={{
         pathname: "/profile",
-        query: { user: username },
+        query: { username },
       }}
     >
       <span className={usernameStyles.username}>@{username}</span>

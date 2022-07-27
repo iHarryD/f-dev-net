@@ -5,21 +5,18 @@ import Layout from "../components/layout/Layout";
 import AuthUIHandler from "../components/authUIHandler/AuthUIHandler";
 import { Provider as StoreProvider } from "react-redux";
 import { store } from "../store";
-import { AuthProvider } from "../contexts/AuthContext";
 
 export default function MyApp({
   Component,
   pageProps: { session, ...pageProps },
 }: AppProps) {
   return (
-    <AuthProvider>
-      <StoreProvider store={store}>
-        <AuthUIHandler>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        </AuthUIHandler>
-      </StoreProvider>
-    </AuthProvider>
+    <StoreProvider store={store}>
+      <AuthUIHandler>
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </AuthUIHandler>
+    </StoreProvider>
   );
 }

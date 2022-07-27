@@ -5,7 +5,7 @@ import PostCard from "../components/postCard/PostCard";
 import commonStyles from "../styles/Common.module.css";
 import connectToMongoDb from "../lib/mongodb";
 import { cursorToDoc } from "../helpers/cursorToDoc";
-import { Post } from "../interfaces/Common.interface";
+import { Post, UserAuthStatus } from "../interfaces/Common.interface";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
 import { refresh } from "../features/postSlice";
@@ -17,6 +17,7 @@ import useInMobileView from "../hooks/useInMobileView";
 
 export default function Home({ posts: newPosts }: { posts: Post[] }) {
   const posts = useSelector((state: RootState) => state.postSlice);
+  const { status } = useSelector((state: RootState) => state.userSlice);
   const dispatch = useDispatch();
   const [sortedBy, setSortedBy] = useState<"date" | "trending">("date");
   const [filterBy, setFilterBy] = useState<"general" | "query" | null>(null);
@@ -48,7 +49,7 @@ export default function Home({ posts: newPosts }: { posts: Post[] }) {
       <>
         {inMobileView === false && <HomePageSidebar />}
         <div className={commonStyles.pagePostsSection}>
-          <CreatePost />
+          {status === UserAuthStatus.AUTHENTICATED && <CreatePost />}
           <div className={commonStyles.chipContainer}>
             <div
               className={`${commonStyles.chip} ${

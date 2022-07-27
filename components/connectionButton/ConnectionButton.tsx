@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { loaderCSSOverrides } from "../../data/loaderCSS";
+import { updateUser } from "../../features/userSlice";
 import {
   ConnectionStatus,
   UserWithStats,
@@ -8,8 +10,8 @@ import {
   acceptConnection,
   initiateConnection,
 } from "../../services/connectionServices";
+import { AppDispatch } from "../../store";
 import buttonsStyles from "../../styles/Buttons.module.css";
-import commonStyles from "../../styles/Common.module.css";
 import { ButtonSyncLoader } from "../buttonLoaders/ButtonLoaders";
 
 export default function ConnectionButton({
@@ -21,16 +23,21 @@ export default function ConnectionButton({
   connectionStatus: ConnectionStatus;
   user: UserWithStats;
 }) {
+  const dispatch = useDispatch<AppDispatch>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   function handleInitiateConnection() {
     if (user === null) return;
-    initiateConnection(user.username, setIsLoading);
+    initiateConnection(user.username, setIsLoading, () =>
+      dispatch(updateUser())
+    );
   }
 
   function hanleAcceptConnection() {
     if (user === null || connectionID === undefined) return;
-    acceptConnection(user.username, connectionID, setIsLoading);
+    acceptConnection(user.username, connectionID, setIsLoading, () =>
+      dispatch(updateUser())
+    );
   }
 
   if (connectionStatus === ConnectionStatus.PENDING) {

@@ -7,14 +7,18 @@ import {
   faRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
 import Logo from "../logo/Logo";
-import { useAuth } from "../../contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { findUsers } from "../../services/profileServices";
 import { useRouter } from "next/router";
 import useDebounce from "../../hooks/useDebounce";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../store";
+import { logout } from "../../features/userSlice";
+import { UserAuthStatus } from "../../interfaces/Common.interface";
 
 export function MacroNavbar() {
-  const { status, logout } = useAuth();
+  const { status, user } = useSelector((state: RootState) => state.userSlice);
+  const dispatch = useDispatch<AppDispatch>();
   const [searchResults, setSearchResults] = useState<
     {
       image: string;
@@ -90,7 +94,12 @@ export function MacroNavbar() {
       </div>
       <ul className={navbarStyles.buttonContainer}>
         <li>
-          <button title="Notifications">
+          <button
+            title="Notifications"
+            onClick={() => {
+              console.log(user);
+            }}
+          >
             <FontAwesomeIcon icon={faBell} />
           </button>
         </li>
@@ -99,9 +108,9 @@ export function MacroNavbar() {
             <FontAwesomeIcon icon={faGear} />
           </button>
         </li>
-        {status === "authenticated" && (
+        {status === UserAuthStatus.AUTHENTICATED && (
           <li>
-            <button title="Log out" onClick={() => logout()}>
+            <button title="Log out" onClick={() => dispatch(logout())}>
               <FontAwesomeIcon icon={faRightFromBracket} />
             </button>
           </li>

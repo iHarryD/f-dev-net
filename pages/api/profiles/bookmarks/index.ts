@@ -36,7 +36,7 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
           const allBookmarkedPosts = connection.clientPromise
             .db()
             .collection("posts")
-            .find({ _id: { $all: allBookmarkedPostsID } });
+            .find({ _id: { $in: allBookmarkedPostsID } });
           return res.status(200).json({
             message: "Bookmarked posts fetched.",
             data: await cursorToDoc(allBookmarkedPosts),

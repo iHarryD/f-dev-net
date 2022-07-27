@@ -11,6 +11,9 @@ import { append } from "../../features/postSlice";
 import GiphyGrid from "../giphyGrid/GiphyGrid";
 import { createNewPost } from "../../services/postServices";
 import { ButtonSyncLoader } from "../buttonLoaders/ButtonLoaders";
+import { PostCategories } from "../../interfaces/Common.interface";
+import { updateUser } from "../../features/userSlice";
+import { AppDispatch } from "../../store";
 
 export default function CreatePost() {
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
@@ -19,7 +22,7 @@ export default function CreatePost() {
   const captionTextAreaRef = useRef<null | HTMLTextAreaElement>(null);
   const categoryDropDownRef = useRef<null | HTMLSelectElement>(null);
   const [isPosting, setIsPosting] = useState<boolean>(false);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const [isGiphyActive, setIsGiphyActive] = useState<boolean>(false);
   const [giphySearchQuery, setGiphySearchQuery] = useState<string>("shazam");
 
@@ -38,11 +41,11 @@ export default function CreatePost() {
     if (!captionTextAreaRef.current.value.replaceAll(" ", "")) return;
     const postDetails: {
       caption: string;
-      category: string;
+      category: PostCategories;
       media?: File;
     } = {
       caption: captionTextAreaRef.current.value,
-      category: categoryDropDownRef.current.value,
+      category: categoryDropDownRef.current.value as PostCategories,
     };
     if (uploadedImage) {
       postDetails.media = uploadedImage;
@@ -50,6 +53,7 @@ export default function CreatePost() {
     createNewPost(postDetails, setIsPosting, (result) => {
       clearForm();
       dispatch(append({ newPosts: [result.data.data] }));
+      dispatch(updateUser());
     });
   }
 
@@ -82,8 +86,8 @@ export default function CreatePost() {
           ref={categoryDropDownRef}
           className={`${commonStyles.styledDropdown} ${createPostStyles.postCategoryDropdown}`}
         >
-          <option value="general">General</option>
-          <option value="query">Query</option>
+          <option value={PostCategories.GENERAL}>General</option>
+          <option value={PostCategories.QUERY}>Query</option>
         </select>
       </div>
       {isGiphyActive && (

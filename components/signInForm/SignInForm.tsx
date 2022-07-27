@@ -3,13 +3,14 @@ import commonStyles from "../../styles/Common.module.css";
 import ThirdPartyAuthButtons from "../thirdPartyAuthButtons/ThirdPartyAuthButtons";
 import buttonsStyles from "../../styles/Buttons.module.css";
 import signInFormStyles from "./SignInForm.module.css";
-import { login, signup } from "../../services/authServices";
-import { useAuth } from "../../contexts/AuthContext";
+import { login as loginService, signup } from "../../services/authServices";
 import { ButtonSyncLoader } from "../buttonLoaders/ButtonLoaders";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExclamationCircle, faEye } from "@fortawesome/free-solid-svg-icons";
 import { emailRegExp } from "../../regExp";
 import { extractErrorMessage } from "../../helpers/extractErrorMessage";
+import { useDispatch } from "react-redux";
+import { login } from "../../features/userSlice";
 
 const testingCredentials = {
   username: "harry",
@@ -17,7 +18,7 @@ const testingCredentials = {
 };
 
 export default function SignInForm() {
-  const { setUserCredentials } = useAuth();
+  const dispatch = useDispatch();
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [username, setUsername] = useState<string>("");
@@ -43,11 +44,10 @@ export default function SignInForm() {
         setFormError("Please fill in the required fields.");
         return;
       }
-      login({ username, password }, setIsLoading, (result) => {
-        setUserCredentials({
-          user: result.data.data.user,
-          token: result.data.data.token,
-        });
+      loginService({ username, password }, setIsLoading, (result) => {
+        dispatch(
+          login({ user: result.data.data.user, token: result.data.data.token })
+        );
       });
     } else {
       if (email === "" || username === "" || password === "" || name === "") {

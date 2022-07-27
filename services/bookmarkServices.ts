@@ -11,6 +11,7 @@ export async function getBookmarkPosts(
   failureCallback?: (err: unknown) => void
 ) {
   try {
+    if (loadingState) loadingState(true);
     const result = await baseAxiosInstance().get(`/profiles/bookmarks`);
     if (successCallback) successCallback(result);
   } catch (err) {
@@ -29,6 +30,7 @@ export async function addToBookmark(
   failureCallback?: (err: unknown) => void
 ) {
   try {
+    if (loadingState) loadingState(true);
     const result = await baseAxiosInstance().post(`/profiles/bookmarks`, {
       postID,
     });
@@ -49,6 +51,7 @@ export async function removeFromBookmark(
   failureCallback?: (err: unknown) => void
 ) {
   try {
+    if (loadingState) loadingState(true);
     const result = await baseAxiosInstance().delete(`/profiles/bookmarks`, {
       data: { postID },
     });

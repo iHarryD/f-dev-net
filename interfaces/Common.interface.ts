@@ -13,9 +13,19 @@ export enum ConnectionStatus {
   SENT = "sent",
 }
 
+export enum UserAuthStatus {
+  AUTHENTICATED = "authenticated",
+  LOADING = "loading",
+  UNAUTHENTICATED = "unauthenticated",
+}
+
+export enum PostCategories {
+  GENERAL = "general",
+  QUERY = "query",
+}
+
 export interface User {
   bio: string;
-  email: string;
   image: string;
   name: string;
   username: string;
@@ -25,6 +35,7 @@ export interface UserWithStats extends User {
   badges: string[];
   connections: Connection[];
   posts: Post[];
+  savedPosts: string[];
 }
 
 export interface PostComment {
@@ -37,6 +48,7 @@ export interface PostComment {
 export interface Post {
   _id: string;
   caption: string;
+  category: PostCategories;
   comments: PostComment[];
   likes: string[];
   media: string;

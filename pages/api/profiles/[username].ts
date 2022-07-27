@@ -25,7 +25,10 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         const userDoc = await connection.clientPromise
           .db()
           .collection("users")
-          .findOne({ username });
+          .findOne(
+            { username },
+            { projection: { _id: 0, email: 0, password: 0, timestamp: 0 } }
+          );
         if (userDoc === null)
           return res
             .status(404)
@@ -37,7 +40,10 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         const connections = connection.clientPromise
           .db()
           .collection("connections")
-          .find({ connectionBetween: { $in: [username] }, isActive: true });
+          .find(
+            { connectionBetween: { $in: [username] }, isActive: true },
+            { projection: { connectionBetween: 1 } }
+          );
         const posts = connection.clientPromise
           .db()
           .collection("posts")

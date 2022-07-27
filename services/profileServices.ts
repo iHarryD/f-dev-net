@@ -1,13 +1,14 @@
 import { AxiosResponse } from "axios";
 import { Dispatch, SetStateAction } from "react";
 import { getImageDataURL } from "../helpers/getImageDataURL";
+import { User, UserWithStats } from "../interfaces/Common.interface";
 import baseAxiosInstance from "./baseAxiosInstance";
 
 export async function getUser(
   username: string,
   loadingState?: Dispatch<SetStateAction<boolean>>,
   successCallback?: (
-    result: AxiosResponse<{ message: string; data: any }>
+    result: AxiosResponse<{ message: string; data: UserWithStats }>
   ) => void,
   failureCallback?: (err: unknown) => void
 ) {
@@ -28,11 +29,7 @@ export async function findUsers(
   successCallback?: (
     result: AxiosResponse<{
       message: string;
-      data: {
-        image: string;
-        name: string;
-        username: string;
-      }[];
+      data: User[];
     }>
   ) => void,
   failureCallback?: (err: unknown) => void

@@ -25,7 +25,10 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         const users = connection.clientPromise
           .db()
           .collection("users")
-          .find({ username: { $regex: req.query.username, $options: "gi" } });
+          .find(
+            { username: { $regex: req.query.username, $options: "gi" } },
+            { projection: { email: 0, password: 0, timestamp: 0 } }
+          );
         return res.status(200).json({
           message: "Users fetched.",
           data: (await cursorToDoc(users)).map((user: User) => ({

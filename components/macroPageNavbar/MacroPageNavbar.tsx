@@ -4,6 +4,7 @@ import {
   faMessage,
   faUser,
 } from "@fortawesome/free-regular-svg-icons";
+import { faHome } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import macroPageNavbarStyles from "./MacroPageNavbar.module.css";
@@ -26,7 +27,7 @@ export default function MacroPageNavbar() {
           <Link href="/">
             <div className={macroPageNavbarStyles.homeNavbarLink}>
               <span className={macroPageNavbarStyles.navbarLinkIconContainer}>
-                <FontAwesomeIcon icon={faBookmark} />
+                <FontAwesomeIcon icon={faHome} />
               </span>
               <span>Feed</span>
             </div>

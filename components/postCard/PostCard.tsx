@@ -20,7 +20,7 @@ import {
   postComment,
   unlikePost,
 } from "../../services/postServices";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   updateComments,
   like,
@@ -29,66 +29,65 @@ import {
 } from "../../features/postSlice";
 import UsernameLink from "../usernameLink/UsernameLink";
 import Tooltip from "../tooltip/Tooltip";
-import { useAuth } from "../../contexts/AuthContext";
 import {
   addToBookmark,
   removeFromBookmark,
 } from "../../services/bookmarkServices";
+import { AppDispatch, RootState } from "../../store";
+import { updateUser } from "../../features/userSlice";
 
 export default function PostCard({
   details: { _id, caption, comments, likes, media, postedBy, timestamp },
 }: {
   details: Post;
 }) {
-  const { userCredentials } = useAuth();
+  const { user } = useSelector((state: RootState) => state.userSlice);
   const [isPostingComment, setIsPostingComment] = useState<boolean>(false);
   const commentInputRef = useRef<HTMLInputElement | null>(null);
   const [isLiking, setIsLiking] = useState<boolean>(false);
   const [isBookmarked, setIsBookmarked] = useState<boolean>(false);
   const [isBookmarking, setIsBookmarking] = useState<boolean>(false);
   const [isCommentBoxOpen, setIsCommentBoxOpen] = useState<boolean>(false);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
-  useEffect(
-    () =>
-      setIsBookmarked(
-        userCredentials.user
-          ? userCredentials.user.savedPosts.includes(_id)
-          : false
-      ),
-    []
-  );
+  useEffect(() => {
+    setIsBookmarked(user ? user.savedPosts.includes(_id) : false);
+  }, [user]);
 
   function handleLikePost() {
-    if (userCredentials.user === null) return;
-    dispatch(like({ postID: _id, username: userCredentials.user.username }));
+    if (user === null) return;
+    dispatch(like({ postID: _id, username: user.username }));
     likePost(_id, setIsLiking, undefined, () =>
-      dispatch(
-        unlike({ postID: _id, username: userCredentials.user!.username })
-      )
+      dispatch(unlike({ postID: _id, username: user!.username }))
     );
   }
 
   function handleUnlikePost() {
-    if (userCredentials.user === null) return;
-    dispatch(unlike({ postID: _id, username: userCredentials.user.username }));
+    if (user === null) return;
+    dispatch(unlike({ postID: _id, username: user.username }));
     unlikePost(_id, setIsLiking, undefined, () =>
-      dispatch(like({ postID: _id, username: userCredentials.user!.username }))
+      dispatch(like({ postID: _id, username: user!.username }))
     );
   }
 
   function handleBookmarkPost() {
-    if (userCredentials.user === null) return;
+    if (user === null) return;
     setIsBookmarked(true);
-    addToBookmark(_id, setIsBookmarking, undefined, () =>
-      setIsBookmarked(false)
+    addToBookmark(
+      _id,
+      setIsBookmarking,
+      () => dispatch(updateUser()),
+      () => setIsBookmarked(false)
     );
   }
   function handleRemoveBookmark() {
-    if (userCredentials.user === null) return;
+    if (user === null) return;
     setIsBookmarked(false);
-    removeFromBookmark(_id, setIsBookmarking, undefined, () =>
-      setIsBookmarked(true)
+    removeFromBookmark(
+      _id,
+      setIsBookmarking,
+      () => dispatch(updateUser()),
+      () => setIsBookmarked(true)
     );
   }
 
@@ -127,7 +126,7 @@ export default function PostCard({
             <UsernameLink username={postedBy.username} />
           </div>
         </div>
-        {userCredentials.user?.username === postedBy.username && (
+        {user?.username === postedBy.username && (
           <div>
             <Tooltip
               tooltipItems={[
@@ -158,11 +157,7 @@ export default function PostCard({
         </div>
         <div className={postCardStyles.actionBar}>
           <div>
-            {(
-              userCredentials.user
-                ? likes.includes(userCredentials.user.username)
-                : false
-            ) ? (
+            {(user ? likes.includes(user.username) : false) ? (
               <button
                 disabled={isLiking}
                 className={buttonsStyles.buttonWithBadge}

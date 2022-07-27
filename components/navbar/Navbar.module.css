@@ -65,6 +65,7 @@
   font-size: var(--SMALL-FONT-SIZE);
   justify-content: center;
   opacity: var(--FADED-TEXT-OPACITY);
+  padding: 2px 5px;
   position: absolute;
   top: var(--INPUT-PADDING);
   right: var(--INPUT-PADDING);

@@ -55,6 +55,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             .db()
             .collection("posts")
             .find({ "postedBy.username": user.username });
+
           const savedPosts = await mongodbConnection
             .db()
             .collection("bookmarks")
@@ -63,6 +64,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             { user: user.username },
             process.env.JWT_SECRET as string
           );
+
           return res.status(200).json({
             message: "Login successful.",
             data: {
