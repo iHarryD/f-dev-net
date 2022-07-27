@@ -11,6 +11,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { findUsers } from "../../services/profileServices";
 import { useRouter } from "next/router";
+import useDebounce from "../../hooks/useDebounce";
 
 export function MacroNavbar() {
   const { status, logout } = useAuth();
@@ -24,16 +25,17 @@ export function MacroNavbar() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
+  const debouncedValue = useDebounce(searchQuery, 500);
 
   useEffect(() => {
-    if (searchQuery.replaceAll(" ", "").length === 0) {
+    if (debouncedValue.replaceAll(" ", "").length === 0) {
       setSearchResults([]);
       return;
     }
-    findUsers(searchQuery, setIsLoading, (result) =>
+    findUsers(debouncedValue, setIsLoading, (result) =>
       setSearchResults(result.data.data)
     );
-  }, [searchQuery]);
+  }, [debouncedValue]);
 
   return (
     <nav className={navbarStyles.navbar}>
