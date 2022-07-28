@@ -1,6 +1,5 @@
 import loggedInUserProfileCardStyles from "./LoggedInUserProfileCard.module.css";
 import commonStyles from "../../styles/Common.module.css";
-import { useAuth } from "../../contexts/AuthContext";
 import { RootState } from "../../store";
 import { useSelector } from "react-redux";
 

@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useAuth } from "../../contexts/AuthContext";
 import { login, logout } from "../../features/userSlice";
 import { UserAuthStatus } from "../../interfaces/Common.interface";
 import { RootState } from "../../store";

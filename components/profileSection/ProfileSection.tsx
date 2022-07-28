@@ -55,7 +55,6 @@ export default function ProfileSection() {
   useEffect(() => {
     if (userQuery) {
       getUser(userQuery as string, setIsLoading, (result) => {
-        console.log(result);
         if (result.data.data.username === LoggedInUser?.username) {
           setUser(LoggedInUser);
           setIsAdmin(true);

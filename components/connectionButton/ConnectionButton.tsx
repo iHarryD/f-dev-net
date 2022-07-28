@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { loaderCSSOverrides } from "../../data/loaderCSS";
 import { updateUser } from "../../features/userSlice";
 import {
   ConnectionStatus,
