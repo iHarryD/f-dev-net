@@ -147,7 +147,7 @@ export default function SignInForm() {
               className={buttonsStyles.textButton}
               onClick={() => toggleAuthMode()}
             >
-              I don't have an account
+              I do not have an account
             </button>
             <button
               type="button"
