@@ -8,7 +8,6 @@ import { Chat as IChat } from "../interfaces/Common.interface";
 import { useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import { refresh } from "../features/chatSlice";
-import { useAuth } from "../contexts/AuthContext";
 
 export default function Chat({ chats: newChats }: { chats: IChat[] }) {
   const dispatch = useDispatch();

@@ -36,7 +36,7 @@ export default function ProfileSection() {
   const {
     query: { username: userQuery },
   } = useRouter();
-  const { user: LoggedInUser } = useSelector(
+  const { user: loggedInUser } = useSelector(
     (state: RootState) => state.userSlice
   );
   const dispatch = useDispatch<AppDispatch>();
@@ -53,23 +53,23 @@ export default function ProfileSection() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    if (userQuery) {
+    if (userQuery && userQuery !== loggedInUser?.username) {
       getUser(userQuery as string, setIsLoading, (result) => {
-        if (result.data.data.username === LoggedInUser?.username) {
-          setUser(LoggedInUser);
+        if (result.data.data.username === loggedInUser?.username) {
+          setUser(loggedInUser);
           setIsAdmin(true);
           return;
         }
-        if (LoggedInUser) {
-          const connectionStatusWithUser = result.data.data.connections.find(
+        if (loggedInUser) {
+          const connectionStatusWithUser = loggedInUser.connections.find(
             (connection: Connection) =>
-              connection.connectionBetween.includes(LoggedInUser!.username)
+              connection.connectionBetween.includes(result.data.data.username)
           );
           if (connectionStatusWithUser) {
             if (connectionStatusWithUser.isActive) {
               setConnectionStatus(ConnectionStatus.CONNECTED);
             } else if (
-              connectionStatusWithUser.initiatedBy === LoggedInUser.username
+              connectionStatusWithUser.initiatedBy === loggedInUser.username
             ) {
               setConnectionStatus(ConnectionStatus.SENT);
             } else if (
@@ -85,12 +85,12 @@ export default function ProfileSection() {
         }
       });
     } else {
-      if (LoggedInUser) {
-        setUser(LoggedInUser);
+      if (loggedInUser) {
+        setUser(loggedInUser);
         setIsAdmin(true);
       }
     }
-  }, [userQuery, LoggedInUser]);
+  }, [userQuery, loggedInUser]);
 
   async function handleUpdateUser() {
     if (nameInputRef.current === null || bioInputRef.current === null) return;
@@ -269,7 +269,10 @@ export default function ProfileSection() {
               <Posts posts={user.posts} />
             )}
             {userDetailCategory === UserDetailCategories.CONNECTIONS && (
-              <Connections connections={[]} />
+              <Connections
+                connections={user.connections}
+                loggedInUser={user.username}
+              />
             )}
             {userDetailCategory === UserDetailCategories.BADGES && (
               <Badges badges={[]} />

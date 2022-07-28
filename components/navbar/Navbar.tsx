@@ -63,7 +63,7 @@ export function MacroNavbar() {
         {searchResults.length > 0 && (
           <ul className={navbarStyles.searchResultsContainer}>
             {searchResults.map((user) => (
-              <li>
+              <li key={user.username}>
                 <button
                   className={navbarStyles.searchResult}
                   onClick={() => {
