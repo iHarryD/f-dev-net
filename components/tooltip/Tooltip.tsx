@@ -18,15 +18,17 @@ export default function Tooltip({
         <FontAwesomeIcon icon={faEllipsisV} />
       </button>
       {isMenuVisible && (
-        <ul className={tooltipStyles.tooltipMenu}>
+        <div className={tooltipStyles.tooltipMenu}>
           {tooltipItems.map((item, index) => (
-            <li key={index} className={tooltipStyles.tooltipMenuItem}>
-              <button onClick={() => item.tooltipOnClickHandler()}>
-                {item.tooltipChild}
-              </button>
-            </li>
+            <button
+              key={index}
+              className={tooltipStyles.tooltipMenuItem}
+              onClick={() => item.tooltipOnClickHandler()}
+            >
+              {item.tooltipChild}
+            </button>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );
