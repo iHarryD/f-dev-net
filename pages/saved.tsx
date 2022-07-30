@@ -8,6 +8,7 @@ import { getBookmarkPosts } from "../services/bookmarkServices";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import MoonLoader from "react-spinners/MoonLoader";
+import PrivateRouteAlert from "../components/privateRouteAlert/PrivateRouteAlert";
 
 export default function Saved() {
   const { user } = useSelector((state: RootState) => state.userSlice);
@@ -20,7 +21,7 @@ export default function Saved() {
     }
   }, [user]);
 
-  return (
+  return user ? (
     <>
       <HomePageSidebar />
       <div className={commonStyles.pagePostsSection}>
@@ -32,5 +33,7 @@ export default function Saved() {
       </div>
       <HomePageNavbar />
     </>
+  ) : (
+    <PrivateRouteAlert />
   );
 }

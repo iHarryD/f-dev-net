@@ -1,8 +1,12 @@
 import chatStyles from "../styles/Chat.module.css";
-import { Player, Controls } from "@lottiefiles/react-lottie-player";
+import { Player } from "@lottiefiles/react-lottie-player";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
+import PrivateRouteAlert from "../components/privateRouteAlert/PrivateRouteAlert";
 
 export default function Chat() {
-  return (
+  const { user } = useSelector((state: RootState) => state.userSlice);
+  return user ? (
     <div className={chatStyles.chatPageContainer}>
       <Player
         autoplay
@@ -12,5 +16,7 @@ export default function Chat() {
       ></Player>
       <div>Chat feature would be added soon. Keep coming back.</div>
     </div>
+  ) : (
+    <PrivateRouteAlert />
   );
 }
