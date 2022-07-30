@@ -93,3 +93,16 @@
   font-size: var(--SMALL-FONT-SIZE);
   opacity: var(--FADED-TEXT-OPACITY);
 }
+
+.category {
+  border-radius: var(--BORDER-RADIUS);
+  background: #6c6c6c69;
+  font-weight: 400;
+  padding: 0.3rem 0.5rem;
+}
+
+.postTitleCategoryContainer {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}

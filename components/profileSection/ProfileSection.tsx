@@ -207,7 +207,14 @@ export default function ProfileSection() {
               <div
                 className={profileSectionStyles.profileSectionButtonContainer}
               >
-                <button className={profileSectionStyles.shareProfileButton}>
+                <button
+                  className={profileSectionStyles.shareProfileButton}
+                  onClick={() =>
+                    navigator.clipboard.writeText(
+                      `${window.location.origin}/profile?username=${user.username}`
+                    )
+                  }
+                >
                   <FontAwesomeIcon icon={faShareNodes} />
                 </button>
                 {isAdmin ? (

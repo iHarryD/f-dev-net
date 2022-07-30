@@ -37,7 +37,16 @@ import { AppDispatch, RootState } from "../../store";
 import { updateUser } from "../../features/userSlice";
 
 export default function PostCard({
-  details: { _id, caption, comments, likes, media, postedBy, timestamp },
+  details: {
+    _id,
+    caption,
+    category,
+    comments,
+    likes,
+    media,
+    postedBy,
+    timestamp,
+  },
 }: {
   details: Post;
 }) {
@@ -150,7 +159,10 @@ export default function PostCard({
       )}
       <div className={postCardStyles.postTextContentContainer}>
         <div className={postCardStyles.postWrittenTextContainer}>
-          <p>{caption}</p>
+          <div className={postCardStyles.postTitleCategoryContainer}>
+            <span>{caption}</span>
+            <span className={postCardStyles.category}>{category}</span>
+          </div>
           <span className={postCardStyles.postAge}>
             {new Date(timestamp).toLocaleDateString()}
           </span>
@@ -222,12 +234,13 @@ export default function PostCard({
             <CommentBox comments={comments} />
           ) : (
             comments.slice(0, comments.length >= 2 ? 2 : 1).map((comment) => (
-              <p
+              <div
                 key={comment._id}
                 className={postCardStyles.latestCommentPreview}
               >
-                {comment.comment}
-              </p>
+                <span>{comment.postedBy}: </span>
+                <span>{comment.comment}</span>
+              </div>
             ))
           )}
         </div>
