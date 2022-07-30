@@ -274,10 +274,10 @@ export default function SignInForm() {
           </div>
         </form>
       )}
-      <div className={signInFormStyles.sectionDivider}></div>
-      <div className={signInFormStyles.authBoxSection}>
+      {/* <div className={signInFormStyles.sectionDivider}></div> */}
+      {/* <div className={signInFormStyles.authBoxSection}>
         <ThirdPartyAuthButtons />
-      </div>
+      </div> */}
     </div>
   );
 }

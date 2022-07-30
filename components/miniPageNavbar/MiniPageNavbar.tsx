@@ -1,6 +1,5 @@
 import {
   faBookmark,
-  faCompass,
   faMessage,
   faUser,
 } from "@fortawesome/free-regular-svg-icons";
@@ -32,13 +31,6 @@ export default function MiniPageNavbar() {
           <Link href="/feed">
             <button className={miniNavbarStyles.navButton}>
               <FontAwesomeIcon icon={faHome} />
-            </button>
-          </Link>
-        </li>
-        <li className={miniNavbarStyles.navItem}>
-          <Link href="/explore">
-            <button className={miniNavbarStyles.navButton}>
-              <FontAwesomeIcon icon={faCompass} />
             </button>
           </Link>
         </li>

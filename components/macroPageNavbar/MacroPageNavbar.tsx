@@ -1,6 +1,5 @@
 import {
   faBookmark,
-  faCompass,
   faMessage,
   faUser,
 } from "@fortawesome/free-regular-svg-icons";
@@ -30,16 +29,6 @@ export default function MacroPageNavbar() {
                 <FontAwesomeIcon icon={faHome} />
               </span>
               <span>Feed</span>
-            </div>
-          </Link>
-        </li>
-        <li>
-          <Link href="/explore">
-            <div className={macroPageNavbarStyles.homeNavbarLink}>
-              <span className={macroPageNavbarStyles.navbarLinkIconContainer}>
-                <FontAwesomeIcon icon={faCompass} />
-              </span>
-              <span>Explore</span>
             </div>
           </Link>
         </li>
