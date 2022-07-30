@@ -46,10 +46,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             .db()
             .collection("connections")
             .find({
-              $and: [
-                { connectionBetween: { $in: [user.username] } },
-                { isActive: true },
-              ],
+              connectionBetween: { $in: [user.username] },
             });
           const posts = mongodbConnection
             .db()
