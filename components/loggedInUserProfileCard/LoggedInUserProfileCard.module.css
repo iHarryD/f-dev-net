@@ -5,7 +5,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--MEDIUM-GAP);
-  margin: auto;
   padding: var(--MEDIUM-PADDING);
   position: relative;
   width: min(100%, 20rem);

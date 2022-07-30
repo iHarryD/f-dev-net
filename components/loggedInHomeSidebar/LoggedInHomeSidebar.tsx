@@ -9,7 +9,7 @@ export default function LoggedInHomeSidebar() {
   return (
     <>
       <LoggedInUserProfileCard />
-      <div>
+      {/* <div>
         <h3>Top tags for you</h3>
         <ul
           className={`${loggedInHomeSidebarStyles.listContainer} ${loggedInHomeSidebarStyles.trendingTagsListContainer}`}
@@ -38,7 +38,7 @@ export default function LoggedInHomeSidebar() {
             )
           )}
         </ul>
-      </div>
+      </div> */}
     </>
   );
 }

@@ -93,7 +93,7 @@ export function MacroNavbar() {
         )}
       </div>
       <ul className={navbarStyles.buttonContainer}>
-        <li>
+        {/* <li>
           <button
             title="Notifications"
             onClick={() => {
@@ -107,7 +107,7 @@ export function MacroNavbar() {
           <button title="Settings">
             <FontAwesomeIcon icon={faGear} />
           </button>
-        </li>
+        </li> */}
         {status === UserAuthStatus.AUTHENTICATED && (
           <li>
             <button title="Log out" onClick={() => dispatch(logout())}>
