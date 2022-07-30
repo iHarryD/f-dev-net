@@ -9,7 +9,7 @@ import { User } from "../../../interfaces/Common.interface";
 const cors = Cors({
   methods: ["GET"],
   credentials: true,
-  origin: "http://localhost:3000",
+  origin: ["http://localhost:3000", "https://roc8-dev-net.vercel.app"],
 });
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {

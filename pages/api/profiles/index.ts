@@ -12,7 +12,7 @@ import { RequestWithUser } from "../../../interfaces/Common.type";
 const cors = Cors({
   methods: ["GET", "PATCH"],
   credentials: true,
-  origin: "http://localhost:3000",
+  origin: ["http://localhost:3000", "https://roc8-dev-net.vercel.app"],
 });
 
 export default async function (req: RequestWithUser, res: NextApiResponse) {

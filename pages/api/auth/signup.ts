@@ -10,7 +10,7 @@ import { userValidation } from "../../../joi/userValidation";
 const cors = Cors({
   methods: ["POST"],
   credentials: true,
-  origin: "http://localhost:3000",
+  origin: ["http://localhost:3000", "https://roc8-dev-net.vercel.app"],
 });
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
