@@ -5,6 +5,7 @@ import {
   Post,
   PostCategories,
   PostComment,
+  UpdatePost,
 } from "../interfaces/Common.interface";
 import baseAxiosInstance from "./baseAxiosInstance";
 
@@ -21,6 +22,24 @@ export async function getPosts(
     const result = await baseAxiosInstance().get(
       `/posts?sort=${sortedBy}&filter=${filterBy}`
     );
+    if (successCallback) successCallback(result);
+  } catch (err) {
+    if (failureCallback) failureCallback(err);
+  } finally {
+    if (loadingState) loadingState(false);
+  }
+}
+
+export async function getPost(
+  postID: string,
+  loadingState?: Dispatch<SetStateAction<boolean>>,
+  successCallback?: (
+    result: AxiosResponse<{ message: string; data: Post }>
+  ) => void,
+  failureCallback?: (err: unknown) => void
+) {
+  try {
+    const result = await baseAxiosInstance().get(`/posts/${postID}`);
     if (successCallback) successCallback(result);
   } catch (err) {
     if (failureCallback) failureCallback(err);
@@ -52,6 +71,40 @@ export async function createNewPost(
       media: base64ImageURL,
     };
     const result = await baseAxiosInstance().post("/posts", data);
+    if (successCallback) successCallback(result);
+  } catch (err) {
+    if (failureCallback) failureCallback(err);
+  } finally {
+    if (loadingState) loadingState(false);
+  }
+}
+
+export async function updatePost(
+  postID: string,
+  postDetails: UpdatePost,
+  loadingState?: Dispatch<SetStateAction<boolean>>,
+  successCallback?: (
+    result: AxiosResponse<{ message: string; data: Post }>
+  ) => void,
+  failureCallback?: (err: unknown) => void
+) {
+  try {
+    if (loadingState) loadingState(true);
+    const data: {
+      caption?: string;
+      category?: PostCategories;
+      media?: string | null;
+    } = {};
+    if (postDetails.caption) data.caption = postDetails.caption;
+    if (postDetails.category) data.category = postDetails.category;
+    if (postDetails.media || postDetails.media === null) {
+      if (postDetails.media) {
+        data.media = (await getImageDataURL(postDetails.media)) as string;
+      } else {
+        data.media = null;
+      }
+    }
+    const result = await baseAxiosInstance().patch(`/posts/${postID}`, data);
     if (successCallback) successCallback(result);
   } catch (err) {
     if (failureCallback) failureCallback(err);

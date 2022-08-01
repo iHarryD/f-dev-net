@@ -50,14 +50,15 @@ export interface Post {
   caption: string;
   category: PostCategories;
   comments: PostComment[];
+  commentsActive: boolean;
+  lastModified: string;
   likes: string[];
-  media: string;
+  media: string | null;
   postedBy: {
     image: string;
     name: string;
     username: string;
   };
-  timestamp: string;
 }
 
 export interface ChatMessage {
@@ -94,3 +95,9 @@ export interface Connection {
 export type BasicAxiosError = AxiosError<
   { message: string; data: unknown } | undefined
 >;
+
+export interface UpdatePost {
+  caption?: string;
+  category?: PostCategories;
+  media?: File | null;
+}

@@ -7,11 +7,17 @@ import {
   faShareNodes,
   faHeart as faSHeart,
   faBookmark as faSBookmark,
+  faUpload,
+  faClose,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import postCardStyles from "./PostCard.module.css";
 import buttonsStyles from "../../styles/Buttons.module.css";
-import { Post } from "../../interfaces/Common.interface";
+import {
+  Post,
+  PostCategories,
+  UpdatePost,
+} from "../../interfaces/Common.interface";
 import { useEffect, useRef, useState } from "react";
 import CommentBox from "../commentBox/CommentBox";
 import {
@@ -19,6 +25,7 @@ import {
   likePost,
   postComment,
   unlikePost,
+  updatePost,
 } from "../../services/postServices";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -35,6 +42,10 @@ import {
 } from "../../services/bookmarkServices";
 import { AppDispatch, RootState } from "../../store";
 import { updateUser } from "../../features/userSlice";
+import Image from "next/image";
+import PostCategoryDropdown from "../postCategoryDropdown/PostCategoryDropdown";
+import { isImage } from "../../helpers/isImage";
+import { ButtonSyncLoader } from "../buttonLoaders/ButtonLoaders";
 
 export default function PostCard({
   details: {
@@ -58,6 +69,11 @@ export default function PostCard({
   const [isBookmarking, setIsBookmarking] = useState<boolean>(false);
   const [isCommentBoxOpen, setIsCommentBoxOpen] = useState<boolean>(false);
   const dispatch = useDispatch<AppDispatch>();
+  const [inEditMode, setInEditMode] = useState<boolean>(false);
+  const postCategoryDropdownRef = useRef<HTMLSelectElement | null>(null);
+  const [currentMedia, setCurrentMedia] = useState<string | File | null>(media);
+  const updateCaptionInputRef = useRef<HTMLInputElement | null>(null);
+  const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
   useEffect(() => {
     setIsBookmarked(user ? user.savedPosts.includes(_id) : false);
@@ -119,6 +135,34 @@ export default function PostCard({
     });
   }
 
+  function handleUpdatePost() {
+    if (updateCaptionInputRef.current && postCategoryDropdownRef.current) {
+      const updatedPostData: UpdatePost = {};
+      if (
+        updateCaptionInputRef.current.value.replaceAll(" ", "") &&
+        updateCaptionInputRef.current.value !== caption
+      ) {
+        updatedPostData.caption = updateCaptionInputRef.current.value;
+      }
+      if (postCategoryDropdownRef.current.value !== category) {
+        updatedPostData.category = postCategoryDropdownRef.current
+          .value as PostCategories;
+      }
+      if (currentMedia !== media) {
+        if (currentMedia) {
+          if (typeof currentMedia !== "string") {
+            updatedPostData.media = currentMedia;
+          }
+        } else {
+          updatedPostData.media = null;
+        }
+      }
+      updatePost(_id, updatedPostData, setIsUpdating, (result) => {
+        setInEditMode(false);
+      });
+    }
+  }
+
   return (
     <div className={postCardStyles.postCardContainer}>
       <div className={postCardStyles.postCardHeader}>
@@ -143,30 +187,119 @@ export default function PostCard({
                   tooltipChild: <span>Delete </span>,
                   tooltipOnClickHandler: handleDeletePost,
                 },
+                {
+                  tooltipChild: <span>Edit</span>,
+                  tooltipOnClickHandler: () => setInEditMode((prev) => !prev),
+                },
               ]}
             />
           </div>
         )}
       </div>
-      {media && (
-        <div>
-          <img
-            src={media}
-            alt={media}
-            className={postCardStyles.demoPostPicture}
-          />
-        </div>
+      {inEditMode ? (
+        currentMedia ? (
+          <div className={postCardStyles.updateImagePreviewContainer}>
+            <button
+              className={buttonsStyles.removeImageButton}
+              onClick={() => setCurrentMedia(null)}
+            >
+              <FontAwesomeIcon icon={faClose} />
+            </button>
+            <Image
+              src={
+                typeof currentMedia === "string"
+                  ? currentMedia
+                  : URL.createObjectURL(currentMedia)
+              }
+              alt="update-image"
+              layout="fill"
+            />
+            <label
+              className={`${postCardStyles.changeImageLabel} ${postCardStyles.addImageLabel}`}
+            >
+              <input
+                type="file"
+                accept="image/*"
+                className={postCardStyles.addImageInput}
+                onChange={(e) => {
+                  if (e.target.files) {
+                    if (isImage(e.target.files[0])) {
+                      setCurrentMedia(e.target.files[0]);
+                    }
+                  }
+                }}
+              />
+              <span>Change image</span>
+            </label>
+          </div>
+        ) : (
+          <label className={postCardStyles.addImageLabel}>
+            <input
+              type="file"
+              accept="image/*"
+              className={postCardStyles.addImageInput}
+              onChange={(e) => {
+                if (e.target.files) {
+                  if (isImage(e.target.files[0])) {
+                    setCurrentMedia(e.target.files[0]);
+                  }
+                }
+              }}
+            />
+            <FontAwesomeIcon icon={faUpload} /> Add an image
+          </label>
+        )
+      ) : (
+        media && (
+          <div className={postCardStyles.postMediaContainer}>
+            <Image src={media} alt={media} layout="fill" />
+          </div>
+        )
       )}
       <div className={postCardStyles.postTextContentContainer}>
         <div className={postCardStyles.postWrittenTextContainer}>
           <div className={postCardStyles.postTitleCategoryContainer}>
-            <span>{caption}</span>
-            <span className={postCardStyles.category}>{category}</span>
+            {inEditMode ? (
+              <>
+                <input
+                  ref={updateCaptionInputRef}
+                  defaultValue={caption}
+                  className={postCardStyles.updateCaptionInput}
+                />
+                <PostCategoryDropdown
+                  background="#0c0c0c"
+                  selectRef={postCategoryDropdownRef}
+                />
+              </>
+            ) : (
+              <>
+                <span>{caption}</span>
+                <span className={postCardStyles.category}>{category}</span>
+              </>
+            )}
           </div>
           <span className={postCardStyles.postAge}>
             {new Date(timestamp).toLocaleDateString()}
           </span>
         </div>
+        {inEditMode && (
+          <>
+            <button
+              disabled={isUpdating}
+              className={`${buttonsStyles.primaryButton} ${postCardStyles.updateButton}`}
+              onClick={() => handleUpdatePost()}
+            >
+              {isUpdating ? <ButtonSyncLoader /> : "Update"}
+            </button>
+            <button
+              disabled={isUpdating}
+              className={postCardStyles.cancelEditButton}
+              onClick={() => setInEditMode(false)}
+            >
+              Cancel
+            </button>
+          </>
+        )}
         <div className={postCardStyles.actionBar}>
           <div>
             {(user ? likes.includes(user.username) : false) ? (
@@ -256,7 +389,7 @@ export default function PostCard({
             className={`${buttonsStyles.primaryButton} ${postCardStyles.commentButton}`}
             onClick={() => handlePostComment()}
           >
-            Comment
+            {isPostingComment ? <ButtonSyncLoader /> : "Comment"}
           </button>
         </div>
       </div>

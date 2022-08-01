@@ -23,7 +23,10 @@ export default function Tooltip({
             <button
               key={index}
               className={tooltipStyles.tooltipMenuItem}
-              onClick={() => item.tooltipOnClickHandler()}
+              onClick={() => {
+                item.tooltipOnClickHandler();
+                setIsMenuVisible(false);
+              }}
             >
               {item.tooltipChild}
             </button>

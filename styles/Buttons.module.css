@@ -84,3 +84,11 @@
   transform: translate(50%, -30%);
   width: 1.2rem;
 }
+
+.removeImageButton {
+  color: #fff;
+  position: absolute;
+  top: var(--MEDIUM-PADDING);
+  right: var(--MEDIUM-PADDING);
+  z-index: 1;
+}

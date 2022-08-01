@@ -46,13 +46,15 @@
   justify-content: space-between;
 }
 
-.individualUploadedImagePreviewContainer {
+.uploadedImagePreviewContainer {
   border-radius: var(--BORDER-RADIUS);
+  height: 30rem;
   overflow: hidden;
   position: relative;
+  width: 100%;
 }
 
-.individualUploadedImagePreviewContainer::after {
+.uploadedImagePreviewContainer::after {
   background: #000;
   content: "";
   opacity: 0;
@@ -66,26 +68,12 @@
   z-index: 1;
 }
 
-.individualUploadedImagePreviewContainer:hover::after {
+.uploadedImagePreviewContainer:hover::after {
   opacity: 0.3;
 }
 
-.individualUploadedImagePreviewContainer img {
+.uploadedImagePreviewContainer img {
   display: block;
-}
-
-.uploadedImagePreviewRemoveButton {
-  color: #fff;
-  position: absolute;
-  top: var(--MEDIUM-PADDING);
-  right: var(--MEDIUM-PADDING);
-  z-index: 2;
-}
-
-.uploadedImagePreview {
-  aspect-ratio: 1;
-  object-fit: cover;
-  width: 100%;
 }
 
 .labelForPostImage {
@@ -97,10 +85,6 @@
   opacity: 0;
   position: absolute;
   left: -200vw;
-}
-
-.postCategoryDropdown {
-  background: #e0e7ee;
 }
 
 .giphyGridContainer {

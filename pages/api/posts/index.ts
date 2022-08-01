@@ -53,6 +53,8 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
         if (req.body.media) {
           const publicID = await uploadImage(req.body.media);
           req.body.media = publicID.secure_url;
+        } else {
+          req.body.media = null;
         }
         const user = await connection.clientPromise
           .db()
@@ -70,7 +72,9 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
             ...req.body,
             likes: [],
             comments: [],
+            commentsActive: true,
             timestamp: new Date(),
+            lastModified: new Date(),
             postedBy: {
               username: user.username,
               name: user.name,
