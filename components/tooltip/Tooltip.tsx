@@ -14,19 +14,27 @@ export default function Tooltip({
   const [isMenuVisible, setIsMenuVisible] = useState<boolean>(false);
   return (
     <div className={tooltipStyles.tooltipContainer}>
-      <button onClick={() => setIsMenuVisible((prev) => !prev)}>
+      <button
+        className={tooltipStyles.tooltipToggleButton}
+        onClick={() => setIsMenuVisible((prev) => !prev)}
+      >
         <FontAwesomeIcon icon={faEllipsisV} />
       </button>
       {isMenuVisible && (
-        <ul className={tooltipStyles.tooltipMenu}>
-          {tooltipItems.map((item) => (
-            <li className={tooltipStyles.tooltipMenuItem}>
-              <button onClick={() => item.tooltipOnClickHandler()}>
-                {item.tooltipChild}
-              </button>
-            </li>
+        <div className={tooltipStyles.tooltipMenu}>
+          {tooltipItems.map((item, index) => (
+            <button
+              key={index}
+              className={tooltipStyles.tooltipMenuItem}
+              onClick={() => {
+                item.tooltipOnClickHandler();
+                setIsMenuVisible(false);
+              }}
+            >
+              {item.tooltipChild}
+            </button>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );

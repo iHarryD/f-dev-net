@@ -25,3 +25,18 @@
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+.textButtonsContainer {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--MEDIUM-GAP);
+  margin-top: 0.5rem;
+}
+
+.formErrorText {
+  color: var(--RED-CLR);
+  font-size: var(--SMALL-FONT-SIZE);
+  margin-top: 1rem;
+  text-align: center;
+}

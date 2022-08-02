@@ -35,7 +35,7 @@ img {
 }
 
 main {
-  padding-top: var(--NAVBAR-HEIGHT);
+  padding: var(--NAVBAR-HEIGHT) 0;
 }
 
 ::-webkit-scrollbar {
@@ -58,5 +58,5 @@ main {
 
 button:disabled {
   pointer-events: none;
-  opacity: 0.5;
+  opacity: 0.8;
 }

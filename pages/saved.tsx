@@ -1,31 +1,39 @@
-import HomePageNavbar from "../components/homePageNavbar/HomePageNavbar";
+import HomePageNavbar from "../components/macroPageNavbar/MacroPageNavbar";
 import HomePageSidebar from "../components/homePageSidebar/HomePageSidebar";
 import commonStyles from "../styles/Common.module.css";
 import PostCard from "../components/postCard/PostCard";
-import { useAuth } from "../contexts/AuthContext";
 import { useEffect, useState } from "react";
 import { Post } from "../interfaces/Common.interface";
 import { getBookmarkPosts } from "../services/bookmarkServices";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
+import MoonLoader from "react-spinners/MoonLoader";
+import PrivateRouteAlert from "../components/privateRouteAlert/PrivateRouteAlert";
 
 export default function Saved() {
-  const { userCredentials } = useAuth();
+  const { user } = useSelector((state: RootState) => state.userSlice);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
-    if (userCredentials.user) {
-      getBookmarkPosts(undefined, (result) => setPosts(result.data.data));
+    if (user) {
+      getBookmarkPosts(setIsLoading, (result) => setPosts(result.data.data));
     }
-  }, [userCredentials.user]);
+  }, [user]);
 
-  return (
+  return user ? (
     <>
       <HomePageSidebar />
       <div className={commonStyles.pagePostsSection}>
-        {posts.map((post) => (
-          <PostCard key={post._id} details={post} />
-        ))}
+        {isLoading ? (
+          <MoonLoader />
+        ) : (
+          posts.map((post) => <PostCard key={post._id} details={post} />)
+        )}
       </div>
       <HomePageNavbar />
     </>
+  ) : (
+    <PrivateRouteAlert />
   );
 }

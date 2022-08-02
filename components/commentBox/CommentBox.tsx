@@ -5,7 +5,7 @@ export default function CommentBox({ comments }: { comments: PostComment[] }) {
   return (
     <div className={commentBoxStyles.commentsContainer}>
       {comments.map((comment) => (
-        <div>
+        <div key={comment._id}>
           <span className={commentBoxStyles.commentPostedBy}>
             {comment.postedBy}:
           </span>

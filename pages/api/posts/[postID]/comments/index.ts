@@ -7,9 +7,9 @@ import verifyToken from "../../../../../helpers/verifyToken";
 import { RequestWithUser } from "../../../../../interfaces/Common.type";
 
 const cors = Cors({
-  methods: ["GET", "POST"],
+  methods: ["GET", "POST", "PATCH"],
   credentials: true,
-  origin: "http://localhost:3000",
+  origin: ["http://localhost:3000", "https://roc8-dev-net.vercel.app"],
 });
 
 export default async function (req: RequestWithUser, res: NextApiResponse) {
@@ -67,6 +67,34 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
             .status(300)
             .json({ message: "Could not add comment.", data: null });
         }
+      case "PATCH":
+        connection.clientPromise = await (await connectToMongoDb).connect();
+        const updatedPost = await connection.clientPromise
+          .db()
+          .collection("posts")
+          .findOneAndUpdate(
+            {
+              _id: new ObjectId(req.query.postID as string),
+              "postedBy.username": req.user,
+            },
+            [{ $set: { commentsActive: { $not: "$commentsActive" } } }],
+            { returnDocument: "after" }
+          );
+        if (updatedPost.value === null) {
+          return res
+            .status(404)
+            .json({ message: "Couldn't find post.", data: null });
+        }
+        return res.status(200).json({
+          message: `Comments ${
+            updatedPost.value.commentsActive ? "enabled" : "disabled"
+          }`,
+          data: null,
+        });
+      default:
+        return res.status(404).json({
+          message: "Requested method is not allowed at this endpoint.",
+        });
     }
   } catch (err) {
     return res.status(500).json({ message: "Unknown error.", data: err });

@@ -51,14 +51,15 @@
   color: var(--PRIMARY-FONT-CLR);
 }
 
-.closeIconButton {
+.trashIconButton {
   aspect-ratio: 1;
   background: var(--RED-CLR);
   border-radius: 50%;
   color: #fff;
+  font-size: var(--SMALL-FONT-SIZE);
   padding: 5px;
   text-align: center;
-  width: 19px;
+  width: 20px;
 }
 
 .buttonWithBadge {
@@ -75,10 +76,19 @@
   font-size: var(--SMALL-FONT-SIZE);
   font-weight: 700;
   opacity: var(--FADED-TEXT-OPACITY);
+  overflow: hidden;
   justify-content: center;
   position: absolute;
   top: 0;
   right: 0;
   transform: translate(50%, -30%);
-  width: 1rem;
+  width: 1.2rem;
+}
+
+.removeImageButton {
+  color: #fff;
+  position: absolute;
+  top: var(--MEDIUM-PADDING);
+  right: var(--MEDIUM-PADDING);
+  z-index: 1;
 }

@@ -9,7 +9,7 @@ import Cors from "cors";
 const cors = Cors({
   methods: ["GET", "POST"],
   credentials: true,
-  origin: "http://localhost:3000",
+  origin: ["http://localhost:3000", "https://roc8-dev-net.vercel.app"],
 });
 
 export default async function (req: RequestWithUser, res: NextApiResponse) {
@@ -49,6 +49,10 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
             .status(300)
             .json({ message: "Could not delete comment.", data: null });
         }
+      default:
+        return res.status(404).json({
+          message: "Requested method is not allowed at this endpoint.",
+        });
     }
   } catch (err) {
     return res.status(500).json({ message: "Unknown error.", data: err });

@@ -3,49 +3,53 @@ import buttonsStyles from "../../styles/Buttons.module.css";
 import commonStyles from "../../styles/Common.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImage, faSmile } from "@fortawesome/free-regular-svg-icons";
-import { faClose, faUserTag } from "@fortawesome/free-solid-svg-icons";
-import { useRef, useState } from "react";
+import { faClose, faTrash, faUserTag } from "@fortawesome/free-solid-svg-icons";
+import { useEffect, useRef, useState } from "react";
 import { isImage } from "../../helpers/isImage";
-import SyncLoader from "react-spinners/SyncLoader";
-import { loaderCSSOverrides } from "../../database/loaderCSS";
 import { useDispatch } from "react-redux";
 import { append } from "../../features/postSlice";
 import GiphyGrid from "../giphyGrid/GiphyGrid";
-import { createNewPost } from "../../services/postServices";
+import { createNewPost, getPost } from "../../services/postServices";
+import { ButtonSyncLoader } from "../buttonLoaders/ButtonLoaders";
+import { PostCategories } from "../../interfaces/Common.interface";
+import { updateUser } from "../../features/userSlice";
+import { AppDispatch } from "../../store";
+import Image from "next/image";
+import PostCategoryDropdown from "../postCategoryDropdown/PostCategoryDropdown";
 
 export default function CreatePost() {
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
-  const [wordCount, setWordCount] = useState<number>(0);
   const wordsLimitForPostTextInput = 500;
-  const captionTextAreaRef = useRef<null | HTMLTextAreaElement>(null);
+  const [caption, setCaption] = useState<string>("");
   const categoryDropDownRef = useRef<null | HTMLSelectElement>(null);
   const [isPosting, setIsPosting] = useState<boolean>(false);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const [isGiphyActive, setIsGiphyActive] = useState<boolean>(false);
-  const [giphySearchQuery, setGiphySearchQuery] = useState<string>("shazam");
+  const [giphySearchQuery, setGiphySearchQuery] = useState<string>("");
+
+  function clearForm() {
+    setCaption("");
+    setUploadedImage(null);
+  }
 
   async function handleCreateNewPost() {
-    if (
-      captionTextAreaRef.current === null ||
-      categoryDropDownRef.current === null
-    )
-      return;
+    if (categoryDropDownRef.current === null) return;
+    if (!caption.replaceAll(" ", "")) return;
     const postDetails: {
       caption: string;
-      category: string;
+      category: PostCategories;
       media?: File;
     } = {
-      caption: captionTextAreaRef.current.value,
-      category: categoryDropDownRef.current.value,
+      caption,
+      category: categoryDropDownRef.current.value as PostCategories,
     };
     if (uploadedImage) {
       postDetails.media = uploadedImage;
     }
     createNewPost(postDetails, setIsPosting, (result) => {
-      captionTextAreaRef.current!.value = "";
-      setUploadedImage(null);
-      setWordCount(0);
+      clearForm();
       dispatch(append({ newPosts: [result.data.data] }));
+      dispatch(updateUser());
     });
   }
 
@@ -53,30 +57,31 @@ export default function CreatePost() {
     <div className={createPostStyles.createPostContainer}>
       <div className={createPostStyles.headingAndCloseButtonContainer}>
         <h3>Create new post</h3>
-        <button className={buttonsStyles.closeIconButton}>
-          <FontAwesomeIcon icon={faClose} />
+        <button
+          title="clear"
+          className={buttonsStyles.trashIconButton}
+          onClick={() => clearForm()}
+        >
+          <FontAwesomeIcon icon={faTrash} />
         </button>
       </div>
       <div className={createPostStyles.postInputTextAreaContainer}>
         <textarea
           placeholder="Write something..."
-          ref={captionTextAreaRef}
           maxLength={wordsLimitForPostTextInput}
+          value={caption}
           className={createPostStyles.postInputTextArea}
-          onChange={(e) => setWordCount(e.target.value.length)}
+          onChange={(e) => setCaption(e.target.value)}
         />
         <span className={createPostStyles.wordCounter}>
-          {wordCount}/{wordsLimitForPostTextInput}
+          {caption.length}/{wordsLimitForPostTextInput}
         </span>
       </div>
       <div>
-        <select
-          ref={categoryDropDownRef}
-          className={`${commonStyles.styledDropdown} ${createPostStyles.postCategoryDropdown}`}
-        >
-          <option value="general">General</option>
-          <option value="query">Query</option>
-        </select>
+        <PostCategoryDropdown
+          background="#e0e7ee"
+          selectRef={categoryDropDownRef}
+        />
       </div>
       {isGiphyActive && (
         <div className={createPostStyles.giphyGridContainer}>
@@ -96,17 +101,16 @@ export default function CreatePost() {
         </div>
       )}
       {uploadedImage && (
-        <div
-          className={createPostStyles.individualUploadedImagePreviewContainer}
-        >
-          <button className={createPostStyles.uploadedImagePreviewRemoveButton}>
+        <div className={createPostStyles.uploadedImagePreviewContainer}>
+          <button className={buttonsStyles.removeImageButton}>
             <FontAwesomeIcon
               icon={faClose}
               onClick={() => setUploadedImage(null)}
             />
           </button>
-          <img
-            className={createPostStyles.uploadedImagePreview}
+          <Image
+            layout="fill"
+            alt="uploaded-image"
             src={URL.createObjectURL(uploadedImage)}
           />
         </div>
@@ -145,18 +149,7 @@ export default function CreatePost() {
           className={buttonsStyles.primaryButton}
           onClick={() => handleCreateNewPost()}
         >
-          {isPosting ? (
-            <div className={commonStyles.buttonLoaderContainer}>
-              <SyncLoader
-                size="6"
-                color="#fff"
-                loading={isPosting}
-                cssOverride={loaderCSSOverrides}
-              />
-            </div>
-          ) : (
-            "Post"
-          )}
+          {isPosting ? <ButtonSyncLoader /> : "Post"}
         </button>
       </div>
     </div>

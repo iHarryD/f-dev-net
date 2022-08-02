@@ -1,0 +1,45 @@
+.postsContainer {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.connectionContainer {
+  align-items: center;
+  border-bottom: 1px solid #0003;
+  display: flex;
+  justify-content: space-between;
+  padding: var(--MIN-PADDING);
+}
+
+.connectionStatus {
+  font-weight: 600;
+}
+
+.username {
+  font-weight: 700;
+  opacity: var(--FADED-TEXT-OPACITY);
+}
+
+.fakePic {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: red;
+  width: 3rem;
+}
+
+.connectionButton {
+  margin-left: auto;
+}
+
+.connectionNameUsernameContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.emptyCategoryTextContainer {
+  font-weight: 700;
+  opacity: var(--FADED-TEXT-OPACITY);
+  text-align: center;
+}

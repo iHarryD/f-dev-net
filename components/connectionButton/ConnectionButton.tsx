@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { SyncLoader } from "react-spinners";
-import { loaderCSSOverrides } from "../../database/loaderCSS";
+import { useDispatch } from "react-redux";
+import { updateUser } from "../../features/userSlice";
 import {
   ConnectionStatus,
   UserWithStats,
@@ -9,8 +9,9 @@ import {
   acceptConnection,
   initiateConnection,
 } from "../../services/connectionServices";
+import { AppDispatch } from "../../store";
 import buttonsStyles from "../../styles/Buttons.module.css";
-import commonStyles from "../../styles/Common.module.css";
+import { ButtonSyncLoader } from "../buttonLoaders/ButtonLoaders";
 
 export default function ConnectionButton({
   connectionID,
@@ -21,16 +22,21 @@ export default function ConnectionButton({
   connectionStatus: ConnectionStatus;
   user: UserWithStats;
 }) {
+  const dispatch = useDispatch<AppDispatch>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   function handleInitiateConnection() {
     if (user === null) return;
-    initiateConnection(user.username, setIsLoading);
+    initiateConnection(user.username, setIsLoading, () =>
+      dispatch(updateUser())
+    );
   }
 
   function hanleAcceptConnection() {
     if (user === null || connectionID === undefined) return;
-    acceptConnection(user.username, connectionID, setIsLoading);
+    acceptConnection(user.username, connectionID, setIsLoading, () =>
+      dispatch(updateUser())
+    );
   }
 
   if (connectionStatus === ConnectionStatus.PENDING) {
@@ -40,18 +46,7 @@ export default function ConnectionButton({
         className={buttonsStyles.primaryButton}
         onClick={() => hanleAcceptConnection()}
       >
-        {isLoading ? (
-          <div className={commonStyles.buttonLoaderContainer}>
-            <SyncLoader
-              size="6"
-              color="#fff"
-              loading={isLoading}
-              cssOverride={loaderCSSOverrides}
-            />
-          </div>
-        ) : (
-          "Accept"
-        )}
+        {isLoading ? <ButtonSyncLoader /> : "Accept"}
       </button>
     );
   } else if (connectionStatus === ConnectionStatus.SENT) {
@@ -69,18 +64,7 @@ export default function ConnectionButton({
         className={buttonsStyles.primaryButton}
         onClick={() => handleInitiateConnection()}
       >
-        {isLoading ? (
-          <div className={commonStyles.buttonLoaderContainer}>
-            <SyncLoader
-              size="6"
-              color="#fff"
-              loading={isLoading}
-              cssOverride={loaderCSSOverrides}
-            />
-          </div>
-        ) : (
-          "Connect"
-        )}
+        {isLoading ? <ButtonSyncLoader /> : "Connect"}
       </button>
     );
   }

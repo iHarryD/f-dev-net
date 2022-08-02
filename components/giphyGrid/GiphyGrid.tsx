@@ -17,7 +17,7 @@ export default function GiphyGrid({
   type?: MediaType;
   width?: number;
 }) {
-  const giphyFetch = new GiphyFetch(process.env.GIPHY_KEY!);
+  const giphyFetch = new GiphyFetch("7vzASXWaDwL6IxIlPaCX35zn5bo4QQVE");
   const options: SearchOptions = {
     sort: "relevant",
     lang: "es",

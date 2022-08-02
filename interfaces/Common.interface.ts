@@ -1,3 +1,5 @@
+import { AxiosError } from "axios";
+
 enum ChatMessageStatus {
   SEDNING = "sending",
   SENT = "sent",
@@ -11,12 +13,21 @@ export enum ConnectionStatus {
   SENT = "sent",
 }
 
+export enum UserAuthStatus {
+  AUTHENTICATED = "authenticated",
+  LOADING = "loading",
+  UNAUTHENTICATED = "unauthenticated",
+}
+
+export enum PostCategories {
+  GENERAL = "general",
+  QUERY = "query",
+}
+
 export interface User {
   bio: string;
-  email: string;
   image: string;
   name: string;
-  savedPosts: string[];
   username: string;
 }
 
@@ -24,6 +35,7 @@ export interface UserWithStats extends User {
   badges: string[];
   connections: Connection[];
   posts: Post[];
+  savedPosts: string[];
 }
 
 export interface PostComment {
@@ -36,15 +48,17 @@ export interface PostComment {
 export interface Post {
   _id: string;
   caption: string;
+  category: PostCategories;
   comments: PostComment[];
+  commentsActive: boolean;
+  lastModified: string;
   likes: string[];
-  media: string;
+  media: string | null;
   postedBy: {
     image: string;
     name: string;
     username: string;
   };
-  timestamp: string;
 }
 
 export interface ChatMessage {
@@ -76,4 +90,14 @@ export interface Connection {
   initiatedBy: string;
   isActive: boolean;
   timestamp: Date;
+}
+
+export type BasicAxiosError = AxiosError<
+  { message: string; data: unknown } | undefined
+>;
+
+export interface UpdatePost {
+  caption?: string;
+  category?: PostCategories;
+  media?: File | null;
 }

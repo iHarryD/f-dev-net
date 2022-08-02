@@ -1,19 +1,42 @@
 import { AxiosResponse } from "axios";
 import { Dispatch, SetStateAction } from "react";
 import { getImageDataURL } from "../helpers/getImageDataURL";
+import { User, UserWithStats } from "../interfaces/Common.interface";
 import baseAxiosInstance from "./baseAxiosInstance";
 
 export async function getUser(
   username: string,
   loadingState?: Dispatch<SetStateAction<boolean>>,
   successCallback?: (
-    result: AxiosResponse<{ message: string; data: any }>
+    result: AxiosResponse<{ message: string; data: UserWithStats }>
   ) => void,
   failureCallback?: (err: unknown) => void
 ) {
   try {
     if (loadingState) loadingState(true);
     const result = await baseAxiosInstance().get(`/profiles/${username}`);
+    if (successCallback) successCallback(result);
+  } catch (err) {
+    if (failureCallback) failureCallback(err);
+  } finally {
+    if (loadingState) loadingState(false);
+  }
+}
+
+export async function findUsers(
+  query: string,
+  loadingState?: Dispatch<SetStateAction<boolean>>,
+  successCallback?: (
+    result: AxiosResponse<{
+      message: string;
+      data: User[];
+    }>
+  ) => void,
+  failureCallback?: (err: unknown) => void
+) {
+  try {
+    if (loadingState) loadingState(true);
+    const result = await baseAxiosInstance().get(`/users?username=${query}`);
     if (successCallback) successCallback(result);
   } catch (err) {
     if (failureCallback) failureCallback(err);

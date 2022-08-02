@@ -1,5 +1,10 @@
 .chatPageContainer {
+  align-items: center;
   display: flex;
+  font-weight: 700;
+  flex-direction: column;
   height: calc(100vh - var(--NAVBAR-HEIGHT));
+  justify-content: center;
+  opacity: var(--FADED-TEXT-OPACITY);
   overflow: hidden;
 }

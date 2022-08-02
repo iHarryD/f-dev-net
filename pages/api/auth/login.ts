@@ -11,7 +11,7 @@ const invalidCredentialsMessage = "Invalid credentials.";
 const cors = Cors({
   methods: ["POST"],
   credentials: true,
-  origin: "http://localhost:3000",
+  origin: ["http://localhost:3000", "https://roc8-dev-net.vercel.app"],
 });
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
@@ -46,19 +46,22 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             .db()
             .collection("connections")
             .find({
-              $and: [
-                { connectionBetween: { $in: [user.username] } },
-                { isActive: true },
-              ],
+              connectionBetween: { $in: [user.username] },
             });
           const posts = mongodbConnection
             .db()
             .collection("posts")
             .find({ "postedBy.username": user.username });
+
+          const savedPosts = await mongodbConnection
+            .db()
+            .collection("bookmarks")
+            .findOne({ belongsTo: user.username });
           const token = jwt.sign(
             { user: user.username },
             process.env.JWT_SECRET as string
           );
+
           return res.status(200).json({
             message: "Login successful.",
             data: {
@@ -66,6 +69,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                 ...user,
                 badges: await cursorToDoc(badges),
                 connections: await cursorToDoc(connections),
+                savedPosts: savedPosts ? savedPosts.savedPosts : [],
                 posts: await cursorToDoc(posts),
               },
               token,

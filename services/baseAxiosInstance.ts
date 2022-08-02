@@ -2,7 +2,7 @@ import axios from "axios";
 
 export default function baseAxiosInstance() {
   return axios.create({
-    baseURL: "http://127.0.0.1:3000/api",
+    baseURL: "https://roc8-dev-net.vercel.app/api",
     withCredentials: true,
   });
 }

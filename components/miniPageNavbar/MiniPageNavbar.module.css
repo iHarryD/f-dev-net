@@ -1,0 +1,40 @@
+.mobileNavbar {
+  background: #ffffff2e;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 5px #56565659;
+  font-size: var(--LARGE-FONT-SIZE);
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+.navItemsContainer {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  padding: 0 var(--LARGE-PADDING);
+  width: 100%;
+}
+
+.navItem {
+  align-items: center;
+  display: flex;
+  flex-grow: 1;
+  justify-content: center;
+}
+
+.navButton {
+  align-items: center;
+  aspect-ratio: 1;
+  /* background: var(--PRIMARY-BACKGROUND-CLR); */
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  padding: var(--MIN-PADDING);
+  width: 2rem;
+}
+
+.followBar {
+}
