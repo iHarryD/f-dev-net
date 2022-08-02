@@ -12,7 +12,7 @@ const initialState: {
   token: null,
 };
 
-export const updateUser = createAsyncThunk("user/updateUser", async () => {
+export const updateUser = createAsyncThunk("user/updateUser", () => {
   return updateSavedUserData();
 });
 

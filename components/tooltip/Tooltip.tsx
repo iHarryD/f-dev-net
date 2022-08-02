@@ -14,7 +14,10 @@ export default function Tooltip({
   const [isMenuVisible, setIsMenuVisible] = useState<boolean>(false);
   return (
     <div className={tooltipStyles.tooltipContainer}>
-      <button onClick={() => setIsMenuVisible((prev) => !prev)}>
+      <button
+        className={tooltipStyles.tooltipToggleButton}
+        onClick={() => setIsMenuVisible((prev) => !prev)}
+      >
         <FontAwesomeIcon icon={faEllipsisV} />
       </button>
       {isMenuVisible && (

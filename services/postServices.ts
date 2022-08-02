@@ -31,21 +31,9 @@ export async function getPosts(
 }
 
 export async function getPost(
-  postID: string,
-  loadingState?: Dispatch<SetStateAction<boolean>>,
-  successCallback?: (
-    result: AxiosResponse<{ message: string; data: Post }>
-  ) => void,
-  failureCallback?: (err: unknown) => void
-) {
-  try {
-    const result = await baseAxiosInstance().get(`/posts/${postID}`);
-    if (successCallback) successCallback(result);
-  } catch (err) {
-    if (failureCallback) failureCallback(err);
-  } finally {
-    if (loadingState) loadingState(false);
-  }
+  postID: string
+): Promise<AxiosResponse<{ message: string; data: Post }>> {
+  return await baseAxiosInstance().get(`/posts/${postID}`);
 }
 
 export async function createNewPost(
@@ -184,6 +172,25 @@ export async function deletePost(
   try {
     if (loadingState) loadingState(true);
     const result = await baseAxiosInstance().delete(`/posts/${postID}`);
+    if (successCallback) successCallback(result);
+  } catch (err) {
+    if (failureCallback) failureCallback(err);
+  } finally {
+    if (loadingState) loadingState(false);
+  }
+}
+
+export async function toggleComments(
+  postID: string,
+  loadingState?: Dispatch<SetStateAction<boolean>>,
+  successCallback?: (
+    result: AxiosResponse<{ message: string; data: null }>
+  ) => void,
+  failureCallback?: (err: unknown) => void
+) {
+  try {
+    if (loadingState) loadingState(true);
+    const result = await baseAxiosInstance().patch(`/posts/${postID}/comments`);
     if (successCallback) successCallback(result);
   } catch (err) {
     if (failureCallback) failureCallback(err);

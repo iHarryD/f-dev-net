@@ -166,3 +166,14 @@
   text-decoration: underline;
   width: fit-content;
 }
+
+.disabledCommentText {
+  font-size: var(--SMALL-FONT-SIZE);
+  margin: 0.5rem 0;
+  opacity: var(--FADED-TEXT-OPACITY);
+  text-align: center;
+}
+
+.deletePostText {
+  color: var(--RED-CLR);
+}

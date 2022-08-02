@@ -24,15 +24,16 @@ import {
   deletePost,
   likePost,
   postComment,
+  toggleComments,
   unlikePost,
   updatePost,
 } from "../../services/postServices";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  updateComments,
   like,
   unlike,
   deletePost as deletePostAction,
+  syncPost,
 } from "../../features/postSlice";
 import UsernameLink from "../usernameLink/UsernameLink";
 import Tooltip from "../tooltip/Tooltip";
@@ -53,10 +54,11 @@ export default function PostCard({
     caption,
     category,
     comments,
+    commentsActive,
     likes,
     media,
     postedBy,
-    timestamp,
+    lastModified,
   },
 }: {
   details: Post;
@@ -123,7 +125,7 @@ export default function PostCard({
       _id,
       setIsPostingComment,
       (result) => {
-        dispatch(updateComments({ postID: _id, comments: result.data.data }));
+        dispatch(syncPost(_id));
         commentInputRef.current!.value = "";
       }
     );
@@ -184,12 +186,27 @@ export default function PostCard({
             <Tooltip
               tooltipItems={[
                 {
-                  tooltipChild: <span>Delete </span>,
+                  tooltipChild: (
+                    <span className={postCardStyles.deletePostText}>
+                      Delete
+                    </span>
+                  ),
                   tooltipOnClickHandler: handleDeletePost,
                 },
                 {
                   tooltipChild: <span>Edit</span>,
                   tooltipOnClickHandler: () => setInEditMode((prev) => !prev),
+                },
+                {
+                  tooltipChild: (
+                    <span>
+                      {commentsActive ? "Disable" : "Enable"} comments
+                    </span>
+                  ),
+                  tooltipOnClickHandler: () =>
+                    toggleComments(_id, undefined, (result) =>
+                      dispatch(syncPost(_id))
+                    ),
                 },
               ]}
             />
@@ -279,7 +296,7 @@ export default function PostCard({
             )}
           </div>
           <span className={postCardStyles.postAge}>
-            {new Date(timestamp).toLocaleDateString()}
+            {new Date(lastModified).toLocaleDateString()}
           </span>
         </div>
         {inEditMode && (
@@ -377,21 +394,27 @@ export default function PostCard({
             ))
           )}
         </div>
-        <div className={postCardStyles.commentActionBar}>
-          <input
-            ref={commentInputRef}
-            className={postCardStyles.addCommentInput}
-            type="text"
-            placeholder="Add a comment"
-          />
-          <button
-            disabled={isPostingComment}
-            className={`${buttonsStyles.primaryButton} ${postCardStyles.commentButton}`}
-            onClick={() => handlePostComment()}
-          >
-            {isPostingComment ? <ButtonSyncLoader /> : "Comment"}
-          </button>
-        </div>
+        {commentsActive ? (
+          <div className={postCardStyles.commentActionBar}>
+            <input
+              ref={commentInputRef}
+              className={postCardStyles.addCommentInput}
+              type="text"
+              placeholder="Add a comment"
+            />
+            <button
+              disabled={isPostingComment}
+              className={`${buttonsStyles.primaryButton} ${postCardStyles.commentButton}`}
+              onClick={() => handlePostComment()}
+            >
+              {isPostingComment ? <ButtonSyncLoader /> : "Comment"}
+            </button>
+          </div>
+        ) : (
+          <p className={postCardStyles.disabledCommentText}>
+            Comments are disabled on this post.
+          </p>
+        )}
       </div>
     </div>
   );
