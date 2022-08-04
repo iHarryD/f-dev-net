@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import commonStyles from "../../styles/Common.module.css";
 import ThirdPartyAuthButtons from "../thirdPartyAuthButtons/ThirdPartyAuthButtons";
 import buttonsStyles from "../../styles/Buttons.module.css";
@@ -11,6 +11,9 @@ import { emailRegExp } from "../../regExp";
 import { extractErrorMessage } from "../../helpers/extractErrorMessage";
 import { useDispatch } from "react-redux";
 import { login } from "../../features/userSlice";
+import Tippy from "@tippyjs/react";
+import useDebounce from "../../hooks/useDebounce";
+import { findUsers } from "../../services/profileServices";
 
 const testingCredentials = {
   username: "harry",
@@ -25,23 +28,36 @@ export default function SignInForm() {
   const [password, setPassword] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
-  const [formError, setFormError] = useState<string | null>(null);
+  const [authError, setAuthError] = useState<string | null>(null);
   const [isShowingPassword, setIsShowingPassword] = useState<boolean>(false);
+  const debouncedValue = useDebounce(username, 500);
+
+  useEffect(() => {
+    if (authMode === "signup" && username.length) {
+      findUsers(username, undefined, (result) => {
+        if (result.data.data.find((user) => user.username === username)) {
+          setAuthError(`Username '${username}' is taken.`);
+        }
+      });
+    } else {
+      setAuthError(null);
+    }
+  }, [debouncedValue]);
 
   function resetForm() {
     setName("");
     setUsername("");
     setEmail("");
     setPassword("");
-    setFormError(null);
+    setAuthError(null);
   }
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setFormError(null);
+    setAuthError(null);
     if (authMode === "login") {
       if (username === "" || password === "") {
-        setFormError("Please fill in the required fields.");
+        setAuthError("Please fill in the required fields.");
         return;
       }
       loginService({ username, password }, setIsLoading, (result) => {
@@ -51,15 +67,15 @@ export default function SignInForm() {
       });
     } else {
       if (email === "" || username === "" || password === "" || name === "") {
-        setFormError("Please fill in the required fields.");
+        setAuthError("Please fill in the required fields.");
         return;
       }
       if (emailRegExp.test(email) === false) {
-        setFormError("Enter a valid email address.");
+        setAuthError("Enter a valid email address.");
         return;
       }
       if (password.length < 6) {
-        setFormError("Password must be at least 6 characters.");
+        setAuthError("Password must be at least 6 characters.");
         return;
       }
       signup(
@@ -70,7 +86,7 @@ export default function SignInForm() {
           const error = extractErrorMessage(err)
             ? extractErrorMessage(err)
             : "Something went wrong.";
-          setFormError(error as string);
+          setAuthError(error);
         }
       );
     }
@@ -131,8 +147,8 @@ export default function SignInForm() {
               <FontAwesomeIcon icon={faEye} />
             </button>
           </div>
-          {formError && (
-            <p className={signInFormStyles.formErrorText}>{formError}</p>
+          {authError && (
+            <p className={signInFormStyles.authErrorText}>{authError}</p>
           )}
           <button
             type="submit"
@@ -219,13 +235,11 @@ export default function SignInForm() {
               className={commonStyles.authInput}
               onChange={(e) => setUsername(e.target.value.toLowerCase())}
             />
-            <button
-              type="button"
-              className={commonStyles.sideButton}
-              title="username can only included lowercase letters and numbers"
-            >
-              <FontAwesomeIcon icon={faExclamationCircle} />
-            </button>
+            <Tippy content="username can only consist of lowercase letters and numbers">
+              <button type="button" className={commonStyles.sideButton}>
+                <FontAwesomeIcon icon={faExclamationCircle} />
+              </button>
+            </Tippy>
           </div>
           <div className={commonStyles.animatedInputLabelContainer}>
             <label
@@ -253,8 +267,8 @@ export default function SignInForm() {
               <FontAwesomeIcon icon={faEye} />
             </button>
           </div>
-          {formError && (
-            <p className={signInFormStyles.formErrorText}>{formError}</p>
+          {authError && (
+            <p className={signInFormStyles.authErrorText}>{authError}</p>
           )}
           <button
             type="submit"

@@ -34,7 +34,7 @@
   margin-top: 0.5rem;
 }
 
-.formErrorText {
+.authErrorText {
   color: var(--RED-CLR);
   font-size: var(--SMALL-FONT-SIZE);
   margin-top: 1rem;

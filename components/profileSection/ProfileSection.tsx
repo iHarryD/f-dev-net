@@ -25,6 +25,10 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
 import { updateUser } from "../../features/userSlice";
+import { toastEmitterConfig } from "../../data/toastEmitterConfig";
+import { extractErrorMessage } from "../../helpers/extractErrorMessage";
+import { toast } from "react-toastify";
+import Tippy from "@tippyjs/react";
 
 enum UserDetailCategories {
   BADGES = "BADGES",
@@ -51,6 +55,9 @@ export default function ProfileSection() {
   const [userDetailCategory, setUserDetailCategory] =
     useState<UserDetailCategories>(UserDetailCategories.BADGES);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLinkCopiedTippyActive, setIsLinkCopiedTippyActive] =
+    useState<boolean>(false);
+  const linkCopiedTippyTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (userQuery && userQuery !== loggedInUser?.username) {
@@ -90,6 +97,11 @@ export default function ProfileSection() {
         setIsAdmin(true);
       }
     }
+    return () => {
+      if (linkCopiedTippyTimeout.current) {
+        clearTimeout(linkCopiedTippyTimeout.current);
+      }
+    };
   }, [userQuery, loggedInUser]);
 
   async function handleUpdateUser() {
@@ -101,7 +113,12 @@ export default function ProfileSection() {
     if (updatedImage) {
       updatedUser.image = updatedImage;
     }
-    updateUserService(updatedUser, undefined, () => dispatch(updateUser()));
+    updateUserService(
+      updatedUser,
+      undefined,
+      () => dispatch(updateUser()),
+      (err) => toast.error(extractErrorMessage(err), toastEmitterConfig)
+    );
   }
 
   return (
@@ -207,16 +224,30 @@ export default function ProfileSection() {
               <div
                 className={profileSectionStyles.profileSectionButtonContainer}
               >
-                <button
-                  className={profileSectionStyles.shareProfileButton}
-                  onClick={() =>
-                    navigator.clipboard.writeText(
-                      `${window.location.origin}/profile?username=${user.username}`
-                    )
-                  }
-                >
-                  <FontAwesomeIcon icon={faShareNodes} />
-                </button>
+                <Tippy content="link copied" visible={isLinkCopiedTippyActive}>
+                  <button
+                    className={profileSectionStyles.shareProfileButton}
+                    onClick={() => {
+                      navigator.clipboard.writeText(
+                        `${window.location.origin}/profile?username=${user.username}`
+                      );
+                      setIsLinkCopiedTippyActive(true);
+                      linkCopiedTippyTimeout.current = setTimeout(() => {
+                        setIsLinkCopiedTippyActive(false);
+                      }, 1000);
+                    }}
+                    onMouseOut={() => {
+                      if (isLinkCopiedTippyActive) {
+                        setIsLinkCopiedTippyActive(false);
+                        if (linkCopiedTippyTimeout.current) {
+                          clearTimeout(linkCopiedTippyTimeout.current);
+                        }
+                      }
+                    }}
+                  >
+                    <FontAwesomeIcon icon={faShareNodes} />
+                  </button>
+                </Tippy>
                 {isAdmin ? (
                   <button
                     className={buttonsStyles.primaryButton}

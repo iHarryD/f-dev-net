@@ -31,11 +31,11 @@
 }
 
 .userStatsBox {
-  align-items: center;
   border-radius: var(--BORDER-RADIUS);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  text-align: center;
 }
 
 .statsNumber {

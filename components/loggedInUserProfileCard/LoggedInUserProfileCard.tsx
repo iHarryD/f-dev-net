@@ -10,7 +10,7 @@ export default function LoggedInUserProfileCard() {
     <div className={loggedInUserProfileCardStyles.userProfileCard}>
       <div>
         <img
-          src={user?.image!}
+          src={user?.image}
           className={loggedInUserProfileCardStyles.profilePicturePreview}
         />
       </div>
@@ -23,19 +23,19 @@ export default function LoggedInUserProfileCard() {
           <span className={loggedInUserProfileCardStyles.statsNumber}>
             {user?.badges.length}
           </span>
-          badges
+          <span title="badges">badges</span>
         </div>
         <div className={loggedInUserProfileCardStyles.userStatsBox}>
           <span className={loggedInUserProfileCardStyles.statsNumber}>
             {user?.connections.length}
           </span>
-          connections
+          <span title="connections">connections</span>
         </div>
         <div className={loggedInUserProfileCardStyles.userStatsBox}>
           <span className={loggedInUserProfileCardStyles.statsNumber}>
             {user?.posts.length}
           </span>
-          <span>posts</span>
+          <span title="posts">posts</span>
         </div>
       </div>
     </div>

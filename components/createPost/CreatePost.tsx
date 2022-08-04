@@ -16,6 +16,9 @@ import { updateUser } from "../../features/userSlice";
 import { AppDispatch } from "../../store";
 import Image from "next/image";
 import PostCategoryDropdown from "../postCategoryDropdown/PostCategoryDropdown";
+import { toastEmitterConfig } from "../../data/toastEmitterConfig";
+import { extractErrorMessage } from "../../helpers/extractErrorMessage";
+import { toast } from "react-toastify";
 
 export default function CreatePost() {
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
@@ -46,11 +49,16 @@ export default function CreatePost() {
     if (uploadedImage) {
       postDetails.media = uploadedImage;
     }
-    createNewPost(postDetails, setIsPosting, (result) => {
-      clearForm();
-      dispatch(append({ newPosts: [result.data.data] }));
-      dispatch(updateUser());
-    });
+    createNewPost(
+      postDetails,
+      setIsPosting,
+      (result) => {
+        clearForm();
+        dispatch(append({ newPosts: [result.data.data] }));
+        dispatch(updateUser());
+      },
+      (err) => toast.error(extractErrorMessage(err), toastEmitterConfig)
+    );
   }
 
   return (

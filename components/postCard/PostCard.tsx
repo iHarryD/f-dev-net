@@ -47,6 +47,9 @@ import Image from "next/image";
 import PostCategoryDropdown from "../postCategoryDropdown/PostCategoryDropdown";
 import { isImage } from "../../helpers/isImage";
 import { ButtonSyncLoader } from "../buttonLoaders/ButtonLoaders";
+import { ToastContainer, toast } from "react-toastify";
+import { extractErrorMessage } from "../../helpers/extractErrorMessage";
+import { toastEmitterConfig } from "../../data/toastEmitterConfig";
 
 export default function PostCard({
   details: {
@@ -84,17 +87,19 @@ export default function PostCard({
   function handleLikePost() {
     if (user === null) return;
     dispatch(like({ postID: _id, username: user.username }));
-    likePost(_id, setIsLiking, undefined, () =>
-      dispatch(unlike({ postID: _id, username: user!.username }))
-    );
+    likePost(_id, setIsLiking, undefined, (err) => {
+      dispatch(unlike({ postID: _id, username: user!.username }));
+      toast.error(extractErrorMessage(err), toastEmitterConfig);
+    });
   }
 
   function handleUnlikePost() {
     if (user === null) return;
     dispatch(unlike({ postID: _id, username: user.username }));
-    unlikePost(_id, setIsLiking, undefined, () =>
-      dispatch(like({ postID: _id, username: user!.username }))
-    );
+    unlikePost(_id, setIsLiking, undefined, (err) => {
+      dispatch(like({ postID: _id, username: user!.username }));
+      toast.error(extractErrorMessage(err), toastEmitterConfig);
+    });
   }
 
   function handleBookmarkPost() {
@@ -104,7 +109,10 @@ export default function PostCard({
       _id,
       setIsBookmarking,
       () => dispatch(updateUser()),
-      () => setIsBookmarked(false)
+      (err) => {
+        setIsBookmarked(false);
+        toast.error(extractErrorMessage(err), toastEmitterConfig);
+      }
     );
   }
   function handleRemoveBookmark() {
@@ -114,7 +122,10 @@ export default function PostCard({
       _id,
       setIsBookmarking,
       () => dispatch(updateUser()),
-      () => setIsBookmarked(true)
+      (err) => {
+        setIsBookmarked(true);
+        toast.error(extractErrorMessage(err), toastEmitterConfig);
+      }
     );
   }
 
@@ -127,14 +138,24 @@ export default function PostCard({
       (result) => {
         dispatch(syncPost(_id));
         commentInputRef.current!.value = "";
+      },
+      (err) => {
+        toast.error(extractErrorMessage(err), toastEmitterConfig);
       }
     );
   }
 
   function handleDeletePost() {
-    deletePost(_id, undefined, (result) => {
-      dispatch(deletePostAction({ postID: _id }));
-    });
+    deletePost(
+      _id,
+      undefined,
+      (result) => {
+        dispatch(deletePostAction({ postID: _id }));
+      },
+      (err) => {
+        toast.error(extractErrorMessage(err), toastEmitterConfig);
+      }
+    );
   }
 
   function handleUpdatePost() {
@@ -159,81 +180,114 @@ export default function PostCard({
           updatedPostData.media = null;
         }
       }
-      updatePost(_id, updatedPostData, setIsUpdating, (result) => {
-        setInEditMode(false);
-      });
+      updatePost(
+        _id,
+        updatedPostData,
+        setIsUpdating,
+        (result) => {
+          setInEditMode(false);
+        },
+        (err) => {
+          toast.error(extractErrorMessage(err), toastEmitterConfig);
+        }
+      );
     }
   }
 
   return (
-    <div className={postCardStyles.postCardContainer}>
-      <div className={postCardStyles.postCardHeader}>
-        <div className={postCardStyles.postingAccountDetailsContainer}>
-          <div>
-            <img
-              src={postedBy.image}
-              alt={postedBy.username}
-              className={postCardStyles.profilePicturePreview}
-            />
+    <>
+      <div className={postCardStyles.postCardContainer}>
+        <div className={postCardStyles.postCardHeader}>
+          <div className={postCardStyles.postingAccountDetailsContainer}>
+            <div>
+              <img
+                src={postedBy.image}
+                alt={postedBy.username}
+                className={postCardStyles.profilePicturePreview}
+              />
+            </div>
+            <div>
+              <p>{postedBy.name}</p>
+              <UsernameLink username={postedBy.username} />
+            </div>
           </div>
-          <div>
-            <p>{postedBy.name}</p>
-            <UsernameLink username={postedBy.username} />
-          </div>
-        </div>
-        {user?.username === postedBy.username && (
-          <div>
-            <Tooltip
-              tooltipItems={[
-                {
-                  tooltipChild: (
-                    <span className={postCardStyles.deletePostText}>
-                      Delete
-                    </span>
-                  ),
-                  tooltipOnClickHandler: handleDeletePost,
-                },
-                {
-                  tooltipChild: <span>Edit</span>,
-                  tooltipOnClickHandler: () => setInEditMode((prev) => !prev),
-                },
-                {
-                  tooltipChild: (
-                    <span>
-                      {commentsActive ? "Disable" : "Enable"} comments
-                    </span>
-                  ),
-                  tooltipOnClickHandler: () =>
-                    toggleComments(_id, undefined, (result) =>
-                      dispatch(syncPost(_id))
+          {user?.username === postedBy.username && (
+            <div>
+              <Tooltip
+                tooltipItems={[
+                  {
+                    tooltipChild: (
+                      <span className={postCardStyles.deletePostText}>
+                        Delete
+                      </span>
                     ),
-                },
-              ]}
-            />
-          </div>
-        )}
-      </div>
-      {inEditMode ? (
-        currentMedia ? (
-          <div className={postCardStyles.updateImagePreviewContainer}>
-            <button
-              className={buttonsStyles.removeImageButton}
-              onClick={() => setCurrentMedia(null)}
-            >
-              <FontAwesomeIcon icon={faClose} />
-            </button>
-            <Image
-              src={
-                typeof currentMedia === "string"
-                  ? currentMedia
-                  : URL.createObjectURL(currentMedia)
-              }
-              alt="update-image"
-              layout="fill"
-            />
-            <label
-              className={`${postCardStyles.changeImageLabel} ${postCardStyles.addImageLabel}`}
-            >
+                    tooltipOnClickHandler: handleDeletePost,
+                  },
+                  {
+                    tooltipChild: <span>Edit</span>,
+                    tooltipOnClickHandler: () => setInEditMode((prev) => !prev),
+                  },
+                  {
+                    tooltipChild: (
+                      <span>
+                        {commentsActive ? "Disable" : "Enable"} comments
+                      </span>
+                    ),
+                    tooltipOnClickHandler: () =>
+                      toggleComments(
+                        _id,
+                        undefined,
+                        (result) => dispatch(syncPost(_id)),
+                        (err) =>
+                          toast.error(
+                            extractErrorMessage(err),
+                            toastEmitterConfig
+                          )
+                      ),
+                  },
+                ]}
+              />
+            </div>
+          )}
+        </div>
+        {inEditMode ? (
+          currentMedia ? (
+            <div className={postCardStyles.updateImagePreviewContainer}>
+              <button
+                className={buttonsStyles.removeImageButton}
+                onClick={() => setCurrentMedia(null)}
+              >
+                <FontAwesomeIcon icon={faClose} />
+              </button>
+              <Image
+                src={
+                  typeof currentMedia === "string"
+                    ? currentMedia
+                    : URL.createObjectURL(currentMedia)
+                }
+                alt="update-image"
+                layout="fill"
+              />
+              <label
+                className={`${postCardStyles.changeImageLabel} ${postCardStyles.addImageLabel}`}
+              >
+                <input
+                  type="file"
+                  accept="image/*"
+                  className={postCardStyles.addImageInput}
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      if (isImage(e.target.files[0])) {
+                        setCurrentMedia(e.target.files[0]);
+                      }
+                    }
+                  }}
+                />
+                <span>Change image</span>
+              </label>
+            </div>
+          ) : (
+            <label className={postCardStyles.addImageLabel}>
               <input
                 type="file"
                 accept="image/*"
@@ -246,176 +300,160 @@ export default function PostCard({
                   }
                 }}
               />
-              <span>Change image</span>
+              <FontAwesomeIcon icon={faUpload} /> Add an image
             </label>
-          </div>
+          )
         ) : (
-          <label className={postCardStyles.addImageLabel}>
-            <input
-              type="file"
-              accept="image/*"
-              className={postCardStyles.addImageInput}
-              onChange={(e) => {
-                if (e.target.files) {
-                  if (isImage(e.target.files[0])) {
-                    setCurrentMedia(e.target.files[0]);
-                  }
-                }
-              }}
-            />
-            <FontAwesomeIcon icon={faUpload} /> Add an image
-          </label>
-        )
-      ) : (
-        media && (
-          <div className={postCardStyles.postMediaContainer}>
-            <Image src={media} alt={media} layout="fill" />
-          </div>
-        )
-      )}
-      <div className={postCardStyles.postTextContentContainer}>
-        <div className={postCardStyles.postWrittenTextContainer}>
-          <div className={postCardStyles.postTitleCategoryContainer}>
-            {inEditMode ? (
-              <>
-                <input
-                  ref={updateCaptionInputRef}
-                  defaultValue={caption}
-                  className={postCardStyles.updateCaptionInput}
-                />
-                <PostCategoryDropdown
-                  background="#0c0c0c"
-                  selectRef={postCategoryDropdownRef}
-                />
-              </>
-            ) : (
-              <>
-                <span>{caption}</span>
-                <span className={postCardStyles.category}>{category}</span>
-              </>
-            )}
-          </div>
-          <span className={postCardStyles.postAge}>
-            {new Date(lastModified).toLocaleDateString()}
-          </span>
-        </div>
-        {inEditMode && (
-          <>
-            <button
-              disabled={isUpdating}
-              className={`${buttonsStyles.primaryButton} ${postCardStyles.updateButton}`}
-              onClick={() => handleUpdatePost()}
-            >
-              {isUpdating ? <ButtonSyncLoader /> : "Update"}
-            </button>
-            <button
-              disabled={isUpdating}
-              className={postCardStyles.cancelEditButton}
-              onClick={() => setInEditMode(false)}
-            >
-              Cancel
-            </button>
-          </>
+          media && (
+            <div className={postCardStyles.postMediaContainer}>
+              <Image src={media} alt={media} layout="fill" />
+            </div>
+          )
         )}
-        <div className={postCardStyles.actionBar}>
-          <div>
-            {(user ? likes.includes(user.username) : false) ? (
-              <button
-                disabled={isLiking}
-                className={buttonsStyles.buttonWithBadge}
-                onClick={() => handleUnlikePost()}
-              >
-                <FontAwesomeIcon icon={faSHeart} color="#fd3b3b" />
-                <span
-                  title={String(likes.length)}
-                  className={buttonsStyles.buttonBadge}
-                >
-                  {likes.length}
-                </span>
-              </button>
-            ) : (
-              <button
-                disabled={isLiking}
-                className={buttonsStyles.buttonWithBadge}
-                onClick={() => handleLikePost()}
-              >
-                <FontAwesomeIcon icon={faRHeart} />
-                <span
-                  title={String(likes.length)}
-                  className={buttonsStyles.buttonBadge}
-                >
-                  {likes.length}
-                </span>
-              </button>
-            )}
-            <button
-              onClick={() => {
-                if (comments.length) setIsCommentBoxOpen((prev) => !prev);
-              }}
-            >
-              <FontAwesomeIcon icon={faComment} />
-            </button>
+        <div className={postCardStyles.postTextContentContainer}>
+          <div className={postCardStyles.postWrittenTextContainer}>
+            <div className={postCardStyles.postTitleCategoryContainer}>
+              {inEditMode ? (
+                <>
+                  <input
+                    ref={updateCaptionInputRef}
+                    defaultValue={caption}
+                    className={postCardStyles.updateCaptionInput}
+                  />
+                  <PostCategoryDropdown
+                    background="#0c0c0c"
+                    selectRef={postCategoryDropdownRef}
+                  />
+                </>
+              ) : (
+                <>
+                  <span>{caption}</span>
+                  <span className={postCardStyles.category}>{category}</span>
+                </>
+              )}
+            </div>
+            <span className={postCardStyles.postAge}>
+              {new Date(lastModified).toLocaleDateString()}
+            </span>
           </div>
-          <div>
-            {isBookmarked ? (
+          {inEditMode && (
+            <>
               <button
-                disabled={isBookmarking}
-                onClick={() => handleRemoveBookmark()}
+                disabled={isUpdating}
+                className={`${buttonsStyles.primaryButton} ${postCardStyles.updateButton}`}
+                onClick={() => handleUpdatePost()}
               >
-                <FontAwesomeIcon icon={faSBookmark} />
+                {isUpdating ? <ButtonSyncLoader /> : "Update"}
               </button>
-            ) : (
               <button
-                disabled={isBookmarking}
-                onClick={() => handleBookmarkPost()}
+                disabled={isUpdating}
+                className={postCardStyles.cancelEditButton}
+                onClick={() => setInEditMode(false)}
               >
-                <FontAwesomeIcon icon={faRBookmark} />
+                Cancel
               </button>
-            )}
-            <button>
-              <FontAwesomeIcon icon={faShareNodes} />
-            </button>
+            </>
+          )}
+          <div className={postCardStyles.actionBar}>
+            <div>
+              {(user ? likes.includes(user.username) : false) ? (
+                <button
+                  disabled={isLiking}
+                  className={buttonsStyles.buttonWithBadge}
+                  onClick={() => handleUnlikePost()}
+                >
+                  <FontAwesomeIcon icon={faSHeart} color="#fd3b3b" />
+                  <span
+                    title={String(likes.length)}
+                    className={buttonsStyles.buttonBadge}
+                  >
+                    {likes.length}
+                  </span>
+                </button>
+              ) : (
+                <button
+                  disabled={isLiking}
+                  className={buttonsStyles.buttonWithBadge}
+                  onClick={() => handleLikePost()}
+                >
+                  <FontAwesomeIcon icon={faRHeart} />
+                  <span
+                    title={String(likes.length)}
+                    className={buttonsStyles.buttonBadge}
+                  >
+                    {likes.length}
+                  </span>
+                </button>
+              )}
+              <button
+                onClick={() => {
+                  if (comments.length) setIsCommentBoxOpen((prev) => !prev);
+                }}
+              >
+                <FontAwesomeIcon icon={faComment} />
+              </button>
+            </div>
+            <div>
+              {isBookmarked ? (
+                <button
+                  disabled={isBookmarking}
+                  onClick={() => handleRemoveBookmark()}
+                >
+                  <FontAwesomeIcon icon={faSBookmark} />
+                </button>
+              ) : (
+                <button
+                  disabled={isBookmarking}
+                  onClick={() => handleBookmarkPost()}
+                >
+                  <FontAwesomeIcon icon={faRBookmark} />
+                </button>
+              )}
+              <button>
+                <FontAwesomeIcon icon={faShareNodes} />
+              </button>
+            </div>
           </div>
-        </div>
-        <div className={postCardStyles.latestCommentsPreviewContainer}>
-          {comments.length === 0 ? (
-            <p>No comments</p>
-          ) : isCommentBoxOpen && comments.length > 2 ? (
-            <CommentBox comments={comments} />
+          <div className={postCardStyles.latestCommentsPreviewContainer}>
+            {comments.length === 0 ? (
+              <p>No comments</p>
+            ) : isCommentBoxOpen && comments.length > 2 ? (
+              <CommentBox comments={comments} />
+            ) : (
+              comments.slice(0, comments.length >= 2 ? 2 : 1).map((comment) => (
+                <div
+                  key={comment._id}
+                  className={postCardStyles.latestCommentPreview}
+                >
+                  <span>{comment.postedBy}: </span>
+                  <span>{comment.comment}</span>
+                </div>
+              ))
+            )}
+          </div>
+          {commentsActive ? (
+            <div className={postCardStyles.commentActionBar}>
+              <input
+                ref={commentInputRef}
+                className={postCardStyles.addCommentInput}
+                type="text"
+                placeholder="Add a comment"
+              />
+              <button
+                disabled={isPostingComment}
+                className={`${buttonsStyles.primaryButton} ${postCardStyles.commentButton}`}
+                onClick={() => handlePostComment()}
+              >
+                {isPostingComment ? <ButtonSyncLoader /> : "Comment"}
+              </button>
+            </div>
           ) : (
-            comments.slice(0, comments.length >= 2 ? 2 : 1).map((comment) => (
-              <div
-                key={comment._id}
-                className={postCardStyles.latestCommentPreview}
-              >
-                <span>{comment.postedBy}: </span>
-                <span>{comment.comment}</span>
-              </div>
-            ))
+            <p className={postCardStyles.disabledCommentText}>
+              Comments are disabled on this post.
+            </p>
           )}
         </div>
-        {commentsActive ? (
-          <div className={postCardStyles.commentActionBar}>
-            <input
-              ref={commentInputRef}
-              className={postCardStyles.addCommentInput}
-              type="text"
-              placeholder="Add a comment"
-            />
-            <button
-              disabled={isPostingComment}
-              className={`${buttonsStyles.primaryButton} ${postCardStyles.commentButton}`}
-              onClick={() => handlePostComment()}
-            >
-              {isPostingComment ? <ButtonSyncLoader /> : "Comment"}
-            </button>
-          </div>
-        ) : (
-          <p className={postCardStyles.disabledCommentText}>
-            Comments are disabled on this post.
-          </p>
-        )}
       </div>
-    </div>
+    </>
   );
 }
