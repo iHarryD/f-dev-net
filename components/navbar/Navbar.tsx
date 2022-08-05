@@ -17,7 +17,7 @@ import { logout } from "../../features/userSlice";
 import { UserAuthStatus } from "../../interfaces/Common.interface";
 
 export function MacroNavbar() {
-  const { status, user } = useSelector((state: RootState) => state.userSlice);
+  const { status } = useSelector((state: RootState) => state.userSlice);
   const dispatch = useDispatch<AppDispatch>();
   const [searchResults, setSearchResults] = useState<
     {

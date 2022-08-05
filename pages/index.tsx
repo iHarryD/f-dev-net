@@ -51,63 +51,71 @@ export default function Home({ posts: newPosts }: { posts: Post[] }) {
         <div className={commonStyles.pagePostsSection}>
           {status === UserAuthStatus.AUTHENTICATED && <CreatePost />}
           <div className={commonStyles.chipContainer}>
-            <div
+            <label
               className={`${commonStyles.chip} ${
                 sortedBy === "date" ? commonStyles.chipActive : ""
               }`}
             >
-              <label>
-                <input
-                  defaultChecked
-                  type="checkbox"
-                  name="post-sort-by"
-                  onChange={() => setSortedBy("date")}
-                />
-                date
-              </label>
-            </div>
-            <div
+              <input
+                defaultChecked
+                type="checkbox"
+                name="post-sort-by"
+                onChange={() => setSortedBy("date")}
+              />
+              date
+            </label>
+
+            <label
               className={`${commonStyles.chip} ${
                 sortedBy === "trending" ? commonStyles.chipActive : ""
               }`}
             >
-              <label>
-                <input
-                  type="checkbox"
-                  name="post-sort-by"
-                  onChange={() => setSortedBy("trending")}
-                />
-                trending
-              </label>
-            </div>
-            <div
+              <input
+                type="checkbox"
+                name="post-sort-by"
+                onChange={() => setSortedBy("trending")}
+              />
+              trending
+            </label>
+
+            <label
+              className={`${commonStyles.chip} ${
+                filterBy === null ? commonStyles.chipActive : ""
+              }`}
+            >
+              <input
+                type="checkbox"
+                name="post-filter-by"
+                onChange={() => setFilterBy(null)}
+              />
+              all
+            </label>
+
+            <label
               className={`${commonStyles.chip} ${
                 filterBy === "general" ? commonStyles.chipActive : ""
               }`}
             >
-              <label>
-                <input
-                  type="checkbox"
-                  name="post-filter-by"
-                  onChange={() => setFilterBy("general")}
-                />
-                general
-              </label>
-            </div>
-            <div
+              <input
+                type="checkbox"
+                name="post-filter-by"
+                onChange={() => setFilterBy("general")}
+              />
+              general
+            </label>
+
+            <label
               className={`${commonStyles.chip} ${
                 filterBy === "query" ? commonStyles.chipActive : ""
               }`}
             >
-              <label>
-                <input
-                  type="checkbox"
-                  name="post-filter-by"
-                  onChange={() => setFilterBy("query")}
-                />
-                query
-              </label>
-            </div>
+              <input
+                type="checkbox"
+                name="post-filter-by"
+                onChange={() => setFilterBy("query")}
+              />
+              query
+            </label>
           </div>
           <div className={commonStyles.postsContainer}>
             {posts.map((post) => (

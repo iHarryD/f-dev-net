@@ -358,6 +358,7 @@ export default function PostCard({
             <div>
               {(user ? likes.includes(user.username) : false) ? (
                 <button
+                  title={String(likes.length)}
                   disabled={isLiking}
                   className={buttonsStyles.buttonWithBadge}
                   onClick={() => handleUnlikePost()}
@@ -372,6 +373,7 @@ export default function PostCard({
                 </button>
               ) : (
                 <button
+                  title={String(likes.length)}
                   disabled={isLiking}
                   className={buttonsStyles.buttonWithBadge}
                   onClick={() => handleLikePost()}
@@ -386,6 +388,7 @@ export default function PostCard({
                 </button>
               )}
               <button
+                title={String(comments.length)}
                 onClick={() => {
                   if (comments.length) setIsCommentBoxOpen((prev) => !prev);
                 }}

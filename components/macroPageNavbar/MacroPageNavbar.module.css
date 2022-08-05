@@ -27,3 +27,7 @@
   text-align: center;
   width: 1rem;
 }
+
+.activeHomeNavbarLink {
+  background: var(--DARK-GREY-CLR);
+}

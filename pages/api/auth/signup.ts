@@ -58,6 +58,10 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         return res
           .status(200)
           .json({ message: "Successfully registered.", data: newUser });
+      default:
+        return res.status(405).json({
+          message: "Requested method is not allowed at this endpoint.",
+        });
     }
   } catch (err) {
     return res
