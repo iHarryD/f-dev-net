@@ -1,7 +1,10 @@
-.postsContainer {
+.postsContainer,
+.connectionsContainer {
   align-items: center;
+  align-self: normal;
   display: flex;
   flex-direction: column;
+  gap: var(--MEDIUM-GAP);
 }
 
 .connectionContainer {
@@ -10,6 +13,7 @@
   display: flex;
   justify-content: space-between;
   padding: var(--MIN-PADDING);
+  width: 100%;
 }
 
 .connectionStatus {
@@ -41,5 +45,13 @@
 .emptyCategoryTextContainer {
   font-weight: 700;
   opacity: var(--FADED-TEXT-OPACITY);
+  text-align: center;
+}
+
+.categoryFilterDropdown {
+  background: var(--SECONDARY-BACKGROUND-CLR);
+  color: var(--SECONDARY-FONT-CLR);
+  display: block;
+  margin: 0 0 1rem auto;
   text-align: center;
 }

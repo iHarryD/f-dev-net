@@ -5,13 +5,17 @@ import {
   Post,
   PostCategories,
   PostComment,
+  PostSortingOptions,
   UpdatePost,
+  UserPostFilter,
 } from "../interfaces/Common.interface";
 import baseAxiosInstance from "./baseAxiosInstance";
 
 export async function getPosts(
-  sortedBy: "date" | "trending",
-  filterBy: "general" | "query" | null,
+  sortedBy: PostSortingOptions,
+  filterBy?: PostCategories,
+  user?: string,
+  userRelationQuery?: UserPostFilter,
   loadingState?: Dispatch<SetStateAction<boolean>>,
   successCallback?: (
     result: AxiosResponse<{ message: string; data: Post[] }>
@@ -19,8 +23,11 @@ export async function getPosts(
   failureCallback?: (err: unknown) => void
 ) {
   try {
+    if (loadingState) loadingState(true);
     const result = await baseAxiosInstance().get(
-      `/posts?sort=${sortedBy}&filter=${filterBy}`
+      `/posts?sort=${sortedBy}${filterBy ? `&filter:${filterBy}` : ""}${
+        user ? `&user=${user}` : ""
+      }${userRelationQuery ? `&relation=${userRelationQuery}` : ""}`
     );
     if (successCallback) successCallback(result);
   } catch (err) {

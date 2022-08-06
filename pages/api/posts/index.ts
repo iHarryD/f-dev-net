@@ -1,4 +1,4 @@
-import { MongoClient, ObjectId } from "mongodb";
+import { Document, Filter, MongoClient, ObjectId } from "mongodb";
 import { NextApiResponse } from "next";
 import corsMiddleware from "../../../helpers/corsMiddleware";
 import { postValidation } from "../../../joi/postValidation";
@@ -26,11 +26,24 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
     switch (method) {
       case "GET":
         connection.clientPromise = await (await connectToMongoDb).connect();
-        const filter: { category?: "query" | "general" } = {};
+        const filter: Filter<Document> = {};
         if (req.query.filter === "query") {
           filter.category = "query";
         } else if (req.query.filter === "general") {
           filter.category = "general";
+        }
+        if (req.query.user) {
+          if (req.query.relation === "liked") {
+            filter.likes = {
+              $in: Array.isArray(req.query.user)
+                ? req.query.user
+                : [req.query.user],
+            };
+          } else if (req.query.relation === "commented") {
+            filter.comments = { $elemMatch: { postedBy: req.query.user } };
+          } else {
+            filter["postedBy.username"] = req.query.user;
+          }
         }
         const result = connection.clientPromise
           .db()
@@ -39,9 +52,10 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
           .sort(
             req.query.sort === "trending" ? { likes: -1 } : { timestamp: -1 }
           );
-        return res
-          .status(200)
-          .json({ message: "Posts fetched.", data: await cursorToDoc(result) });
+        return res.status(200).json({
+          message: "Posts fetched.",
+          data: await cursorToDoc(result),
+        });
       case "POST":
         await verifyToken(req, res);
         const { error } = postValidation(req.body);

@@ -133,5 +133,7 @@ textarea.profileUpdatingInput {
 
 .categorySection {
   gap: var(--LARGE-GAP);
-  padding: 2rem 0;
+  margin: auto;
+  padding: 1rem 0;
+  width: min(35rem, 100%);
 }

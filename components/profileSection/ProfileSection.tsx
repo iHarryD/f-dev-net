@@ -274,7 +274,7 @@ export default function ProfileSection() {
                   setUserDetailCategory(UserDetailCategories.BADGES)
                 }
               >
-                {user.badges.length} badges
+                badges
               </button>
               <button
                 className={`${profileSectionStyles.userDetailCategoryButton} ${
@@ -286,7 +286,7 @@ export default function ProfileSection() {
                   setUserDetailCategory(UserDetailCategories.CONNECTIONS)
                 }
               >
-                {user.connections.length} connections
+                connections
               </button>
               <button
                 className={`${profileSectionStyles.userDetailCategoryButton} ${
@@ -298,13 +298,13 @@ export default function ProfileSection() {
                   setUserDetailCategory(UserDetailCategories.POSTS)
                 }
               >
-                {user.posts.length} posts
+                posts
               </button>
             </div>
           </section>
           <section className={profileSectionStyles.categorySection}>
             {userDetailCategory === UserDetailCategories.POSTS && (
-              <Posts posts={user.posts} />
+              <Posts posts={user.posts} user={user.username} />
             )}
             {userDetailCategory === UserDetailCategories.CONNECTIONS && (
               <Connections
