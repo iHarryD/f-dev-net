@@ -19,6 +19,7 @@ import PostCategoryDropdown from "../postCategoryDropdown/PostCategoryDropdown";
 import { toastEmitterConfig } from "../../data/toastEmitterConfig";
 import { extractErrorMessage } from "../../helpers/extractErrorMessage";
 import { toast } from "react-toastify";
+import Tippy from "@tippyjs/react";
 
 export default function CreatePost() {
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
@@ -29,6 +30,14 @@ export default function CreatePost() {
   const dispatch = useDispatch<AppDispatch>();
   const [isGiphyActive, setIsGiphyActive] = useState<boolean>(false);
   const [giphySearchQuery, setGiphySearchQuery] = useState<string>("");
+  const [formError, setFormError] = useState<string | null>(null);
+  const tippyTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (tippyTimeout.current) clearTimeout(tippyTimeout.current);
+    };
+  }, []);
 
   function clearForm() {
     setCaption("");
@@ -37,7 +46,11 @@ export default function CreatePost() {
 
   async function handleCreateNewPost() {
     if (categoryDropDownRef.current === null) return;
-    if (!caption.replaceAll(" ", "")) return;
+    if (!caption.replaceAll(" ", "")) {
+      setFormError("Caption cannot be empty.");
+      tippyTimeout.current = setTimeout(() => setFormError(null), 2000);
+      return;
+    }
     const postDetails: {
       caption: string;
       category: PostCategories;
@@ -125,9 +138,11 @@ export default function CreatePost() {
       )}
       <div className={createPostStyles.utilitiesContainer}>
         <div className={createPostStyles.iconButtonsContainer}>
-          <button>
-            <FontAwesomeIcon icon={faUserTag} />
-          </button>
+          <Tippy content="not implemented yet">
+            <button>
+              <FontAwesomeIcon icon={faUserTag} />
+            </button>
+          </Tippy>
           <button>
             <label
               htmlFor="post-image"
@@ -149,16 +164,18 @@ export default function CreatePost() {
               />
             </label>
           </button>
-          <button onClick={() => setIsGiphyActive((prev) => !prev)}>
+          {/* <button onClick={() => setIsGiphyActive((prev) => !prev)}>
             <FontAwesomeIcon icon={faSmile} />
-          </button>
+          </button> */}
         </div>
-        <button
-          className={buttonsStyles.primaryButton}
-          onClick={() => handleCreateNewPost()}
-        >
-          {isPosting ? <ButtonSyncLoader /> : "Post"}
-        </button>
+        <Tippy content={formError} visible={!!formError}>
+          <button
+            className={buttonsStyles.primaryButton}
+            onClick={() => handleCreateNewPost()}
+          >
+            {isPosting ? <ButtonSyncLoader /> : "Post"}
+          </button>
+        </Tippy>
       </div>
     </div>
   );

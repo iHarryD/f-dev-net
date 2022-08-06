@@ -50,6 +50,7 @@ import { ButtonSyncLoader } from "../buttonLoaders/ButtonLoaders";
 import { ToastContainer, toast } from "react-toastify";
 import { extractErrorMessage } from "../../helpers/extractErrorMessage";
 import { toastEmitterConfig } from "../../data/toastEmitterConfig";
+import Tippy from "@tippyjs/react";
 
 export default function PostCard({
   details: {
@@ -412,9 +413,11 @@ export default function PostCard({
                   <FontAwesomeIcon icon={faRBookmark} />
                 </button>
               )}
-              <button>
-                <FontAwesomeIcon icon={faShareNodes} />
-              </button>
+              <Tippy content="not implemented yet">
+                <button>
+                  <FontAwesomeIcon icon={faShareNodes} />
+                </button>
+              </Tippy>
             </div>
           </div>
           <div className={postCardStyles.latestCommentsPreviewContainer}>
