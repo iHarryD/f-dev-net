@@ -133,7 +133,10 @@ export function Connections({
       )}
       <div className={categoriesStyles.connectionsContainer}>
         {filteredConnections.map((connection) => (
-          <div className={categoriesStyles.connectionContainer}>
+          <div
+            className={categoriesStyles.connectionContainer}
+            key={connection.user}
+          >
             <div className={categoriesStyles.connectionNameUsernameContainer}>
               <UsernameLink username={connection.user as string} />
             </div>
