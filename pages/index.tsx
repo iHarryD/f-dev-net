@@ -5,7 +5,12 @@ import PostCard from "../components/postCard/PostCard";
 import commonStyles from "../styles/Common.module.css";
 import connectToMongoDb from "../lib/mongodb";
 import { cursorToDoc } from "../helpers/cursorToDoc";
-import { Post, UserAuthStatus } from "../interfaces/Common.interface";
+import {
+  Post,
+  PostCategories,
+  PostSortingOptions,
+  UserAuthStatus,
+} from "../interfaces/Common.interface";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
 import { refresh } from "../features/postSlice";
@@ -19,8 +24,10 @@ export default function Home({ posts: newPosts }: { posts: Post[] }) {
   const posts = useSelector((state: RootState) => state.postSlice);
   const { status } = useSelector((state: RootState) => state.userSlice);
   const dispatch = useDispatch();
-  const [sortedBy, setSortedBy] = useState<"date" | "trending">("date");
-  const [filterBy, setFilterBy] = useState<"general" | "query" | null>(null);
+  const [sortedBy, setSortedBy] = useState<PostSortingOptions>(
+    PostSortingOptions.DATE
+  );
+  const [filterBy, setFilterBy] = useState<PostCategories | null>(null);
   const { inMobileView } = useInMobileView();
   const inititalFetch = useRef(false);
 
@@ -32,11 +39,12 @@ export default function Home({ posts: newPosts }: { posts: Post[] }) {
     if (inititalFetch.current === false) {
       inititalFetch.current = true;
     } else {
-      (async () => {
-        await getPosts(sortedBy, filterBy, undefined, (result) => {
-          dispatch(refresh({ newPosts: result.data.data }));
-        });
-      })();
+      const filter: PostCategories | undefined = filterBy
+        ? filterBy
+        : undefined;
+      getPosts(sortedBy, filter, undefined, undefined, undefined, (result) => {
+        dispatch(refresh({ newPosts: result.data.data }));
+      });
     }
   }, [sortedBy, filterBy]);
 
@@ -53,27 +61,31 @@ export default function Home({ posts: newPosts }: { posts: Post[] }) {
           <div className={commonStyles.chipContainer}>
             <label
               className={`${commonStyles.chip} ${
-                sortedBy === "date" ? commonStyles.chipActive : ""
+                sortedBy === PostSortingOptions.DATE
+                  ? commonStyles.chipActive
+                  : ""
               }`}
             >
               <input
                 defaultChecked
                 type="checkbox"
                 name="post-sort-by"
-                onChange={() => setSortedBy("date")}
+                onChange={() => setSortedBy(PostSortingOptions.DATE)}
               />
               date
             </label>
 
             <label
               className={`${commonStyles.chip} ${
-                sortedBy === "trending" ? commonStyles.chipActive : ""
+                sortedBy === PostSortingOptions.TRENDING
+                  ? commonStyles.chipActive
+                  : ""
               }`}
             >
               <input
                 type="checkbox"
                 name="post-sort-by"
-                onChange={() => setSortedBy("trending")}
+                onChange={() => setSortedBy(PostSortingOptions.TRENDING)}
               />
               trending
             </label>
@@ -90,31 +102,31 @@ export default function Home({ posts: newPosts }: { posts: Post[] }) {
               />
               all
             </label>
-
             <label
               className={`${commonStyles.chip} ${
-                filterBy === "general" ? commonStyles.chipActive : ""
+                filterBy === PostCategories.GENERAL
+                  ? commonStyles.chipActive
+                  : ""
               }`}
             >
               <input
                 type="checkbox"
                 name="post-filter-by"
-                onChange={() => setFilterBy("general")}
+                onChange={() => setFilterBy(PostCategories.GENERAL)}
               />
-              general
+              {PostCategories.GENERAL}
             </label>
-
             <label
               className={`${commonStyles.chip} ${
-                filterBy === "query" ? commonStyles.chipActive : ""
+                filterBy === PostCategories.QUERY ? commonStyles.chipActive : ""
               }`}
             >
               <input
                 type="checkbox"
                 name="post-filter-by"
-                onChange={() => setFilterBy("query")}
+                onChange={() => setFilterBy(PostCategories.QUERY)}
               />
-              query
+              {PostCategories.QUERY}
             </label>
           </div>
           <div className={commonStyles.postsContainer}>
