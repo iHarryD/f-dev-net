@@ -328,7 +328,7 @@ export default function PostCard({
                 </>
               ) : (
                 <>
-                  <span>{caption}</span>
+                  <span className={postCardStyles.caption}>{caption}</span>
                   <span className={postCardStyles.category}>{category}</span>
                 </>
               )}
@@ -437,6 +437,14 @@ export default function PostCard({
               ))
             )}
           </div>
+          {comments.length > 2 && (
+            <button
+              className={buttonsStyles.textButton}
+              onClick={() => setIsCommentBoxOpen((prev) => !prev)}
+            >
+              {isCommentBoxOpen ? "Hide" : "Show all"} comments
+            </button>
+          )}
           {commentsActive ? (
             <div className={postCardStyles.commentActionBar}>
               <input

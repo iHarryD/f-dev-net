@@ -24,6 +24,17 @@ export enum PostCategories {
   QUERY = "query",
 }
 
+export enum UserPostFilter {
+  COMMENTED = "commented",
+  LIKED = "liked",
+  POSTED = "posted",
+}
+
+export enum PostSortingOptions {
+  DATE = "date",
+  TRENDING = "trending",
+}
+
 export interface User {
   bio: string;
   image: string;

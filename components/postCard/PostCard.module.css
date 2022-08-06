@@ -94,7 +94,12 @@
   opacity: var(--FADED-TEXT-OPACITY);
 }
 
+.caption {
+  word-break: break-all;
+}
+
 .category {
+  align-self: flex-start;
   border-radius: var(--BORDER-RADIUS);
   background: #6c6c6c69;
   font-weight: 400;

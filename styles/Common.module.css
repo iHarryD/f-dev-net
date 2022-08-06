@@ -55,6 +55,7 @@
 
 .styledDropdown {
   border-radius: var(--BORDER-RADIUS);
+  cursor: pointer;
   font-size: var(--SMALL-FONT-SIZE);
   padding: 5px 10px;
 }
