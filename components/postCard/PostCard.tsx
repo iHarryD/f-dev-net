@@ -22,6 +22,7 @@ import { useEffect, useRef, useState } from "react";
 import CommentBox from "../commentBox/CommentBox";
 import {
   deletePost,
+  getPost,
   likePost,
   postComment,
   toggleComments,
@@ -47,26 +48,13 @@ import Image from "next/image";
 import PostCategoryDropdown from "../postCategoryDropdown/PostCategoryDropdown";
 import { isImage } from "../../helpers/isImage";
 import { ButtonSyncLoader } from "../buttonLoaders/ButtonLoaders";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { extractErrorMessage } from "../../helpers/extractErrorMessage";
 import { toastEmitterConfig } from "../../data/toastEmitterConfig";
 import Tippy from "@tippyjs/react";
 
-export default function PostCard({
-  details: {
-    _id,
-    caption,
-    category,
-    comments,
-    commentsActive,
-    likes,
-    media,
-    postedBy,
-    lastModified,
-  },
-}: {
-  details: Post;
-}) {
+export default function PostCard({ details }: { details: Post }) {
+  const [post, setPost] = useState<Post>(details);
   const { user } = useSelector((state: RootState) => state.userSlice);
   const [isPostingComment, setIsPostingComment] = useState<boolean>(false);
   const commentInputRef = useRef<HTMLInputElement | null>(null);
@@ -77,28 +65,30 @@ export default function PostCard({
   const dispatch = useDispatch<AppDispatch>();
   const [inEditMode, setInEditMode] = useState<boolean>(false);
   const postCategoryDropdownRef = useRef<HTMLSelectElement | null>(null);
-  const [currentMedia, setCurrentMedia] = useState<string | File | null>(media);
+  const [currentMedia, setCurrentMedia] = useState<string | File | null>(
+    details.media
+  );
   const updateCaptionInputRef = useRef<HTMLInputElement | null>(null);
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
   useEffect(() => {
-    setIsBookmarked(user ? user.savedPosts.includes(_id) : false);
+    setIsBookmarked(user ? user.savedPosts.includes(details._id) : false);
   }, [user]);
 
   function handleLikePost() {
     if (user === null) return;
-    dispatch(like({ postID: _id, username: user.username }));
-    likePost(_id, setIsLiking, undefined, (err) => {
-      dispatch(unlike({ postID: _id, username: user!.username }));
+    dispatch(like({ postID: post._id, username: user.username }));
+    likePost(post._id, setIsLiking, undefined, (err) => {
+      dispatch(unlike({ postID: post._id, username: user!.username }));
       toast.error(extractErrorMessage(err), toastEmitterConfig);
     });
   }
 
   function handleUnlikePost() {
     if (user === null) return;
-    dispatch(unlike({ postID: _id, username: user.username }));
-    unlikePost(_id, setIsLiking, undefined, (err) => {
-      dispatch(like({ postID: _id, username: user!.username }));
+    dispatch(unlike({ postID: post._id, username: user.username }));
+    unlikePost(post._id, setIsLiking, undefined, (err) => {
+      dispatch(like({ postID: post._id, username: user!.username }));
       toast.error(extractErrorMessage(err), toastEmitterConfig);
     });
   }
@@ -107,7 +97,7 @@ export default function PostCard({
     if (user === null) return;
     setIsBookmarked(true);
     addToBookmark(
-      _id,
+      post._id,
       setIsBookmarking,
       () => dispatch(updateUser()),
       (err) => {
@@ -120,7 +110,7 @@ export default function PostCard({
     if (user === null) return;
     setIsBookmarked(false);
     removeFromBookmark(
-      _id,
+      post._id,
       setIsBookmarking,
       () => dispatch(updateUser()),
       (err) => {
@@ -134,10 +124,10 @@ export default function PostCard({
     if (!commentInputRef.current?.value.replaceAll(" ", "")) return;
     postComment(
       commentInputRef.current.value,
-      _id,
+      post._id,
       setIsPostingComment,
       (result) => {
-        dispatch(syncPost(_id));
+        dispatch(syncPost(post._id));
         commentInputRef.current!.value = "";
       },
       (err) => {
@@ -148,10 +138,10 @@ export default function PostCard({
 
   function handleDeletePost() {
     deletePost(
-      _id,
+      post._id,
       undefined,
       (result) => {
-        dispatch(deletePostAction({ postID: _id }));
+        dispatch(deletePostAction({ postID: post._id }));
       },
       (err) => {
         toast.error(extractErrorMessage(err), toastEmitterConfig);
@@ -164,15 +154,15 @@ export default function PostCard({
       const updatedPostData: UpdatePost = {};
       if (
         updateCaptionInputRef.current.value.replaceAll(" ", "") &&
-        updateCaptionInputRef.current.value !== caption
+        updateCaptionInputRef.current.value !== post.caption
       ) {
         updatedPostData.caption = updateCaptionInputRef.current.value;
       }
-      if (postCategoryDropdownRef.current.value !== category) {
+      if (postCategoryDropdownRef.current.value !== post.category) {
         updatedPostData.category = postCategoryDropdownRef.current
           .value as PostCategories;
       }
-      if (currentMedia !== media) {
+      if (currentMedia !== post.media) {
         if (currentMedia) {
           if (typeof currentMedia !== "string") {
             updatedPostData.media = currentMedia;
@@ -182,11 +172,12 @@ export default function PostCard({
         }
       }
       updatePost(
-        _id,
+        post._id,
         updatedPostData,
         setIsUpdating,
         (result) => {
           setInEditMode(false);
+          setPost(result.data.data);
         },
         (err) => {
           toast.error(extractErrorMessage(err), toastEmitterConfig);
@@ -202,17 +193,17 @@ export default function PostCard({
           <div className={postCardStyles.postingAccountDetailsContainer}>
             <div>
               <img
-                src={postedBy.image}
-                alt={postedBy.username}
+                src={post.postedBy.image}
+                alt={post.postedBy.username}
                 className={postCardStyles.profilePicturePreview}
               />
             </div>
             <div>
-              <p>{postedBy.name}</p>
-              <UsernameLink username={postedBy.username} />
+              <p>{post.postedBy.name}</p>
+              <UsernameLink username={post.postedBy.username} />
             </div>
           </div>
-          {user?.username === postedBy.username && (
+          {user?.username === post.postedBy.username && (
             <div>
               <Tooltip
                 tooltipItems={[
@@ -231,14 +222,17 @@ export default function PostCard({
                   {
                     tooltipChild: (
                       <span>
-                        {commentsActive ? "Disable" : "Enable"} comments
+                        {post.commentsActive ? "Disable" : "Enable"} comments
                       </span>
                     ),
                     tooltipOnClickHandler: () =>
                       toggleComments(
-                        _id,
+                        post._id,
                         undefined,
-                        (result) => dispatch(syncPost(_id)),
+                        (result) => {
+                          dispatch(syncPost(post._id));
+                          setPost(result.data.data);
+                        },
                         (err) =>
                           toast.error(
                             extractErrorMessage(err),
@@ -305,9 +299,9 @@ export default function PostCard({
             </label>
           )
         ) : (
-          media && (
+          post.media && (
             <div className={postCardStyles.postMediaContainer}>
-              <Image src={media} alt={media} layout="fill" />
+              <Image src={post.media} alt={post.media} layout="fill" />
             </div>
           )
         )}
@@ -318,7 +312,7 @@ export default function PostCard({
                 <>
                   <input
                     ref={updateCaptionInputRef}
-                    defaultValue={caption}
+                    defaultValue={post.caption}
                     className={postCardStyles.updateCaptionInput}
                   />
                   <PostCategoryDropdown
@@ -328,13 +322,15 @@ export default function PostCard({
                 </>
               ) : (
                 <>
-                  <span className={postCardStyles.caption}>{caption}</span>
-                  <span className={postCardStyles.category}>{category}</span>
+                  <span className={postCardStyles.caption}>{post.caption}</span>
+                  <span className={postCardStyles.category}>
+                    {post.category}
+                  </span>
                 </>
               )}
             </div>
             <span className={postCardStyles.postAge}>
-              {new Date(lastModified).toLocaleDateString()}
+              {new Date(post.lastModified).toLocaleDateString()}
             </span>
           </div>
           {inEditMode && (
@@ -357,41 +353,42 @@ export default function PostCard({
           )}
           <div className={postCardStyles.actionBar}>
             <div>
-              {(user ? likes.includes(user.username) : false) ? (
+              {(user ? post.likes.includes(user.username) : false) ? (
                 <button
-                  title={String(likes.length)}
+                  title={String(post.likes.length)}
                   disabled={isLiking}
                   className={buttonsStyles.buttonWithBadge}
                   onClick={() => handleUnlikePost()}
                 >
                   <FontAwesomeIcon icon={faSHeart} color="#fd3b3b" />
                   <span
-                    title={String(likes.length)}
+                    title={String(post.likes.length)}
                     className={buttonsStyles.buttonBadge}
                   >
-                    {likes.length}
+                    {post.likes.length}
                   </span>
                 </button>
               ) : (
                 <button
-                  title={String(likes.length)}
+                  title={String(post.likes.length)}
                   disabled={isLiking}
                   className={buttonsStyles.buttonWithBadge}
                   onClick={() => handleLikePost()}
                 >
                   <FontAwesomeIcon icon={faRHeart} />
                   <span
-                    title={String(likes.length)}
+                    title={String(post.likes.length)}
                     className={buttonsStyles.buttonBadge}
                   >
-                    {likes.length}
+                    {post.likes.length}
                   </span>
                 </button>
               )}
               <button
-                title={String(comments.length)}
+                title={String(post.comments.length)}
                 onClick={() => {
-                  if (comments.length) setIsCommentBoxOpen((prev) => !prev);
+                  if (post.comments.length)
+                    setIsCommentBoxOpen((prev) => !prev);
                 }}
               >
                 <FontAwesomeIcon icon={faComment} />
@@ -421,23 +418,25 @@ export default function PostCard({
             </div>
           </div>
           <div className={postCardStyles.latestCommentsPreviewContainer}>
-            {comments.length === 0 ? (
+            {post.comments.length === 0 ? (
               <p>No comments</p>
-            ) : isCommentBoxOpen && comments.length > 2 ? (
-              <CommentBox comments={comments} />
+            ) : isCommentBoxOpen && post.comments.length > 2 ? (
+              <CommentBox comments={post.comments} />
             ) : (
-              comments.slice(0, comments.length >= 2 ? 2 : 1).map((comment) => (
-                <div
-                  key={comment._id}
-                  className={postCardStyles.latestCommentPreview}
-                >
-                  <span>{comment.postedBy}: </span>
-                  <span>{comment.comment}</span>
-                </div>
-              ))
+              post.comments
+                .slice(0, post.comments.length >= 2 ? 2 : 1)
+                .map((comment) => (
+                  <div
+                    key={comment._id}
+                    className={postCardStyles.latestCommentPreview}
+                  >
+                    <span>{comment.postedBy}: </span>
+                    <span>{comment.comment}</span>
+                  </div>
+                ))
             )}
           </div>
-          {comments.length > 2 && (
+          {post.comments.length > 2 && (
             <button
               className={buttonsStyles.textButton}
               onClick={() => setIsCommentBoxOpen((prev) => !prev)}
@@ -445,7 +444,7 @@ export default function PostCard({
               {isCommentBoxOpen ? "Hide" : "Show all"} comments
             </button>
           )}
-          {commentsActive ? (
+          {post.commentsActive ? (
             <div className={postCardStyles.commentActionBar}>
               <input
                 ref={commentInputRef}
