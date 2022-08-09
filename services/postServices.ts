@@ -25,7 +25,7 @@ export async function getPosts(
   try {
     if (loadingState) loadingState(true);
     const result = await baseAxiosInstance().get(
-      `/posts?sort=${sortedBy}${filterBy ? `&filter:${filterBy}` : ""}${
+      `/posts?sort=${sortedBy}${filterBy ? `&filter=${filterBy}` : ""}${
         user ? `&user=${user}` : ""
       }${userRelationQuery ? `&relation=${userRelationQuery}` : ""}`
     );
@@ -191,7 +191,7 @@ export async function toggleComments(
   postID: string,
   loadingState?: Dispatch<SetStateAction<boolean>>,
   successCallback?: (
-    result: AxiosResponse<{ message: string; data: null }>
+    result: AxiosResponse<{ message: string; data: Post }>
   ) => void,
   failureCallback?: (err: unknown) => void
 ) {
