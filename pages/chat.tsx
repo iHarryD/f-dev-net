@@ -14,7 +14,9 @@ export default function Chat() {
         src="https://assets8.lottiefiles.com/private_files/lf30_y9czxcb9.json"
         style={{ height: "300px", width: "300px" }}
       ></Player>
-      <div>Chat feature would be added soon. Keep coming back.</div>
+      <div>
+        Migrating from Socket.io to Pusher due to Vercel incompatibility.
+      </div>
     </div>
   ) : (
     <PrivateRouteAlert />
