@@ -9,11 +9,12 @@
   color: #fff;
   flex-direction: column;
   font-size: 0.9rem;
-  margin: 1rem;
-  min-width: 12rem;
+  min-width: 10rem;
+  max-width: 15rem;
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 100%;
+  right: 100%;
+  width: max-content;
 }
 
 .tooltipMenuItem {

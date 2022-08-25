@@ -8,16 +8,16 @@
 }
 
 .connectionContainer {
-  align-items: center;
-  border-bottom: 1px solid #0003;
-  display: flex;
-  justify-content: space-between;
-  padding: var(--MIN-PADDING);
+  background: #0001;
+  border-radius: var(--BORDER-RADIUS);
+  cursor: pointer;
+  padding: var(--MIN-PADDING) var(--MEDIUM-PADDING);
+  transition: all 150ms ease-in;
   width: 100%;
 }
 
-.connectionStatus {
-  font-weight: 600;
+.connectionContainer:hover {
+  transform: scale(1.015);
 }
 
 .username {
@@ -36,10 +36,32 @@
   margin-left: auto;
 }
 
+.connectionUserDetails {
+  align-items: center;
+  display: flex;
+  gap: var(--MEDIUM-GAP);
+}
+
 .connectionNameUsernameContainer {
   display: flex;
-  flex-direction: column;
-  gap: 5px;
+  gap: var(--MIN-GAP);
+  margin-bottom: 5px;
+}
+
+.connectionStatus {
+  background: #0000;
+  display: block;
+  margin-inline-start: auto;
+  opacity: 0.5;
+  width: fit-content;
+}
+
+.connectionUserBio {
+  display: block;
+  max-width: 40ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .emptyCategoryTextContainer {
@@ -54,4 +76,12 @@
   display: block;
   margin: 0 0 1rem auto;
   text-align: center;
+}
+
+.connectionUserImageContainer {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+  width: 3rem;
 }

@@ -73,15 +73,16 @@ textarea.profileUpdatingInput {
   text-transform: uppercase;
 }
 
+.topButtonsContainer {
+  font-size: 1.2rem;
+  gap: var(--LARGE-GAP);
+}
+
 .profileSectionButtonContainer {
   align-items: flex-end;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-}
-
-.shareProfileButton {
-  font-size: var(--LARGE-FONT-SIZE);
 }
 
 .profilePictureInput {
@@ -136,4 +137,15 @@ textarea.profileUpdatingInput {
   margin: auto;
   padding: 1rem 0;
   width: min(35rem, 100%);
+}
+
+.blockUserText {
+  color: var(--RED-CLR);
+}
+
+.blockUserTooltipItem {
+  align-items: center;
+  display: flex;
+  gap: var(--LARGE-GAP);
+  justify-content: space-between;
 }

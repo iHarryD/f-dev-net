@@ -3,6 +3,12 @@
   opacity: var(--FADED-TEXT-OPACITY);
 }
 
+.horizontalFlexWithGap {
+  align-items: center;
+  display: flex;
+  gap: var(--MEDIUM-GAP);
+}
+
 .authInput {
   border-bottom: 1px solid currentColor;
   padding: var(--INPUT-PADDING);
@@ -75,6 +81,7 @@
   align-items: center;
   display: flex;
   flex-direction: column;
+  gap: var(--LARGE-GAP);
   margin: 0 var(--HOME-SIDEBARS-WIDTH);
   padding: var(--MEDIUM-PADDING);
 }

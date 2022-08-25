@@ -73,8 +73,8 @@
 .addCommentInput {
   background: var(--SECONDARY-BACKGROUND-CLR);
   color: var(--SECONDARY-FONT-CLR);
-  padding: 0.5rem 0;
-  width: 100%;
+  flex-grow: 1;
+  padding: var(--MIN-PADDING) 0;
 }
 
 .commentButton {
@@ -86,7 +86,7 @@
 
 .commentActionBar {
   display: flex;
-  gap: (--MEDIUM-GAP);
+  gap: var(--MEDIUM-GAP);
 }
 
 .postAge {
