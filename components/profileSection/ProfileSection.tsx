@@ -413,7 +413,10 @@ export default function ProfileSection() {
               <Posts posts={user.posts} user={user.username} />
             )}
             {userDetailCategory === UserDetailCategories.CONNECTIONS && (
-              <Connections connections={user.connections} isAdmin={isAdmin} />
+              <Connections
+                connections={user.connections}
+                isAdmin={isAdmin as false}
+              />
             )}
             {userDetailCategory === UserDetailCategories.BADGES && (
               <Badges badges={[]} />
