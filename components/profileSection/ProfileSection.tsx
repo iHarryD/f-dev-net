@@ -2,12 +2,18 @@ import profileSectionStyles from "./ProfileSection.module.css";
 import buttonsStyles from "../../styles/Buttons.module.css";
 import commonStyles from "../../styles/Common.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faShareNodes } from "@fortawesome/free-solid-svg-icons";
+import {
+  faExclamationCircle,
+  faShareNodes,
+} from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import {
   Connection,
   ConnectionStatus,
+  OwnConnection,
+  Post,
+  User,
   UserWithStats,
 } from "../../interfaces/Common.interface";
 import ConnectionButton from "../connectionButton/ConnectionButton";
@@ -29,11 +35,22 @@ import { toastEmitterConfig } from "../../data/toastEmitterConfig";
 import { extractErrorMessage } from "../../helpers/extractErrorMessage";
 import { toast } from "react-toastify";
 import Tippy from "@tippyjs/react";
+import Tooltip from "../tooltip/Tooltip";
+import {
+  addToBlacklist,
+  removeFromBlacklist,
+} from "../../services/blacklistServices";
 
 enum UserDetailCategories {
   BADGES = "BADGES",
   CONNECTIONS = "CONNECTIONS",
   POSTS = "POSTS",
+}
+
+interface OtherUser extends User {
+  badges: string[];
+  connections: Connection[];
+  posts: Post[];
 }
 
 export default function ProfileSection() {
@@ -44,7 +61,7 @@ export default function ProfileSection() {
     (state: RootState) => state.userSlice
   );
   const dispatch = useDispatch<AppDispatch>();
-  const [user, setUser] = useState<UserWithStats | null>(null);
+  const [user, setUser] = useState<UserWithStats | OtherUser | null>(null);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const nameInputRef = useRef<HTMLInputElement | null>(null);
   const bioInputRef = useRef<HTMLTextAreaElement | null>(null);
@@ -58,36 +75,25 @@ export default function ProfileSection() {
   const [isLinkCopiedTippyActive, setIsLinkCopiedTippyActive] =
     useState<boolean>(false);
   const linkCopiedTippyTimeout = useRef<NodeJS.Timeout | null>(null);
+  const [connectionWithUser, setConnectionWithUser] = useState<
+    OwnConnection | undefined
+  >(undefined);
 
   useEffect(() => {
     if (userQuery && userQuery !== loggedInUser?.username) {
       getUser(userQuery as string, setIsLoading, (result) => {
-        if (result.data.data.username === loggedInUser?.username) {
-          setUser(loggedInUser);
-          setIsAdmin(true);
-          return;
-        }
         if (loggedInUser) {
-          const connectionStatusWithUser = loggedInUser.connections.find(
-            (connection: Connection) =>
-              connection.connectionBetween.includes(result.data.data.username)
+          const connectionWithUser = loggedInUser.connections.find(
+            (connection) =>
+              connection.connectionWith.username === result.data.data.username
           );
-          if (connectionStatusWithUser) {
-            if (connectionStatusWithUser.isActive) {
-              setConnectionStatus(ConnectionStatus.CONNECTED);
-            } else if (
-              connectionStatusWithUser.initiatedBy === loggedInUser.username
-            ) {
-              setConnectionStatus(ConnectionStatus.SENT);
-            } else if (
-              connectionStatusWithUser.initiatedBy === result.data.data.username
-            ) {
-              setConnectionStatus(ConnectionStatus.PENDING);
-            } else {
-              setConnectionStatus(ConnectionStatus.NULL);
-            }
-          }
-          setUser(result.data.data);
+          setConnectionWithUser(connectionWithUser);
+          evaluateConnectionStatus(
+            connectionWithUser,
+            loggedInUser.username,
+            result.data.data.username
+          );
+          setUser(result.data.data as OtherUser);
           setIsAdmin(false);
         }
       });
@@ -102,7 +108,41 @@ export default function ProfileSection() {
         clearTimeout(linkCopiedTippyTimeout.current);
       }
     };
-  }, [userQuery, loggedInUser]);
+  }, [userQuery]);
+
+  useEffect(() => {
+    if (loggedInUser && user && loggedInUser.username !== user.username) {
+      const connectionWithUser = loggedInUser.connections.find(
+        (connection) => connection.connectionWith.username === user.username
+      );
+      setConnectionWithUser(connectionWithUser);
+      evaluateConnectionStatus(
+        connectionWithUser,
+        loggedInUser.username,
+        user.username
+      );
+    }
+  }, [loggedInUser]);
+
+  function evaluateConnectionStatus(
+    connection: OwnConnection | undefined,
+    loggedInUserUsername: string,
+    otherUserUsername: string
+  ) {
+    if (connection) {
+      if (connection.isActive) {
+        setConnectionStatus(ConnectionStatus.CONNECTED);
+      } else if (connection.initiatedBy === loggedInUserUsername) {
+        setConnectionStatus(ConnectionStatus.SENT);
+      } else if (connection.initiatedBy === otherUserUsername) {
+        setConnectionStatus(ConnectionStatus.PENDING);
+      } else {
+        setConnectionStatus(ConnectionStatus.NULL);
+      }
+    } else {
+      setConnectionStatus(ConnectionStatus.NULL);
+    }
+  }
 
   async function handleUpdateUser() {
     if (nameInputRef.current === null || bioInputRef.current === null) return;
@@ -119,6 +159,20 @@ export default function ProfileSection() {
       () => dispatch(updateUser()),
       (err) => toast.error(extractErrorMessage(err), toastEmitterConfig)
     );
+  }
+
+  function handleAddToBlacklist() {
+    if (user && loggedInUser) {
+      addToBlacklist(user.username, undefined, () => dispatch(updateUser()));
+    }
+  }
+
+  function handleRemoveFromBlacklist() {
+    if (user && loggedInUser) {
+      removeFromBlacklist(user.username, undefined, () => {
+        dispatch(updateUser());
+      });
+    }
   }
 
   return (
@@ -199,6 +253,7 @@ export default function ProfileSection() {
                 >
                   <label htmlFor="name">Name</label>
                   <input
+                    disabled={!isAdmin}
                     ref={nameInputRef}
                     defaultValue={user.name}
                     id="name"
@@ -213,6 +268,7 @@ export default function ProfileSection() {
                 >
                   <label htmlFor="bio">Bio</label>
                   <textarea
+                    disabled={!isAdmin}
                     ref={bioInputRef}
                     defaultValue={user.bio}
                     id="bio"
@@ -224,41 +280,91 @@ export default function ProfileSection() {
               <div
                 className={profileSectionStyles.profileSectionButtonContainer}
               >
-                <Tippy content="link copied" visible={isLinkCopiedTippyActive}>
-                  <button
-                    className={profileSectionStyles.shareProfileButton}
-                    onClick={() => {
-                      navigator.clipboard.writeText(
-                        `${window.location.origin}/profile?username=${user.username}`
-                      );
-                      setIsLinkCopiedTippyActive(true);
-                      linkCopiedTippyTimeout.current = setTimeout(() => {
-                        setIsLinkCopiedTippyActive(false);
-                      }, 1000);
-                    }}
-                    onMouseOut={() => {
-                      if (isLinkCopiedTippyActive) {
-                        setIsLinkCopiedTippyActive(false);
-                        if (linkCopiedTippyTimeout.current) {
-                          clearTimeout(linkCopiedTippyTimeout.current);
-                        }
-                      }
-                    }}
+                <div
+                  className={`${commonStyles.horizontalFlexWithGap} ${profileSectionStyles.topButtonsContainer}`}
+                >
+                  <Tippy
+                    content="link copied"
+                    visible={isLinkCopiedTippyActive}
                   >
-                    <FontAwesomeIcon icon={faShareNodes} />
-                  </button>
-                </Tippy>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(
+                          `${window.location.origin}/profile?username=${user.username}`
+                        );
+                        setIsLinkCopiedTippyActive(true);
+                        linkCopiedTippyTimeout.current = setTimeout(() => {
+                          setIsLinkCopiedTippyActive(false);
+                        }, 1000);
+                      }}
+                      onMouseOut={() => {
+                        if (isLinkCopiedTippyActive) {
+                          setIsLinkCopiedTippyActive(false);
+                          if (linkCopiedTippyTimeout.current) {
+                            clearTimeout(linkCopiedTippyTimeout.current);
+                          }
+                        }
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faShareNodes} />
+                    </button>
+                  </Tippy>
+                  {isAdmin === false && loggedInUser && (
+                    <Tooltip
+                      tooltipItems={[
+                        {
+                          tooltipChild: (
+                            <div
+                              className={
+                                profileSectionStyles.blockUserTooltipItem
+                              }
+                            >
+                              <span
+                                className={profileSectionStyles.blockUserText}
+                              >
+                                {`${
+                                  loggedInUser.blacklist.includes(user.username)
+                                    ? "Unblock"
+                                    : "Block"
+                                } ${user.username}`}
+                              </span>
+                              <Tippy content="blocked users won't be able to send you connection requests">
+                                <span>
+                                  <FontAwesomeIcon icon={faExclamationCircle} />
+                                </span>
+                              </Tippy>
+                            </div>
+                          ),
+                          tooltipOnClickHandler:
+                            loggedInUser.blacklist.includes(user.username)
+                              ? () => handleRemoveFromBlacklist()
+                              : () => handleAddToBlacklist(),
+                        },
+                      ]}
+                    />
+                  )}
+                </div>
                 {isAdmin ? (
                   <button
-                    className={buttonsStyles.primaryButton}
+                    className={buttonsStyles.secondaryButton}
                     onClick={() => handleUpdateUser()}
                   >
                     Update
                   </button>
+                ) : loggedInUser?.blacklist.includes(user.username) ? (
+                  <button
+                    className={buttonsStyles.secondaryButton}
+                    onClick={() => handleRemoveFromBlacklist()}
+                  >
+                    Unblock
+                  </button>
                 ) : (
                   <ConnectionButton
+                    connectionID={
+                      connectionWithUser ? connectionWithUser._id : undefined
+                    }
                     connectionStatus={connectionStatus}
-                    user={user}
+                    username={user.username}
                   />
                 )}
               </div>
@@ -307,10 +413,7 @@ export default function ProfileSection() {
               <Posts posts={user.posts} user={user.username} />
             )}
             {userDetailCategory === UserDetailCategories.CONNECTIONS && (
-              <Connections
-                connections={user.connections}
-                loggedInUser={user.username}
-              />
+              <Connections connections={user.connections} isAdmin={isAdmin} />
             )}
             {userDetailCategory === UserDetailCategories.BADGES && (
               <Badges badges={[]} />
