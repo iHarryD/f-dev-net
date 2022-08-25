@@ -44,7 +44,8 @@ export interface User {
 
 export interface UserWithStats extends User {
   badges: string[];
-  connections: Connection[];
+  blacklist: string[];
+  connections: OwnConnection[];
   posts: Post[];
   savedPosts: string[];
 }
@@ -97,7 +98,18 @@ export interface ChatPreview {
 }
 
 export interface Connection {
-  connectionBetween: string[];
+  connectionWith: User;
+}
+
+export interface OwnConnection extends Connection {
+  _id: string;
+  initiatedBy: string;
+  isActive: boolean;
+}
+
+export interface ConnectionInDatabase {
+  _id: string;
+  connectionBetween: [User, User];
   initiatedBy: string;
   isActive: boolean;
   timestamp: Date;

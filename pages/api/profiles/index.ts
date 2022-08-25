@@ -8,6 +8,7 @@ import Cors from "cors";
 import corsMiddleware from "../../../helpers/corsMiddleware";
 import verifyToken from "../../../helpers/verifyToken";
 import { RequestWithUser } from "../../../interfaces/Common.type";
+import { ConnectionInDatabase } from "../../../interfaces/Common.interface";
 
 const cors = Cors({
   methods: ["GET", "PATCH"],
@@ -41,10 +42,14 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
           .db()
           .collection("badges")
           .find({ givenTo: req.user });
+        const blacklist = await connection.clientPromise
+          .db()
+          .collection("blacklists")
+          .findOne({ belongsTo: req.user });
         const connections = connection.clientPromise
           .db()
           .collection("connections")
-          .find({ connectionBetween: { $in: [req.user] } });
+          .find({ connectionBetween: { $elemMatch: { username: req.user } } });
         const posts = connection.clientPromise
           .db()
           .collection("posts")
@@ -53,10 +58,21 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
           .db()
           .collection("bookmarks")
           .findOne({ belongsTo: req.user });
+        const simplifiedConnections = (await cursorToDoc(connections)).map(
+          (connection: ConnectionInDatabase) => ({
+            _id: connection._id,
+            connectionWith: connection.connectionBetween.find(
+              (user) => user.username !== req.user
+            ),
+            initiatedBy: connection.initiatedBy,
+            isActive: connection.isActive,
+          })
+        );
         const userDetails = {
           ...userDoc,
           badges: await cursorToDoc(badges),
-          connections: await cursorToDoc(connections),
+          blacklist: blacklist ? blacklist.blacklist : [],
+          connections: simplifiedConnections,
           savedPosts: savedPosts ? savedPosts.savedPosts : [],
           posts: await cursorToDoc(posts),
         };
@@ -77,13 +93,53 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
         const updatedUser = await connection.clientPromise
           .db()
           .collection("users")
-          .updateOne(
+          .findOneAndUpdate(
             { username: req.user },
             {
               $set: updates,
+            },
+            { returnDocument: "after" }
+          );
+        if (updatedUser.value === null) {
+          return res
+            .status(404)
+            .json({ message: "User not found.", data: null });
+        }
+        await connection.clientPromise
+          .db()
+          .collection("posts")
+          .updateMany(
+            { "postedBy.username": req.user },
+            {
+              $set: {
+                "postedBy.image": updatedUser.value.image,
+                "postedBy.name": updatedUser.value.name,
+              },
             }
           );
-        return res.json({ message: "Profile updated.", data: updatedUser });
+        await connection.clientPromise
+          .db()
+          .collection("connections")
+          .updateMany(
+            { connectionBetween: { $elemMatch: { username: req.user } } },
+            {
+              $set: {
+                "connectionBetween.$[own]": {
+                  name: updatedUser.value.name,
+                  username: updatedUser.value.username,
+                  bio: updatedUser.value.bio,
+                  image: updatedUser.value.image,
+                },
+              },
+            },
+            {
+              arrayFilters: [{ "own.username": req.user }],
+            }
+          );
+        return res.json({
+          message: "Profile updated.",
+          data: updatedUser.value,
+        });
       default:
         return res.status(404).json({
           message: "Requested method is not allowed at this endpoint.",

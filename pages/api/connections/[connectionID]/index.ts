@@ -7,7 +7,7 @@ import verifyToken from "../../../../helpers/verifyToken";
 import { RequestWithUser } from "../../../../interfaces/Common.type";
 
 const cors = Cors({
-  methods: ["GET", "POST"],
+  methods: ["PATCH", "DELETE"],
   credentials: true,
   origin: ["http://localhost:3000", "https://roc8-dev-net.vercel.app"],
 });
@@ -38,9 +38,7 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
           .updateOne(
             {
               _id: new ObjectId(connectionID as string),
-              connectionBetween: {
-                $all: [req.user, otherUser.username],
-              },
+              connectionBetween: { $elemMatch: { username: req.user } },
               initiatedBy: otherUser.username,
             },
             {
@@ -58,9 +56,7 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
           .collection("connections")
           .findOneAndDelete({
             _id: new ObjectId(connectionID as string),
-            connectionBetween: {
-              $all: [req.user, otherUser.username],
-            },
+            connectionBetween: { $elemMatch: { username: req.user } },
           });
         return res
           .status(200)
