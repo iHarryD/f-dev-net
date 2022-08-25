@@ -23,28 +23,6 @@ export async function getUser(
   }
 }
 
-export async function findUsers(
-  query: string,
-  loadingState?: Dispatch<SetStateAction<boolean>>,
-  successCallback?: (
-    result: AxiosResponse<{
-      message: string;
-      data: User[];
-    }>
-  ) => void,
-  failureCallback?: (err: unknown) => void
-) {
-  try {
-    if (loadingState) loadingState(true);
-    const result = await baseAxiosInstance().get(`/users?username=${query}`);
-    if (successCallback) successCallback(result);
-  } catch (err) {
-    if (failureCallback) failureCallback(err);
-  } finally {
-    if (loadingState) loadingState(false);
-  }
-}
-
 export async function updateUser(
   updatedUserDetails: {
     name: string;

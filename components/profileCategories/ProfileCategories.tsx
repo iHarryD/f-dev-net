@@ -1,18 +1,18 @@
 import {
   Connection,
+  OwnConnection,
   Post,
   PostSortingOptions,
   UserPostFilter,
 } from "../../interfaces/Common.interface";
 import PostCard from "../postCard/PostCard";
 import categoriesStyles from "./ProfileCategories.module.css";
-import UsernameLink from "../usernameLink/UsernameLink";
 import commonStyles from "../../styles/Common.module.css";
 import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store";
 import { getPosts } from "../../services/postServices";
 import MoonLoader from "react-spinners/MoonLoader";
+import Image from "next/image";
+import Link from "next/link";
 
 export function Posts({ posts, user }: { posts: Post[]; user: string }) {
   const [activePostFilter, setActivePostFilter] = useState<UserPostFilter>(
@@ -66,59 +66,46 @@ enum ConnectionFilter {
   PENDING = "pending",
 }
 
-interface SimplifiedConnection {
-  status: boolean;
-  user: string;
-}
+type MyConnections = {
+  connections: OwnConnection[];
+  isAdmin: true;
+};
 
-export function Connections({
-  connections,
-  loggedInUser,
-}: {
-  connections: Connection[];
-  loggedInUser: string;
-}) {
+type ElseConnections = { connections: Connection[]; isAdmin: false };
+
+type IConnections = MyConnections | ElseConnections;
+
+export function Connections(props: IConnections) {
   const [activeConnectionFilter, setActiveConnectionFilter] =
     useState<ConnectionFilter>(ConnectionFilter.ALL);
-  const [filteredConnections, setFilteredConnections] = useState<
-    SimplifiedConnection[]
-  >(simplifyConnection(connections));
-  const { user } = useSelector((state: RootState) => state.userSlice);
-
-  function simplifyConnection(
-    connections: Connection[]
-  ): SimplifiedConnection[] {
-    return connections.map((connection) => {
-      return {
-        user: connection.connectionBetween.find(
-          (user) => user !== loggedInUser
-        ) as string,
-        status: connection.isActive,
-      };
-    });
-  }
+  const [filteredConnections, setFilteredConnections] = useState(
+    props.connections
+  );
 
   useEffect(() => {
+    if (props.isAdmin === false) return;
     if (activeConnectionFilter === ConnectionFilter.ACTIVE) {
-      const filtered = connections.filter((connection) => connection.isActive);
-      setFilteredConnections(simplifyConnection(filtered));
+      const filtered = props.connections.filter(
+        (connection) => connection.isActive
+      );
+      setFilteredConnections(filtered);
     } else if (activeConnectionFilter === ConnectionFilter.PENDING) {
-      const filtered = connections.filter(
+      const filtered = props.connections.filter(
         (connection) => connection.isActive === false
       );
-      setFilteredConnections(simplifyConnection(filtered));
+      setFilteredConnections(filtered);
     } else {
-      setFilteredConnections(simplifyConnection(connections));
+      setFilteredConnections(props.connections);
     }
   }, [activeConnectionFilter, filteredConnections]);
 
-  return connections.length === 0 ? (
+  return props.connections.length === 0 ? (
     <p className={categoriesStyles.emptyCategoryTextContainer}>
       No connections.
     </p>
   ) : (
     <>
-      {user?.username === loggedInUser && (
+      {props.isAdmin && (
         <select
           value={activeConnectionFilter}
           className={`${commonStyles.styledDropdown} ${categoriesStyles.categoryFilterDropdown}`}
@@ -133,20 +120,38 @@ export function Connections({
       )}
       <div className={categoriesStyles.connectionsContainer}>
         {filteredConnections.map((connection) => (
-          <div
-            className={categoriesStyles.connectionContainer}
-            key={connection.user}
+          <Link
+            key={connection.connectionWith.username}
+            href={`/profile?username=${connection.connectionWith.username}`}
           >
-            <div className={categoriesStyles.connectionNameUsernameContainer}>
-              <UsernameLink username={connection.user as string} />
+            <div
+              className={categoriesStyles.connectionContainer}
+              key={connection.connectionWith.username}
+            >
+              <div className={categoriesStyles.connectionUserDetails}>
+                <div className={categoriesStyles.connectionUserImageContainer}>
+                  {connection.connectionWith.image && (
+                    <Image
+                      src={connection.connectionWith.image}
+                      alt={connection.connectionWith.username}
+                      layout="fill"
+                    />
+                  )}
+                </div>
+                <div>
+                  <div
+                    className={categoriesStyles.connectionNameUsernameContainer}
+                  >
+                    <span>{connection.connectionWith.name}</span>
+                    <span className={categoriesStyles.username}>
+                      {connection.connectionWith.username}
+                    </span>
+                  </div>
+                  <span>{connection.connectionWith.bio}</span>
+                </div>
+              </div>
             </div>
-            <span>
-              status:{" "}
-              <span className={categoriesStyles.connectionStatus}>
-                {connection.status ? "connected" : "pending"}
-              </span>
-            </span>
-          </div>
+          </Link>
         ))}
       </div>
     </>

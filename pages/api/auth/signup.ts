@@ -17,7 +17,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   await corsMiddleware(req, res, cors);
   const {
     method,
-    body: { username, password, email, name },
+    body: { username, password, email },
   } = req;
   try {
     switch (method) {
@@ -50,11 +50,20 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           .collection("users")
           .insertOne({
             ...req.body,
-            bio: "",
-            image: "",
+            bio: "Hi, I am new here.",
+            image:
+              "https://res.cloudinary.com/iharrycld/image/upload/v1660116409/devnet/pngegg_ftbgtu.png",
             password: encryptedPassword,
             timestamp: new Date(),
           });
+        await mongodbConnection
+          .db()
+          .collection("blacklists")
+          .insertOne({ belongsTo: username, blacklist: [] });
+        await mongodbConnection
+          .db()
+          .collection("bookmarks")
+          .insertOne({ belongsTo: username, savedPosts: [] });
         return res
           .status(200)
           .json({ message: "Successfully registered.", data: newUser });

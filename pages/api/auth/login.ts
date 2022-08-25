@@ -5,6 +5,7 @@ import * as jwt from "jsonwebtoken";
 import Cors from "cors";
 import corsMiddleware from "../../../helpers/corsMiddleware";
 import { cursorToDoc } from "../../../helpers/cursorToDoc";
+import { ConnectionInDatabase } from "../../../interfaces/Common.interface";
 
 const invalidCredentialsMessage = "Invalid credentials.";
 
@@ -42,17 +43,20 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             .db()
             .collection("badges")
             .find({ givenTo: user.username });
+          const blacklist = await mongodbConnection
+            .db()
+            .collection("blacklists")
+            .findOne({ belongsTo: user.username });
           const connections = mongodbConnection
             .db()
             .collection("connections")
             .find({
-              connectionBetween: { $in: [user.username] },
+              connectionBetween: { $elemMatch: { username } },
             });
           const posts = mongodbConnection
             .db()
             .collection("posts")
             .find({ "postedBy.username": user.username });
-
           const savedPosts = await mongodbConnection
             .db()
             .collection("bookmarks")
@@ -61,14 +65,24 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             { user: user.username },
             process.env.JWT_SECRET as string
           );
-
+          const simplifiedConnections = (await cursorToDoc(connections)).map(
+            (connection: ConnectionInDatabase) => ({
+              _id: connection._id,
+              connectionWith: connection.connectionBetween.find(
+                (connection) => connection.username !== user.username
+              ),
+              initiatedBy: connection.initiatedBy,
+              isActive: connection.isActive,
+            })
+          );
           return res.status(200).json({
             message: "Login successful.",
             data: {
               user: {
                 ...user,
                 badges: await cursorToDoc(badges),
-                connections: await cursorToDoc(connections),
+                blacklist: blacklist ? blacklist.blacklist : [],
+                connections: simplifiedConnections,
                 savedPosts: savedPosts ? savedPosts.savedPosts : [],
                 posts: await cursorToDoc(posts),
               },

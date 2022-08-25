@@ -1,6 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
 import commonStyles from "../../styles/Common.module.css";
-import ThirdPartyAuthButtons from "../thirdPartyAuthButtons/ThirdPartyAuthButtons";
 import buttonsStyles from "../../styles/Buttons.module.css";
 import signInFormStyles from "./SignInForm.module.css";
 import { login as loginService, signup } from "../../services/authServices";
@@ -13,7 +12,7 @@ import { useDispatch } from "react-redux";
 import { login } from "../../features/userSlice";
 import Tippy from "@tippyjs/react";
 import useDebounce from "../../hooks/useDebounce";
-import { findUsers } from "../../services/profileServices";
+import { searchUsers } from "../../services/userServices";
 
 const testingCredentials = {
   username: "harry",
@@ -34,7 +33,7 @@ export default function SignInForm() {
 
   useEffect(() => {
     if (authMode === "signup" && username.length) {
-      findUsers(username, undefined, (result) => {
+      searchUsers(username, undefined, (result) => {
         if (result.data.data.find((user) => user.username === username)) {
           setAuthError(`Username '${username}' is taken.`);
         }

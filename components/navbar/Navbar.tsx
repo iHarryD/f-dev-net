@@ -8,13 +8,13 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Logo from "../logo/Logo";
 import { useEffect, useState } from "react";
-import { findUsers } from "../../services/profileServices";
 import { useRouter } from "next/router";
 import useDebounce from "../../hooks/useDebounce";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store";
 import { logout } from "../../features/userSlice";
 import { UserAuthStatus } from "../../interfaces/Common.interface";
+import { searchUsers } from "../../services/userServices";
 
 export function MacroNavbar() {
   const { status } = useSelector((state: RootState) => state.userSlice);
@@ -36,7 +36,7 @@ export function MacroNavbar() {
       setSearchResults([]);
       return;
     }
-    findUsers(debouncedValue, setIsLoading, (result) =>
+    searchUsers(debouncedValue, setIsLoading, (result) =>
       setSearchResults(result.data.data)
     );
   }, [debouncedValue]);
