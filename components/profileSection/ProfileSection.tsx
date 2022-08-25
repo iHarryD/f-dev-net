@@ -40,6 +40,7 @@ import {
   addToBlacklist,
   removeFromBlacklist,
 } from "../../services/blacklistServices";
+import { ButtonSyncLoader } from "../buttonLoaders/ButtonLoaders";
 
 enum UserDetailCategories {
   BADGES = "BADGES",
@@ -78,6 +79,7 @@ export default function ProfileSection() {
   const [connectionWithUser, setConnectionWithUser] = useState<
     OwnConnection | undefined
   >(undefined);
+  const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
   useEffect(() => {
     if (userQuery && userQuery !== loggedInUser?.username) {
@@ -155,7 +157,7 @@ export default function ProfileSection() {
     }
     updateUserService(
       updatedUser,
-      undefined,
+      setIsUpdating,
       () => dispatch(updateUser()),
       (err) => toast.error(extractErrorMessage(err), toastEmitterConfig)
     );
@@ -349,7 +351,7 @@ export default function ProfileSection() {
                     className={buttonsStyles.secondaryButton}
                     onClick={() => handleUpdateUser()}
                   >
-                    Update
+                    {isUpdating ? <ButtonSyncLoader color="#fff" /> : "Update"}
                   </button>
                 ) : loggedInUser?.blacklist.includes(user.username) ? (
                   <button
