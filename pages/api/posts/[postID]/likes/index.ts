@@ -1,4 +1,4 @@
-import { MongoClient, ObjectId } from "mongodb";
+import { MongoClient, ObjectId, PullOperator, SetFields } from "mongodb";
 import { NextApiResponse } from "next";
 import connectToMongoDb from "../../../../../lib/mongodb";
 import Cors from "cors";
@@ -27,25 +27,27 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
         const likedPost = await connection.clientPromise
           .db()
           .collection("posts")
-          .updateOne(
+          .findOneAndUpdate(
             { _id: new ObjectId(postID as string) },
-            { $addToSet: { likes: req.user } }
+            { $addToSet: { likes: req.user } as SetFields<Document> },
+            { returnDocument: "after" }
           );
         return res
           .status(200)
-          .json({ message: "Post liked.", data: likedPost });
+          .json({ message: "Post liked.", data: likedPost.value });
       case "DELETE":
         connection.clientPromise = await (await connectToMongoDb).connect();
         const unlikedPost = await connection.clientPromise
           .db()
           .collection("posts")
-          .updateOne(
+          .findOneAndUpdate(
             { _id: new ObjectId(postID as string) },
-            { $pull: { likes: req.user } }
+            { $pull: { likes: req.user } as PullOperator<Document> },
+            { returnDocument: "after" }
           );
         return res
           .status(200)
-          .json({ message: "Post unliked.", data: unlikedPost });
+          .json({ message: "Post unliked.", data: unlikedPost.value });
       default:
         return res.status(404).json({
           message: "Requested method is not allowed at this endpoint.",

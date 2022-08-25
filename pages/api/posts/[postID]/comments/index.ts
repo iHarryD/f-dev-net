@@ -1,4 +1,4 @@
-import { MongoClient, ObjectId } from "mongodb";
+import { MongoClient, ObjectId, PushOperator } from "mongodb";
 import { NextApiResponse } from "next";
 import connectToMongoDb from "../../../../../lib/mongodb";
 import Cors from "cors";
@@ -37,10 +37,10 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
       case "POST":
         const { comment } = req.body;
         connection.clientPromise = await (await connectToMongoDb).connect();
-        const newComment = await connection.clientPromise
+        const commentedOnPost = await connection.clientPromise
           .db()
           .collection("posts")
-          .updateOne(
+          .findOneAndUpdate(
             { _id: new ObjectId(req.query.postID as string) },
             {
               $push: {
@@ -50,23 +50,15 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
                   timestamp: new Date(),
                   _id: new ObjectId(),
                 },
-              },
-            }
+              } as PushOperator<Document>,
+            },
+
+            { returnDocument: "after" }
           );
-        if (newComment.modifiedCount > 0) {
-          const updatedComments = await connection.clientPromise
-            .db()
-            .collection("posts")
-            .findOne({ _id: new ObjectId(req.query.postID as string) });
-          return res.status(200).json({
-            message: "Comment added.",
-            data: updatedComments?.comments,
-          });
-        } else {
-          return res
-            .status(300)
-            .json({ message: "Could not add comment.", data: null });
-        }
+        return res.status(200).json({
+          message: "Comment added.",
+          data: commentedOnPost.value,
+        });
       case "PATCH":
         connection.clientPromise = await (await connectToMongoDb).connect();
         const updatedPost = await connection.clientPromise
@@ -89,7 +81,7 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
           message: `Comments ${
             updatedPost.value.commentsActive ? "enabled" : "disabled"
           }`,
-          data: null,
+          data: updatedPost.value,
         });
       default:
         return res.status(404).json({

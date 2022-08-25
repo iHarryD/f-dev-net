@@ -4,7 +4,6 @@ import { getImageDataURL } from "../helpers/getImageDataURL";
 import {
   Post,
   PostCategories,
-  PostComment,
   PostSortingOptions,
   UpdatePost,
   UserPostFilter,
@@ -38,9 +37,22 @@ export async function getPosts(
 }
 
 export async function getPost(
-  postID: string
-): Promise<AxiosResponse<{ message: string; data: Post }>> {
-  return await baseAxiosInstance().get(`/posts/${postID}`);
+  postID: string,
+  loadingState?: Dispatch<SetStateAction<boolean>>,
+  successCallback?: (
+    result: AxiosResponse<{ message: string; data: Post }>
+  ) => void,
+  failureCallback?: (err: unknown) => void
+) {
+  try {
+    if (loadingState) loadingState(true);
+    const result = await baseAxiosInstance().get(`/posts/${postID}`);
+    if (successCallback) successCallback(result);
+  } catch (err) {
+    if (failureCallback) failureCallback(err);
+  } finally {
+    if (loadingState) loadingState(false);
+  }
 }
 
 export async function createNewPost(
@@ -151,7 +163,7 @@ export async function postComment(
   postID: string,
   loadingState?: Dispatch<SetStateAction<boolean>>,
   successCallback?: (
-    result: AxiosResponse<{ message: string; data: PostComment[] }>
+    result: AxiosResponse<{ message: string; data: Post }>
   ) => void,
   failureCallback?: (err: unknown) => void
 ) {

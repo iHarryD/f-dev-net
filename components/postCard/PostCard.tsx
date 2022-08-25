@@ -22,7 +22,6 @@ import { useEffect, useRef, useState } from "react";
 import CommentBox from "../commentBox/CommentBox";
 import {
   deletePost,
-  getPost,
   likePost,
   postComment,
   toggleComments,
@@ -30,12 +29,7 @@ import {
   updatePost,
 } from "../../services/postServices";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  like,
-  unlike,
-  deletePost as deletePostAction,
-  syncPost,
-} from "../../features/postSlice";
+import { deletePost as deletePostAction } from "../../features/postSlice";
 import UsernameLink from "../usernameLink/UsernameLink";
 import Tooltip from "../tooltip/Tooltip";
 import {
@@ -76,25 +70,44 @@ export default function PostCard({ details }: { details: Post }) {
   }, [user]);
 
   function handleLikePost() {
-    if (user === null) return;
-    dispatch(like({ postID: post._id, username: user.username }));
-    likePost(post._id, setIsLiking, undefined, (err) => {
-      dispatch(unlike({ postID: post._id, username: user!.username }));
-      toast.error(extractErrorMessage(err), toastEmitterConfig);
-    });
+    if (user === null)
+      return toast.error("You need to login.", toastEmitterConfig);
+    setPost((post) => ({ ...post, likes: [...post.likes, user.username] }));
+    likePost(
+      post._id,
+      setIsLiking,
+      (result) => setPost(result.data.data),
+      (err) => {
+        setPost((post) => ({
+          ...post,
+          likes: post.likes.filter((like) => like !== user.username),
+        }));
+        toast.error(extractErrorMessage(err), toastEmitterConfig);
+      }
+    );
   }
 
   function handleUnlikePost() {
-    if (user === null) return;
-    dispatch(unlike({ postID: post._id, username: user.username }));
-    unlikePost(post._id, setIsLiking, undefined, (err) => {
-      dispatch(like({ postID: post._id, username: user!.username }));
-      toast.error(extractErrorMessage(err), toastEmitterConfig);
-    });
+    if (user === null)
+      return toast.error("You need to login.", toastEmitterConfig);
+    setPost((post) => ({
+      ...post,
+      likes: post.likes.filter((like) => like !== user.username),
+    }));
+    unlikePost(
+      post._id,
+      setIsLiking,
+      (result) => setPost(result.data.data),
+      (err) => {
+        setPost((post) => ({ ...post, likes: [...post.likes, user.username] }));
+        toast.error(extractErrorMessage(err), toastEmitterConfig);
+      }
+    );
   }
 
   function handleBookmarkPost() {
-    if (user === null) return;
+    if (user === null)
+      return toast.error("You need to login.", toastEmitterConfig);
     setIsBookmarked(true);
     addToBookmark(
       post._id,
@@ -107,7 +120,8 @@ export default function PostCard({ details }: { details: Post }) {
     );
   }
   function handleRemoveBookmark() {
-    if (user === null) return;
+    if (user === null)
+      return toast.error("You need to login.", toastEmitterConfig);
     setIsBookmarked(false);
     removeFromBookmark(
       post._id,
@@ -121,14 +135,18 @@ export default function PostCard({ details }: { details: Post }) {
   }
 
   function handlePostComment() {
+    if (user === null)
+      return toast.error("You need to login.", toastEmitterConfig);
     if (!commentInputRef.current?.value.replaceAll(" ", "")) return;
     postComment(
       commentInputRef.current.value,
       post._id,
       setIsPostingComment,
       (result) => {
-        dispatch(syncPost(post._id));
-        commentInputRef.current!.value = "";
+        if (commentInputRef.current) {
+          commentInputRef.current.value = "";
+        }
+        setPost(result.data.data);
       },
       (err) => {
         toast.error(extractErrorMessage(err), toastEmitterConfig);
@@ -142,6 +160,7 @@ export default function PostCard({ details }: { details: Post }) {
       undefined,
       (result) => {
         dispatch(deletePostAction({ postID: post._id }));
+        dispatch(updateUser());
       },
       (err) => {
         toast.error(extractErrorMessage(err), toastEmitterConfig);
@@ -230,7 +249,6 @@ export default function PostCard({ details }: { details: Post }) {
                         post._id,
                         undefined,
                         (result) => {
-                          dispatch(syncPost(post._id));
                           setPost(result.data.data);
                         },
                         (err) =>

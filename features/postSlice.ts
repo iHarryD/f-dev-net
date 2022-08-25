@@ -1,13 +1,8 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { Post, PostComment } from "../interfaces/Common.interface";
+import { createSlice } from "@reduxjs/toolkit";
+import { Post } from "../interfaces/Common.interface";
 import { PayloadAction } from "@reduxjs/toolkit";
-import { getPost } from "../services/postServices";
 
 const initialState: Post[] = [];
-
-export const syncPost = createAsyncThunk("post/update", (postID: string) => {
-  return getPost(postID);
-});
 
 export const postSlice = createSlice({
   name: "post",
@@ -43,19 +38,6 @@ export const postSlice = createSlice({
     deletePost(state, action: PayloadAction<{ postID: string }>) {
       return state.filter((post) => post._id !== action.payload.postID);
     },
-  },
-  extraReducers(builder) {
-    builder.addCase(syncPost.fulfilled, (state, action) => {
-      const indexOfPost = state.findIndex(
-        (post) =>
-          post._id === JSON.parse(JSON.stringify(action.payload.data.data._id))
-      );
-      if (indexOfPost >= 0) {
-        state[indexOfPost] = JSON.parse(
-          JSON.stringify(action.payload.data.data)
-        );
-      }
-    });
   },
 });
 

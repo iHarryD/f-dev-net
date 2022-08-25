@@ -17,7 +17,7 @@ export default function Saved() {
 
   useEffect(() => {
     if (user) {
-      getBookmarkPosts(setIsLoading, (result) => setPosts(result.data.data));
+      getBookmarkPosts(setIsLoading, (result) => setPosts(result.data.data)); // causes re-render
     }
   }, [user]);
 

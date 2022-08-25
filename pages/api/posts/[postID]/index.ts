@@ -1,4 +1,4 @@
-import { MongoClient, ObjectId } from "mongodb";
+import { MongoClient, ObjectId, PullOperator } from "mongodb";
 import { NextApiResponse } from "next";
 import connectToMongoDb from "../../../../lib/mongodb";
 import Cors from "cors";
@@ -42,6 +42,13 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
             _id: new ObjectId(postID as string),
             "postedBy.username": req.user,
           });
+        await connection.clientPromise
+          .db()
+          .collection("bookmarks")
+          .updateMany(
+            { savedPosts: { $in: [postID] } },
+            { $pull: { savedPosts: postID } as PullOperator<Document> }
+          );
         return res.status(200).json({ message: "Post deleted.", data: null });
       case "PATCH":
         const updateQuery: {
@@ -67,16 +74,17 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
         const updatedPost = await connection.clientPromise
           .db()
           .collection("posts")
-          .updateOne(
+          .findOneAndUpdate(
             {
               _id: new ObjectId(postID as string),
               "postedBy.username": req.user,
             },
-            { $set: { ...updateQuery, lastModified: new Date() } }
+            { $set: { ...updateQuery, lastModified: new Date() } },
+            { returnDocument: "after" }
           );
         return res
           .status(200)
-          .json({ message: "Post updated.", data: updatedPost });
+          .json({ message: "Post updated.", data: updatedPost.value });
       default:
         return res.status(404).json({
           message: "Requested method is not allowed at this endpoint.",
