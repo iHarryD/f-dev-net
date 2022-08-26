@@ -108,7 +108,9 @@ export default function Home() {
       <>
         {inMobileView === false && <HomePageSidebar />}
         <div className={commonStyles.pagePostsSection}>
-          {status === UserAuthStatus.AUTHENTICATED && <CreatePost />}
+          {status === UserAuthStatus.AUTHENTICATED && (
+            <CreatePost activeSort={sortedBy} activeFilter={filterBy} />
+          )}
           <div className={commonStyles.chipContainer}>
             <label
               className={`${commonStyles.chip} ${

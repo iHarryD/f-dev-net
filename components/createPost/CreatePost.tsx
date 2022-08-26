@@ -7,11 +7,14 @@ import { faClose, faTrash, faUserTag } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useRef, useState } from "react";
 import { isImage } from "../../helpers/isImage";
 import { useDispatch } from "react-redux";
-import { append } from "../../features/postSlice";
+import { append, refresh } from "../../features/postSlice";
 import GiphyGrid from "../giphyGrid/GiphyGrid";
-import { createNewPost, getPost } from "../../services/postServices";
+import { createNewPost, getPost, getPosts } from "../../services/postServices";
 import { ButtonSyncLoader } from "../buttonLoaders/ButtonLoaders";
-import { PostCategories } from "../../interfaces/Common.interface";
+import {
+  PostCategories,
+  PostSortingOptions,
+} from "../../interfaces/Common.interface";
 import { updateUser } from "../../features/userSlice";
 import { AppDispatch } from "../../store";
 import Image from "next/image";
@@ -21,7 +24,13 @@ import { extractErrorMessage } from "../../helpers/extractErrorMessage";
 import { toast } from "react-toastify";
 import Tippy from "@tippyjs/react";
 
-export default function CreatePost() {
+export default function CreatePost({
+  activeSort,
+  activeFilter,
+}: {
+  activeSort: PostSortingOptions;
+  activeFilter: PostCategories | null;
+}) {
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const wordsLimitForPostTextInput = 500;
   const [caption, setCaption] = useState<string>("");
@@ -65,9 +74,22 @@ export default function CreatePost() {
     createNewPost(
       postDetails,
       setIsPosting,
-      (result) => {
+      () => {
         clearForm();
-        dispatch(append({ newPosts: [result.data.data] }));
+        const filter: PostCategories | undefined = activeFilter
+          ? activeFilter
+          : undefined;
+        getPosts(
+          activeSort,
+          undefined,
+          filter,
+          undefined,
+          undefined,
+          undefined,
+          (result) => {
+            dispatch(refresh({ newPosts: result.data.data.posts }));
+          }
+        );
         dispatch(updateUser());
       },
       (err) => toast.error(extractErrorMessage(err), toastEmitterConfig)
