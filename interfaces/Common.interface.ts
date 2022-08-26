@@ -124,3 +124,10 @@ export interface UpdatePost {
   category?: PostCategories;
   media?: File | null;
 }
+
+export interface PaginationData {
+  count: number;
+  currentPage: number;
+  nextPage: number | null;
+  previousPage: number | null;
+}

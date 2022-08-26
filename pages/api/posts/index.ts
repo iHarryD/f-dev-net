@@ -52,9 +52,34 @@ export default async function (req: RequestWithUser, res: NextApiResponse) {
           .sort(
             req.query.sort === "trending" ? { likes: -1 } : { timestamp: -1 }
           );
+        let paginatedResults = await cursorToDoc(result);
+        const paginationData: {
+          count?: number;
+          currentPage?: number;
+          nextPage?: number | null;
+          previousPage?: number | null;
+        } = {};
+        if (req.query.page) {
+          const requestedPageNumber = Number(req.query.page as string);
+          const resultsPerPage = 5;
+          const startIndex = (requestedPageNumber - 1) * resultsPerPage;
+          const endIndex = requestedPageNumber * resultsPerPage;
+          const nextPage =
+            paginatedResults.length > endIndex ? requestedPageNumber + 1 : null;
+          const previousPage =
+            requestedPageNumber - 1 > 0 ? requestedPageNumber - 1 : null;
+          paginatedResults = paginatedResults.slice(startIndex, endIndex);
+          paginationData.count = paginatedResults.length;
+          paginationData.currentPage = requestedPageNumber;
+          paginationData.nextPage = nextPage;
+          paginationData.previousPage = previousPage;
+        }
         return res.status(200).json({
           message: "Posts fetched.",
-          data: await cursorToDoc(result),
+          data: {
+            posts: paginatedResults,
+            paginationData: req.query.page ? paginationData : null,
+          },
         });
       case "POST":
         await verifyToken(req, res);

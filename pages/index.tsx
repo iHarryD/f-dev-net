@@ -6,6 +6,7 @@ import commonStyles from "../styles/Common.module.css";
 import connectToMongoDb from "../lib/mongodb";
 import { cursorToDoc } from "../helpers/cursorToDoc";
 import {
+  PaginationData,
   Post,
   PostCategories,
   PostSortingOptions,
@@ -13,14 +14,16 @@ import {
 } from "../interfaces/Common.interface";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
-import { refresh } from "../features/postSlice";
+import { append, refresh } from "../features/postSlice";
 import { RootState } from "../store";
 import { getPosts } from "../services/postServices";
 import HomePageNavbar from "../components/homePageNavbar/HomePageNavbar";
 import HomePageSidebar from "../components/homePageSidebar/HomePageSidebar";
 import useInMobileView from "../hooks/useInMobileView";
+import useIntersectionObserver from "../hooks/useIntersectionObserver";
+import { MoonLoader } from "react-spinners";
 
-export default function Home({ posts: newPosts }: { posts: Post[] }) {
+export default function Home() {
   const posts = useSelector((state: RootState) => state.postSlice);
   const { status } = useSelector((state: RootState) => state.userSlice);
   const dispatch = useDispatch();
@@ -29,23 +32,84 @@ export default function Home({ posts: newPosts }: { posts: Post[] }) {
   );
   const [filterBy, setFilterBy] = useState<PostCategories | null>(null);
   const { inMobileView } = useInMobileView();
-  const inititalFetch = useRef(false);
+  const [paginationData, setPaginationData] = useState<{
+    count?: number;
+    currentPage: number;
+    nextPage: number | null;
+    previousPage: number | null;
+  }>({
+    currentPage: 1,
+    nextPage: null,
+    previousPage: null,
+  });
+  const lastPostRef = useRef<HTMLDivElement | null>(null);
+  const entry = useIntersectionObserver(lastPostRef, {});
+  const [isFetchingPosts, setIsFetchingPosts] = useState<boolean>(false);
 
   useEffect(() => {
-    dispatch(refresh({ newPosts }));
+    if (entry && entry.isIntersecting) {
+      if (paginationData.nextPage) {
+        setPaginationData((prev) => ({
+          ...prev,
+          currentPage: prev.currentPage + 1,
+        }));
+      }
+    }
+  }, [entry?.isIntersecting]);
+
+  useEffect(() => {
+    const filter: PostCategories | undefined = filterBy ? filterBy : undefined;
+    getPosts(
+      sortedBy,
+      paginationData.currentPage,
+      filter,
+      undefined,
+      undefined,
+      setIsFetchingPosts,
+      (result) => {
+        dispatch(refresh({ newPosts: result.data.data.posts }));
+        if (result.data.data.paginationData) {
+          setPaginationData(result.data.data.paginationData);
+        }
+      }
+    );
   }, []);
 
   useEffect(() => {
-    if (inititalFetch.current === false) {
-      inititalFetch.current = true;
-    } else {
-      const filter: PostCategories | undefined = filterBy
-        ? filterBy
-        : undefined;
-      getPosts(sortedBy, filter, undefined, undefined, undefined, (result) => {
-        dispatch(refresh({ newPosts: result.data.data }));
-      });
-    }
+    if (paginationData.currentPage === 1) return;
+    const filter: PostCategories | undefined = filterBy ? filterBy : undefined;
+    getPosts(
+      sortedBy,
+      paginationData.currentPage,
+      filter,
+      undefined,
+      undefined,
+      setIsFetchingPosts,
+      (result) => {
+        dispatch(append({ newPosts: result.data.data.posts }));
+        if (result.data.data.paginationData) {
+          setPaginationData(result.data.data.paginationData);
+        }
+      }
+    );
+  }, [paginationData.currentPage]);
+
+  useEffect(() => {
+    const filter: PostCategories | undefined = filterBy ? filterBy : undefined;
+    getPosts(
+      sortedBy,
+      1,
+      filter,
+      undefined,
+      undefined,
+      setIsFetchingPosts,
+      (result) => {
+        dispatch(refresh({ newPosts: result.data.data.posts }));
+        if (result.data.data.paginationData) {
+          setPaginationData(paginationData);
+        }
+      }
+    );
   }, [sortedBy, filterBy]);
 
   return (
@@ -130,43 +194,26 @@ export default function Home({ posts: newPosts }: { posts: Post[] }) {
             </label>
           </div>
           <div className={commonStyles.postsContainer}>
-            {posts.map((post) => (
-              <PostCard key={post._id} details={post} />
+            {posts.map((post, index) => (
+              <PostCard
+                lastPostRef={index === posts.length - 1 ? lastPostRef : null}
+                key={post._id}
+                details={post}
+              />
             ))}
+            {(isFetchingPosts || paginationData.nextPage === null) && (
+              <div className={commonStyles.postsEndDataContainer}>
+                {isFetchingPosts ? (
+                  <MoonLoader size={30} />
+                ) : (
+                  <p>You have reached the end.</p>
+                )}
+              </div>
+            )}
           </div>
         </div>
         <HomePageNavbar />
       </>
     </>
   );
-}
-
-export async function getServerSideProps({
-  req,
-  res,
-}: {
-  req: NextApiRequest;
-  res: NextApiResponse;
-}) {
-  const connection = await (await connectToMongoDb).connect();
-  try {
-    const result = connection
-      .db()
-      .collection("posts")
-      .find({})
-      .sort({ timestamp: -1 });
-    return {
-      props: {
-        posts: await cursorToDoc(result),
-      },
-    };
-  } catch (err) {
-    return {
-      props: {
-        posts: [],
-      },
-    };
-  } finally {
-    connection.close();
-  }
 }

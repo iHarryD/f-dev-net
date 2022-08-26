@@ -2,6 +2,7 @@ import { AxiosResponse } from "axios";
 import { Dispatch, SetStateAction } from "react";
 import { getImageDataURL } from "../helpers/getImageDataURL";
 import {
+  PaginationData,
   Post,
   PostCategories,
   PostSortingOptions,
@@ -12,12 +13,19 @@ import baseAxiosInstance from "./baseAxiosInstance";
 
 export async function getPosts(
   sortedBy: PostSortingOptions,
+  pageNumber?: number,
   filterBy?: PostCategories,
   user?: string,
   userRelationQuery?: UserPostFilter,
   loadingState?: Dispatch<SetStateAction<boolean>>,
   successCallback?: (
-    result: AxiosResponse<{ message: string; data: Post[] }>
+    result: AxiosResponse<{
+      message: string;
+      data: {
+        posts: Post[];
+        paginationData: PaginationData | null;
+      };
+    }>
   ) => void,
   failureCallback?: (err: unknown) => void
 ) {
@@ -26,7 +34,9 @@ export async function getPosts(
     const result = await baseAxiosInstance().get(
       `/posts?sort=${sortedBy}${filterBy ? `&filter=${filterBy}` : ""}${
         user ? `&user=${user}` : ""
-      }${userRelationQuery ? `&relation=${userRelationQuery}` : ""}`
+      }${userRelationQuery ? `&relation=${userRelationQuery}` : ""}${
+        pageNumber ? `&page=${pageNumber}` : ""
+      }`
     );
     if (successCallback) successCallback(result);
   } catch (err) {

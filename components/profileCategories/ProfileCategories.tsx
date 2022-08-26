@@ -27,10 +27,11 @@ export function Posts({ posts, user }: { posts: Post[]; user: string }) {
       getPosts(
         PostSortingOptions.DATE,
         undefined,
+        undefined,
         user,
         activePostFilter,
         setIsLoading,
-        (result) => setFilteredPosts(result.data.data)
+        (result) => setFilteredPosts(result.data.data.posts)
       );
     } else {
       firstLoad.current = true;

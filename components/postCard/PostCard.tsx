@@ -18,7 +18,7 @@ import {
   PostCategories,
   UpdatePost,
 } from "../../interfaces/Common.interface";
-import { useEffect, useRef, useState } from "react";
+import { MutableRefObject, useEffect, useRef, useState } from "react";
 import CommentBox from "../commentBox/CommentBox";
 import {
   deletePost,
@@ -47,7 +47,13 @@ import { extractErrorMessage } from "../../helpers/extractErrorMessage";
 import { toastEmitterConfig } from "../../data/toastEmitterConfig";
 import Tippy from "@tippyjs/react";
 
-export default function PostCard({ details }: { details: Post }) {
+export default function PostCard({
+  details,
+  lastPostRef,
+}: {
+  details: Post;
+  lastPostRef?: MutableRefObject<HTMLDivElement | null> | null;
+}) {
   const [post, setPost] = useState<Post>(details);
   const { user } = useSelector((state: RootState) => state.userSlice);
   const [isPostingComment, setIsPostingComment] = useState<boolean>(false);
@@ -207,7 +213,7 @@ export default function PostCard({ details }: { details: Post }) {
 
   return (
     <>
-      <div className={postCardStyles.postCardContainer}>
+      <div ref={lastPostRef} className={postCardStyles.postCardContainer}>
         <div className={postCardStyles.postCardHeader}>
           <div className={postCardStyles.postingAccountDetailsContainer}>
             <div>

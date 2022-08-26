@@ -9,7 +9,7 @@ export const postSlice = createSlice({
   initialState,
   reducers: {
     append(state, action: PayloadAction<{ newPosts: Post[] }>) {
-      state.unshift(...action.payload.newPosts);
+      state.push(...action.payload.newPosts);
     },
     refresh(state, action: PayloadAction<{ newPosts: Post[] }>) {
       return action.payload.newPosts;
