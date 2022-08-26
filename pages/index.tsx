@@ -1,13 +1,8 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import Head from "next/head";
 import CreatePost from "../components/createPost/CreatePost";
 import PostCard from "../components/postCard/PostCard";
 import commonStyles from "../styles/Common.module.css";
-import connectToMongoDb from "../lib/mongodb";
-import { cursorToDoc } from "../helpers/cursorToDoc";
 import {
-  PaginationData,
-  Post,
   PostCategories,
   PostSortingOptions,
   UserAuthStatus,
@@ -32,27 +27,16 @@ export default function Home() {
   );
   const [filterBy, setFilterBy] = useState<PostCategories | null>(null);
   const { inMobileView } = useInMobileView();
-  const [paginationData, setPaginationData] = useState<{
-    count?: number;
-    currentPage: number;
-    nextPage: number | null;
-    previousPage: number | null;
-  }>({
-    currentPage: 1,
-    nextPage: null,
-    previousPage: null,
-  });
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [nextPage, setNextPage] = useState<number | null>(null);
   const lastPostRef = useRef<HTMLDivElement | null>(null);
   const entry = useIntersectionObserver(lastPostRef, {});
   const [isFetchingPosts, setIsFetchingPosts] = useState<boolean>(false);
 
   useEffect(() => {
     if (entry && entry.isIntersecting) {
-      if (paginationData.nextPage) {
-        setPaginationData((prev) => ({
-          ...prev,
-          currentPage: prev.currentPage + 1,
-        }));
+      if (nextPage) {
+        setCurrentPage((prev) => prev + 1);
       }
     }
   }, [entry?.isIntersecting]);
@@ -61,7 +45,7 @@ export default function Home() {
     const filter: PostCategories | undefined = filterBy ? filterBy : undefined;
     getPosts(
       sortedBy,
-      paginationData.currentPage,
+      currentPage,
       filter,
       undefined,
       undefined,
@@ -69,18 +53,19 @@ export default function Home() {
       (result) => {
         dispatch(refresh({ newPosts: result.data.data.posts }));
         if (result.data.data.paginationData) {
-          setPaginationData(result.data.data.paginationData);
+          setCurrentPage(result.data.data.paginationData.currentPage);
+          setNextPage(result.data.data.paginationData.nextPage);
         }
       }
     );
   }, []);
 
   useEffect(() => {
-    if (paginationData.currentPage === 1) return;
+    if (currentPage === 1) return;
     const filter: PostCategories | undefined = filterBy ? filterBy : undefined;
     getPosts(
       sortedBy,
-      paginationData.currentPage,
+      currentPage,
       filter,
       undefined,
       undefined,
@@ -88,11 +73,12 @@ export default function Home() {
       (result) => {
         dispatch(append({ newPosts: result.data.data.posts }));
         if (result.data.data.paginationData) {
-          setPaginationData(result.data.data.paginationData);
+          setCurrentPage(result.data.data.paginationData.currentPage);
+          setNextPage(result.data.data.paginationData.nextPage);
         }
       }
     );
-  }, [paginationData.currentPage]);
+  }, [currentPage]);
 
   useEffect(() => {
     const filter: PostCategories | undefined = filterBy ? filterBy : undefined;
@@ -106,7 +92,8 @@ export default function Home() {
       (result) => {
         dispatch(refresh({ newPosts: result.data.data.posts }));
         if (result.data.data.paginationData) {
-          setPaginationData(paginationData);
+          setCurrentPage(result.data.data.paginationData.currentPage);
+          setNextPage(result.data.data.paginationData.nextPage);
         }
       }
     );
@@ -201,7 +188,7 @@ export default function Home() {
                 details={post}
               />
             ))}
-            {(isFetchingPosts || paginationData.nextPage === null) && (
+            {(isFetchingPosts || nextPage === null) && (
               <div className={commonStyles.postsEndDataContainer}>
                 {isFetchingPosts ? (
                   <MoonLoader size={30} />
